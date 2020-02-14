@@ -1,0 +1,16 @@
+// Global app reset
+*,
+*::after,
+*::before {
+  margin: 0;
+  padding: 0;
+  box-sizing: inherit;
+}
+
+html {
+  font-size: 62.5%; // 1rem = 10px
+}
+
+body {
+  box-sizing: border-box;
+}
