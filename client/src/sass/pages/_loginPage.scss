@@ -1,0 +1,24 @@
+.login-page {
+  display: grid;
+  grid-template-rows: repeat(2, min-content);
+  grid-template-columns: minmax(30rem, min-content);
+  grid-row-gap: 1rem;
+  justify-content: center;
+  align-items: center;
+
+  transform: translateY(15rem);
+}
+
+.login-card {
+  padding: 2rem;
+
+  display: grid;
+  grid-template-rows: 9rem;
+  align-items: start;
+}
+
+.login-form {
+  & > * {
+    width: 100%;
+  }
+}

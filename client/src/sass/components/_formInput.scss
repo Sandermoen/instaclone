@@ -1,0 +1,18 @@
+.form-group {
+  position: relative;
+
+  &:not(:last-child) {
+    margin-bottom: 0.5rem;
+  }
+}
+
+.form-input {
+  border: 1px solid $color-grey-2;
+  border-radius: 3px;
+  padding: 1rem 1rem;
+  font-family: inherit;
+  font-size: 1.2rem;
+  height: 100%;
+  width: 100%;
+  color: $color-black;
+}

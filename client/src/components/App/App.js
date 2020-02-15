@@ -1,9 +1,16 @@
 import React from 'react';
+import { Switch, Route } from 'react-router-dom';
+
+import LoginPage from '../../pages/LoginPage';
 
 function App() {
   return (
-    <div data-test="component-app" className="App">
-      <h1>Test</h1>
+    <div className="app" data-test="component-app">
+      <Switch>
+        <Route exact path="/">
+          <LoginPage />
+        </Route>
+      </Switch>
     </div>
   );
 }
