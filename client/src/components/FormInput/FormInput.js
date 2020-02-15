@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const FormInput = ({ placeholder, type, onChange, required }) => (
+const FormInput = ({ placeholder, type, onChange, required, id }) => (
   <div data-test="component-input" className="form-group">
     <input
       className="form-input"

@@ -1,5 +1,24 @@
 import React from 'react';
 import { assertPropTypes } from 'check-prop-types';
+import { createStore, applyMiddleware } from 'redux';
+
+import rootReducer from '../../redux/rootReducer';
+import { middlewares } from '../../redux/store';
+
+/**
+ * Create a testing store with imported reducers, middleware,and initial state
+ *  globals: rootReducer, middlewares.
+ * @function storeFactory
+ * @param {object} initialState Initial state for the store.
+ * @returns {store} Redux store
+ */
+export const storeFactory = initialState => {
+  return createStore(
+    rootReducer,
+    initialState,
+    applyMiddleware(...middlewares)
+  );
+};
 
 /**
  * Function to find a component by it's data-test attribute

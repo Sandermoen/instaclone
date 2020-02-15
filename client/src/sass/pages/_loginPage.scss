@@ -1,7 +1,7 @@
 .login-page {
   display: grid;
   grid-template-rows: repeat(2, min-content);
-  grid-template-columns: minmax(30rem, min-content);
+  grid-template-columns: minmax(35rem, min-content);
   grid-row-gap: 1rem;
   justify-content: center;
   align-items: center;
@@ -10,7 +10,7 @@
 }
 
 .login-card {
-  padding: 2rem;
+  padding: 2rem 4rem;
 
   display: grid;
   grid-template-rows: 9rem;
