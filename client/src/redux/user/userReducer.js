@@ -1,23 +1,22 @@
-import authTypes from './authTypes';
+import authTypes from './userTypes';
 
 export const INITIAL_STATE = {
-  auth: null,
+  currentUser: null,
   error: false
 };
 
-const authReducer = (state = INITIAL_STATE, action) => {
+const userReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
-    case authTypes.AUTH_SUCCESS: {
+    case authTypes.SIGN_IN_SUCCESS: {
       return {
         ...state,
-        auth: true,
+        currentUser: action.payload,
         error: false
       };
     }
-    case authTypes.AUTH_FAILURE: {
+    case authTypes.SIGN_IN_FAILURE: {
       return {
         ...state,
-        auth: false,
         error: action.payload
       };
     }
@@ -26,4 +25,4 @@ const authReducer = (state = INITIAL_STATE, action) => {
   }
 };
 
-export default authReducer;
+export default userReducer;

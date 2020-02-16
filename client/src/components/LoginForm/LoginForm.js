@@ -1,12 +1,12 @@
 import React, { useState, Fragment } from 'react';
 import { connect } from 'react-redux';
 
-import { authStart } from '../../redux/auth/authActions';
+import { signInStart } from '../../redux/user/userActions';
 
 import Button from '../Button/Button';
 import FormInput from '../FormInput/FormInput';
 
-const LoginForm = ({ authStart }) => {
+const LoginForm = ({ signInStart }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
@@ -17,7 +17,7 @@ const LoginForm = ({ authStart }) => {
     if (!email || !password) {
       return setError('Please fill out both fields before trying to log in');
     }
-    authStart(email, password);
+    signInStart(email, password);
     console.log('submitted');
   };
 
@@ -44,7 +44,7 @@ const LoginForm = ({ authStart }) => {
 };
 
 const mapDispatchToProps = dispatch => ({
-  authStart: (email, password) => dispatch(authStart(email, password))
+  signInStart: (email, password) => dispatch(signInStart(email, password))
 });
 
 export default connect(null, mapDispatchToProps)(LoginForm);

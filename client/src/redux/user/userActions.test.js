@@ -1,7 +1,7 @@
 import moxios from 'moxios';
 
 import { storeFactory } from '../../utils/test/testUtils';
-import { authStart } from './authActions';
+import { signInStart } from './userActions';
 
 describe('auth action creator', () => {
   beforeEach(() => {
@@ -11,44 +11,51 @@ describe('auth action creator', () => {
     moxios.uninstall();
   });
 
-  test('sets auth to true and error to false upon success', () => {
+  test('sets the currentUser and sets error to false upon success', () => {
     expect.assertions(1);
 
     const store = storeFactory();
     moxios.wait(() => {
       const request = moxios.requests.mostRecent();
       request.respondWith({
-        status: 200
+        status: 200,
+        response: {
+          username: 'testuser'
+        }
       });
     });
 
     return store
       .dispatch(
-        authStart({ email: 'test@hotmail.com', password: 'testpassword' })
+        signInStart({ email: 'test@hotmail.com', password: 'testpassword' })
       )
       .then(() => {
         const newState = store.getState();
-        expect(newState.auth).toEqual({ auth: true, error: false });
+        expect(newState.user).toEqual({
+          currentUser: { username: 'testuser' },
+          error: false
+        });
       });
   });
 
-  test('sets auth to false and displays error upon failure', () => {
+  test('sets error and currentUser to false', () => {
     expect.assertions(1);
     const store = storeFactory();
+    const error = 'Invalid credentials please try again';
 
     moxios.wait(() => {
       const request = moxios.requests.mostRecent();
       request.respondWith({
         status: 400,
-        response: 'Invalid credentials please try again'
+        response: error
       });
     });
 
-    return store.dispatch(authStart()).then(() => {
+    return store.dispatch(signInStart()).then(() => {
       const newState = store.getState();
-      expect(newState.auth).toEqual({
-        auth: false,
-        error: 'Invalid credentials please try again'
+      expect(newState.user).toEqual({
+        error,
+        currentUser: null
       });
     });
   });
