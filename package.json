@@ -16,5 +16,19 @@
   "bugs": {
     "url": "https://github.com/Sandermoen/instaclone/issues"
   },
-  "homepage": "https://github.com/Sandermoen/instaclone#readme"
+  "homepage": "https://github.com/Sandermoen/instaclone#readme",
+  "dependencies": {
+    "bcrypt": "^3.0.8",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "helmet": "^3.21.2",
+    "jwt-simple": "^0.5.6",
+    "mongoose": "^5.9.1",
+    "validator": "^12.2.0"
+  },
+  "devDependencies": {
+    "dotenv": "^8.2.0",
+    "morgan": "^1.9.1"
+  }
 }
