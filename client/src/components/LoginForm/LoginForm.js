@@ -1,22 +1,21 @@
 import React, { useState, Fragment } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { createStructuredSelector } from 'reselect';
 
 import { signInStart } from '../../redux/user/userActions';
+
+import { selectError } from '../../redux/user/userSelectors';
 
 import Button from '../Button/Button';
 import FormInput from '../FormInput/FormInput';
 
-const LoginForm = ({ signInStart }) => {
+const LoginForm = ({ signInStart, error }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState(null);
 
   const handleSubmit = event => {
     event.preventDefault();
-
-    if (!email || !password) {
-      return setError('Please fill out both fields before trying to log in');
-    }
     signInStart(email, password);
     console.log('submitted');
   };
@@ -38,13 +37,25 @@ const LoginForm = ({ signInStart }) => {
         />
         <Button>Login</Button>
       </form>
-      {error && <p className="error">{error}</p>}
+      {error && (
+        <p style={{ padding: '1rem 0' }} className="error">
+          {error.error}
+        </p>
+      )}
     </Fragment>
   );
+};
+
+LoginForm.propTypes = {
+  signInStart: PropTypes.func.isRequired
 };
 
 const mapDispatchToProps = dispatch => ({
   signInStart: (email, password) => dispatch(signInStart(email, password))
 });
 
-export default connect(null, mapDispatchToProps)(LoginForm);
+const mapStateToProps = createStructuredSelector({
+  error: selectError
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(LoginForm);

@@ -1,0 +1,10 @@
+.app {
+  display: grid;
+  grid-template-rows: 7rem;
+  grid-template-columns:
+    [full-start] minmax(3rem, 1fr)
+    [center-start] repeat(8, [col-start] min-content)
+    [center-end] minmax(3rem, 1fr) [full-end];
+
+  grid-row-gap: 4rem;
+}

@@ -11,7 +11,7 @@ const apiRouter = require('./routes');
 const app = express();
 const PORT = process.env.PORT || 9000;
 
-app.use(helmet());
+app.use(helmet.hidePoweredBy());
 app.use(cors());
 app.use(bodyParser.json());
 app.use(morgan('dev'));

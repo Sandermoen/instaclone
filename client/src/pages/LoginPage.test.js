@@ -3,15 +3,24 @@ import { shallow } from 'enzyme';
 
 import LoginPage from './LoginPage';
 
-import { findByTestAttribute } from '../utils/test/testUtils';
+import { findByTestAttribute, storeFactory } from '../utils/test/testUtils';
+
+jest.mock('react-router-dom', () => ({
+  useHistory: () => ({
+    push: jest.fn()
+  })
+}));
 
 /**
  * Factory function that returns a wrapped component
  * @function setup
  * @returns {ShallowWrapper}
  */
-export const setup = () => {
-  const wrapper = shallow(<LoginPage />);
+export const setup = (initialState = {}) => {
+  const store = storeFactory(initialState);
+  const wrapper = shallow(<LoginPage store={store} />)
+    .dive()
+    .dive();
   return wrapper;
 };
 

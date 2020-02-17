@@ -63,6 +63,22 @@ userSchema.statics.findByCredentials = async function(
   return user;
 };
 
+userSchema.statics.findByTokenId = async function(id) {
+  try {
+    const user = await User.findOne({
+      _id: id
+    });
+
+    if (!user) {
+      throw new Error('Invalid login credentials');
+    }
+
+    return user;
+  } catch (err) {
+    return next(err);
+  }
+};
+
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;

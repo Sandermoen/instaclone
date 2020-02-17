@@ -8,15 +8,23 @@ test('returns initial state when no action is passed', () => {
 });
 
 test('returns expected state when `SIGN_IN_SUCCESS` is passed', () => {
-  const user = {
-    username: 'test'
+  const response = {
+    user: {
+      email: 'test@test.com',
+      username: 'test'
+    },
+    token: 'token'
   };
-  const newState = userReducer(undefined, signInSuccess(user));
-  expect(newState).toEqual({ currentUser: user, error: false });
+  const newState = userReducer(undefined, signInSuccess(response));
+  expect(newState).toEqual({
+    currentUser: response.user,
+    error: false,
+    token: response.token
+  });
 });
 
 test('returns expected state when `SIGN_IN_FAILURE` is passed', () => {
   const error = 'Invalid email or password';
   const newState = userReducer(undefined, signInFailure(error));
-  expect(newState).toEqual({ currentUser: null, error });
+  expect(newState).toEqual({ currentUser: null, error, token: null });
 });

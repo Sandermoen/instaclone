@@ -20,20 +20,28 @@ describe('auth action creator', () => {
       request.respondWith({
         status: 200,
         response: {
-          username: 'testuser'
+          user: {
+            username: 'test',
+            email: 'test@hotmail.com'
+          },
+          token: 'token'
         }
       });
     });
 
     return store
       .dispatch(
-        signInStart({ email: 'test@hotmail.com', password: 'testpassword' })
+        signInStart({
+          usernameOrEmail: 'test@hotmail.com',
+          password: 'testpassword'
+        })
       )
       .then(() => {
         const newState = store.getState();
         expect(newState.user).toEqual({
-          currentUser: { username: 'testuser' },
-          error: false
+          currentUser: { username: 'test', email: 'test@hotmail.com' },
+          error: false,
+          token: 'token'
         });
       });
   });
@@ -55,7 +63,8 @@ describe('auth action creator', () => {
       const newState = store.getState();
       expect(newState.user).toEqual({
         error,
-        currentUser: null
+        currentUser: null,
+        token: null
       });
     });
   });

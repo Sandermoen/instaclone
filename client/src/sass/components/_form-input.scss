@@ -18,6 +18,12 @@
 
     &::placeholder {
       visibility: hidden;
+      opacity: 0;
+    }
+
+    &:focus {
+      outline: none;
+      border: 1px solid $color-grey-1;
     }
   }
 
@@ -33,6 +39,19 @@
     top: 30%;
     left: 1rem;
     transform: translateY(-50%);
+  }
+
+  &__toggle {
+    cursor: pointer;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 1rem;
+
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: $color-black;
   }
 
   &__input:placeholder-shown + &__placeholder {

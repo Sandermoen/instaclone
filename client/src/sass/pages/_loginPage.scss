@@ -6,7 +6,10 @@
   justify-content: center;
   align-items: center;
 
-  transform: translateY(15rem);
+  grid-row: 2 / span 1;
+  grid-column: center-start / center-end;
+
+  transform: translateY(10rem);
 }
 
 .login-card {

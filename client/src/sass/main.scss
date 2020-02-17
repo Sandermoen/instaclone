@@ -9,6 +9,11 @@
 
 @import './components/card';
 @import './components/button';
-@import './components/formInput';
+@import './components/form-input';
+@import './components/search-box';
+
+@import './layout/grid';
+@import './layout/header';
 
 @import './pages/loginPage';
+@import './pages/HomePage';
