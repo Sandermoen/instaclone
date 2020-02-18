@@ -1,8 +1,10 @@
 import React, { Fragment } from 'react';
 import { Route, Switch } from 'react-router-dom';
 
+import ProtectedRoute from '../ProtectedRoute/ProtectedRoute';
 import Header from '../Header/Header';
 import HomePage from '../../pages/HomePage';
+import ProfilePage from '../../pages/ProfilePage';
 
 /**
  * Renders routes that require a header at the top
@@ -13,9 +15,10 @@ const HeaderRoutes = () => (
   <Fragment>
     <Header />
     <Switch>
-      <Route exact path="/">
+      <ProtectedRoute exact path="/">
         <HomePage />
-      </Route>
+      </ProtectedRoute>
+      <Route path="/:username" component={ProfilePage} />
     </Switch>
   </Fragment>
 );

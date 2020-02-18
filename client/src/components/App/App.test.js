@@ -1,7 +1,6 @@
 import React from 'react';
 import { shallow } from 'enzyme';
-
-import App from './App';
+import { UnconnectedApp } from './App';
 
 import { findByTestAttribute } from '../../utils/test/testUtils';
 
@@ -11,7 +10,7 @@ import { findByTestAttribute } from '../../utils/test/testUtils';
  * @returns {ShallowWrapper}
  */
 export const setup = () => {
-  const wrapper = shallow(<App />);
+  const wrapper = shallow(<UnconnectedApp />);
   return wrapper;
 };
 

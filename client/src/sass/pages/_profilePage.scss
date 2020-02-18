@@ -1,0 +1,44 @@
+.profile-header {
+  grid-column: center-start / center-end;
+  display: grid;
+  grid-template-columns: min-content 1fr;
+  grid-column-gap: 10rem;
+  justify-items: start;
+
+  width: 75rem;
+
+  &__info {
+    display: grid;
+    justify-items: start;
+  }
+}
+
+.profile-buttons {
+  display: flex;
+  align-items: center;
+  width: 100%;
+
+  & > * {
+    &:not(:last-child) {
+      margin-right: 1.5rem;
+    }
+  }
+
+  svg {
+    width: $icon-width;
+    height: $icon-height;
+  }
+}
+
+.profile-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+
+  & > * {
+    &:not(:last-child) {
+      margin-right: 5rem;
+    }
+  }
+}

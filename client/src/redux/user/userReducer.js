@@ -22,10 +22,11 @@ const userReducer = (state = INITIAL_STATE, action) => {
         error: action.payload
       };
     }
-    case authTypes.SET_USER: {
+    case authTypes.SIGN_OUT: {
       return {
         ...state,
-        currentUser: action.payload
+        currentUser: null,
+        token: null
       };
     }
     default:
