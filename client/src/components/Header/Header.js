@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 
 import sprite from '../../assets/svg/svg-sprites.svg';
 import { ReactComponent as LogoCamera } from '../../assets/svg/logo-camera.svg';
@@ -18,7 +18,7 @@ const Header = () => (
       </Link>
       <SearchBox />
       <div className="header__icons">
-        <svg>
+        <svg style={{ maskImage: 'red' }}>
           <use href={sprite + '#icon-compass'} />
         </svg>
         <svg>
@@ -26,6 +26,9 @@ const Header = () => (
         </svg>
         <svg>
           <use href={sprite + '#icon-profile-male'} />
+        </svg>
+        <svg>
+          <use href={sprite + '#icon-upload'} />
         </svg>
       </div>
     </div>

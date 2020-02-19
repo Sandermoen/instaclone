@@ -1,0 +1,56 @@
+.upload-media-form {
+  height: 200px;
+  width: 50rem;
+  background-color: $color-grey-3;
+  box-shadow: 0 1rem 2rem $color-black;
+  transform: translateY(-15rem);
+
+  &__header {
+    background-color: $color-white;
+    padding: 1rem 2rem;
+    border-bottom: 1px solid $color-grey-2;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &__input {
+    position: relative;
+    display: flex;
+    justify-content: center;
+  }
+
+  &__textarea {
+    resize: none;
+    background-color: $color-white;
+    border: none;
+    font-family: inherit;
+    font-size: 1.5rem;
+    padding: 1.5rem 1rem;
+    width: 100%;
+    outline: none;
+
+    &::placeholder {
+      color: $color-grey-1;
+    }
+  }
+
+  &__avatar {
+    background-color: $color-white;
+    padding-left: 2rem;
+
+    div {
+      transform: translateY(30%);
+    }
+  }
+
+  &__preview {
+    background-color: $color-white;
+    display: flex;
+    align-items: center;
+    padding: 0 1rem;
+    img {
+      width: 4.5rem;
+      height: 4rem;
+    }
+  }
+}

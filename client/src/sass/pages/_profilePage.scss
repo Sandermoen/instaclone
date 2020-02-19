@@ -5,7 +5,8 @@
   grid-column-gap: 10rem;
   justify-items: start;
 
-  width: 75rem;
+  padding-bottom: 4rem;
+  border-bottom: 1px solid $color-grey-2;
 
   &__info {
     display: grid;
@@ -23,11 +24,6 @@
       margin-right: 1.5rem;
     }
   }
-
-  svg {
-    width: $icon-width;
-    height: $icon-height;
-  }
 }
 
 .profile-stats {
@@ -39,6 +35,44 @@
   & > * {
     &:not(:last-child) {
       margin-right: 5rem;
+    }
+  }
+}
+
+.profile-categories {
+  grid-column: center-start / center-end;
+  display: flex;
+  justify-content: center;
+  transform: translateY(-1px);
+  color: $color-black;
+
+  &__category {
+    display: flex;
+    align-items: center;
+    border-top: 1px solid currentColor;
+    padding: 1.5rem 0;
+    text-align: center;
+    cursor: pointer;
+
+    & > * {
+      &:not(:last-child) {
+        margin-right: 3px;
+      }
+    }
+  }
+}
+
+.profile-images {
+  display: grid;
+  grid-column: center-start / center-end;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 25rem));
+  grid-column-gap: 2.5rem;
+  grid-row-gap: 2.5rem;
+
+  &__image {
+    img {
+      object-fit: cover;
+      width: 100%;
     }
   }
 }

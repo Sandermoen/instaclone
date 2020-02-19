@@ -1,0 +1,16 @@
+#modal-root {
+  position: relative;
+}
+
+.modal {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+
+  background-color: rgba($color-black, 0.3);
+}

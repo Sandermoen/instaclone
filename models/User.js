@@ -28,7 +28,18 @@ const userSchema = new Schema({
     required: true,
     minlength: 8
   },
-  avatar: String
+  avatar: String,
+  bio: {
+    type: String,
+    maxlength: 130
+  },
+  followers: Array,
+  following: Array,
+  posts: Array,
+  private: {
+    type: Boolean,
+    default: false
+  }
 });
 
 userSchema.pre('save', function(next) {
@@ -60,6 +71,15 @@ userSchema.statics.findByCredentials = async function(
     throw new Error('Invalid login credentials');
   }
 
+  return user;
+};
+
+userSchema.statics.findByUsername = async function(username) {
+  const user = await User.findOne({ username });
+
+  if (!user) {
+    throw new Error('User does not exist');
+  }
   return user;
 };
 

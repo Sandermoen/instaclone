@@ -8,22 +8,21 @@ import LoginPage from '../../pages/LoginPage';
 import HeaderRoutes from '../../components/HeaderRoutes/HeaderRoutes';
 
 export function UnconnectedApp({ signInStart }) {
+  const token = localStorage.getItem('token');
   useEffect(() => {
-    const token = localStorage.getItem('token');
     if (token) {
       signInStart(null, null, token);
     }
-  }, [signInStart]);
+  }, [signInStart, token]);
   return (
     <div className="app" data-test="component-app">
       <Switch>
-        <Route path="/login">
-          <LoginPage />
-        </Route>
+        {!token && (
+          <Route path="/login">
+            <LoginPage />
+          </Route>
+        )}
         <Route component={HeaderRoutes} />
-        <Route>
-          <h1>This resource does not exist</h1>
-        </Route>
       </Switch>
     </div>
   );

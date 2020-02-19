@@ -1,10 +1,6 @@
 .grid {
   display: grid;
   padding-top: 6rem;
-  grid-template-columns:
-    [full-start] minmax(3rem, 1fr)
-    [center-start] repeat(8, [col-start] min-content)
-    [center-end] minmax(3rem, 1fr) [full-end];
-
-  grid-row-gap: 4rem;
+  grid-template-columns: [center-start] repeat(8, [col-start] 10rem) [center-end];
+  justify-content: center;
 }

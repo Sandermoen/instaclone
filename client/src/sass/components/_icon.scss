@@ -1,0 +1,9 @@
+.icon {
+  width: $icon-medium-size;
+  height: $icon-medium-size;
+
+  &__small {
+    width: $icon-small-size;
+    height: $icon-small-size;
+  }
+}
