@@ -95,7 +95,7 @@ userSchema.statics.findByTokenId = async function(id) {
 
     return user;
   } catch (err) {
-    return next(err);
+    throw new Error(err);
   }
 };
 

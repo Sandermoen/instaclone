@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/Sandermoen/instaclone#readme",
   "dependencies": {
+    "aws-sdk": "^2.623.0",
     "bcrypt": "^3.0.8",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
@@ -25,6 +26,7 @@
     "helmet": "^3.21.2",
     "jwt-simple": "^0.5.6",
     "mongoose": "^5.9.1",
+    "multer": "^1.4.2",
     "validator": "^12.2.0"
   },
   "devDependencies": {

@@ -1,7 +1,7 @@
 const jwt = require('jwt-simple');
 const User = require('../models/User');
 
-const verifyJwt = token => {
+module.exports.verifyJwt = token => {
   return new Promise(async (resolve, reject) => {
     try {
       const id = jwt.decode(token, process.env.JWT_SECRET).id;
@@ -17,9 +17,10 @@ const verifyJwt = token => {
 
 module.exports.requireAuth = async (req, res, next) => {
   const { authorization } = req.headers;
-  if (!authorization) res.status(401).send({ error: 'Not authorized' });
+  if (!authorization) return res.status(401).send({ error: 'Not authorized' });
+  console.log(authorization);
   try {
-    await verifyJwt(authorization);
+    await this.verifyJwt(authorization);
     return next();
   } catch (err) {
     return res.status(401).send({ error: err });
@@ -31,7 +32,7 @@ module.exports.loginAuthentication = async (req, res, next) => {
   const { usernameOrEmail, password } = req.body;
   if (authorization) {
     try {
-      const user = await verifyJwt(authorization);
+      const user = await this.verifyJwt(authorization);
       return res.send({
         user: { email: user.email, username: user.username },
         token: authorization

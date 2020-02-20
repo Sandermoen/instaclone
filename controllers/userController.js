@@ -11,7 +11,8 @@ module.exports.retrieveUser = async (req, res, next) => {
       bio,
       followersCount: followers.length,
       followingCount: following.length,
-      postCount: posts.length
+      postCount: posts.length,
+      posts
     });
   } catch (err) {
     res.status(404).send(err.message);

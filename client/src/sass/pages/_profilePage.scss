@@ -66,6 +66,7 @@
   display: grid;
   grid-column: center-start / center-end;
   grid-template-columns: repeat(auto-fit, minmax(10rem, 25rem));
+  grid-template-rows: repeat(auto-fit, 25rem);
   grid-column-gap: 2.5rem;
   grid-row-gap: 2.5rem;
 
@@ -73,6 +74,7 @@
     img {
       object-fit: cover;
       width: 100%;
+      height: 100%;
     }
   }
 }
