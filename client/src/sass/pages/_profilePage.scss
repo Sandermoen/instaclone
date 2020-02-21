@@ -71,6 +71,7 @@
   grid-row-gap: 2.5rem;
 
   &__image {
+    height: 100%;
     img {
       object-fit: cover;
       width: 100%;

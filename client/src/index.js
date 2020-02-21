@@ -9,6 +9,11 @@ import store from './redux/store';
 
 import './sass/main.scss';
 
+if (process.env.NODE_ENV === 'development') {
+  const whyDidYouRender = require('@welldone-software/why-did-you-render');
+  whyDidYouRender(React);
+}
+
 ReactDOM.render(
   <Provider store={store}>
     <BrowserRouter>

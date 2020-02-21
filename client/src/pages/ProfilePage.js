@@ -47,7 +47,13 @@ const ProfilePage = ({ currentUser }) => {
       {profile && (
         <Fragment>
           <header className="profile-header">
-            <Avatar imageSrc="https://iupac.org/wp-content/uploads/2018/05/default-avatar.png" />
+            <Avatar
+              imageSrc={
+                profile.avatar
+                  ? profile.avatar
+                  : require('../assets/img/default-avatar.png')
+              }
+            />
             <div className="profile-header__info">
               <div className="profile-buttons">
                 <h1 className="heading-1 font-thin">{profile.username}</h1>

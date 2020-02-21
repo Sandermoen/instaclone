@@ -44,6 +44,7 @@
     ]
   },
   "devDependencies": {
+    "@welldone-software/why-did-you-render": "^4.0.4",
     "check-prop-types": "^1.1.2",
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.2",

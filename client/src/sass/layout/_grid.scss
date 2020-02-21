@@ -1,6 +1,6 @@
 .grid {
   display: grid;
-  padding-top: 6rem;
+  padding-top: 14rem;
   grid-template-columns: [center-start] repeat(8, [col-start] 10rem) [center-end];
   justify-content: center;
 }

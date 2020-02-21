@@ -1,11 +1,14 @@
 .header {
-  height: 7rem;
-
+  height: 7.5rem;
   background-color: $color-white;
   border-bottom: 1px solid $color-grey-2;
 
   display: flex;
   justify-content: center;
+  position: fixed;
+  width: 100%;
+  z-index: 10;
+  transition: height 300ms ease;
 
   &__content {
     display: grid;
@@ -19,6 +22,11 @@
     display: flex;
     justify-content: center;
     align-items: center;
+
+    h3 {
+      opacity: 1;
+      transition: opacity 200ms;
+    }
 
     cursor: pointer;
     text-decoration: none;
@@ -37,6 +45,9 @@
         background-color: $color-black;
         display: inline-block;
         margin: 0 1.5rem;
+
+        opacity: 1;
+        transition: opacity 200ms;
       }
     }
 
@@ -62,6 +73,20 @@
 
       &:not(:last-child) {
         margin-right: 3rem;
+      }
+    }
+  }
+
+  &--small {
+    height: 5rem;
+    .header__logo {
+      h3 {
+        opacity: 0;
+      }
+      &-image {
+        &::after {
+          opacity: 0;
+        }
       }
     }
   }
