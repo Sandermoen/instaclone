@@ -6,6 +6,6 @@ const apiRouter = express.Router();
 
 apiRouter.use('/auth', authRouter);
 apiRouter.use('/user', userRouter);
-apiRouter.use('/file', postRouter);
+apiRouter.use('/post', postRouter);
 
 module.exports = apiRouter;

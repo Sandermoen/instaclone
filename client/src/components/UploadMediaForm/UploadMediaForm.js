@@ -10,8 +10,9 @@ import sprite from '../../assets/svg/svg-sprites.svg';
 import Loader from '../Loader/Loader';
 import Avatar from '../Avatar/Avatar';
 
-const UploadMediaForm = ({ token, file }) => {
+const UploadMediaForm = ({ token, file, hideForm }) => {
   const [previewImage, setPreviewImage] = useState(null);
+  const [caption, setCaption] = useState('');
   const [formEvents, setFormEvents] = useState({
     error: null,
     isLoading: false
@@ -42,9 +43,10 @@ const UploadMediaForm = ({ token, file }) => {
     event.preventDefault();
     const formData = new FormData();
     formData.append('image', file);
+    formData.set('caption', caption);
     try {
       setFormEvents(previous => ({ ...previous, isLoading: true }));
-      await axios.post('/file', formData, {
+      await axios.post('/post', formData, {
         headers: {
           authorization: token,
           'Content-Type': 'multipart/form-data'
@@ -52,6 +54,7 @@ const UploadMediaForm = ({ token, file }) => {
       });
       setFormEvents(previous => ({ ...previous, isLoading: false }));
       history.push('/');
+      hideForm();
     } catch (err) {
       setFormEvents({
         isLoading: false,
@@ -90,6 +93,7 @@ const UploadMediaForm = ({ token, file }) => {
             <textarea
               className="upload-media-form__textarea"
               placeholder="Write a caption..."
+              onChange={event => setCaption(event.target.value)}
             />
             <div className="upload-media-form__preview">
               <img src={previewImage} alt="Preview" />

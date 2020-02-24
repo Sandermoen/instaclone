@@ -24,7 +24,7 @@ const UploadMediaButton = () => {
       />
       {file && (
         <Modal>
-          <UploadMediaForm file={file} />
+          <UploadMediaForm file={file} hideForm={() => setFile(undefined)} />
         </Modal>
       )}
     </Fragment>

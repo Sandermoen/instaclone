@@ -15,7 +15,6 @@ import sprite from '../assets/svg/svg-sprites.svg';
 const ProfilePage = ({ currentUser }) => {
   const { username } = useParams();
   const [profile, setProfile] = useState(undefined);
-  // const [error, setError] = useState(undefined);
 
   useEffect(() => {
     axios
@@ -82,9 +81,9 @@ const ProfilePage = ({ currentUser }) => {
           </header>
           <ProfileCategory category="POSTS" svg="#icon-grid" />
           <div className="profile-images">
-            {profile.posts.map(post => (
-              <div key={post} className="profile-images__image">
-                <img src={post} alt="User post" />
+            {profile.posts.map(({ image }) => (
+              <div key={image} className="profile-images__image">
+                <img src={image} alt="User post" />
               </div>
             ))}
           </div>
