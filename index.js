@@ -14,6 +14,7 @@ const PORT = process.env.PORT || 9000;
 app.use(helmet.hidePoweredBy());
 app.use(cors());
 app.use(bodyParser.json());
+app.set('trust proxy', 1);
 app.use(morgan('dev'));
 app.use('/api', apiRouter);
 

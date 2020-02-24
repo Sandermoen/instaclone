@@ -16,4 +16,6 @@ const Modal = ({ children }) => {
   return ReactDOM.createPortal(children, el);
 };
 
+Modal.whyDidYouRender = true;
+
 export default Modal;

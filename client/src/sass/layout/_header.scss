@@ -65,10 +65,10 @@
   &__icons {
     display: flex;
     justify-content: space-between;
+    align-items: center;
 
-    svg {
-      width: 2.5rem;
-      height: 2.5rem;
+    a:link,
+    a:visited {
       cursor: pointer;
 
       &:not(:last-child) {

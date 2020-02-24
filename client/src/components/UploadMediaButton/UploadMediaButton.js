@@ -9,8 +9,8 @@ const UploadMediaButton = () => {
 
   return (
     <Fragment>
-      <label htmlFor="file-upload">
-        <svg>
+      <label className="icon" htmlFor="file-upload">
+        <svg style={{ cursor: 'pointer' }}>
           <use href={sprite + '#icon-upload'} />
         </svg>
       </label>

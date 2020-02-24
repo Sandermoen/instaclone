@@ -6,4 +6,15 @@
     width: $icon-small-size;
     height: $icon-small-size;
   }
+
+  &--active {
+    fill: none;
+    stroke: $color-black;
+    stroke-width: 1px;
+  }
+
+  * {
+    width: 100%;
+    height: 100%;
+  }
 }

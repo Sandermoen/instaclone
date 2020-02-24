@@ -1,16 +1,19 @@
-import React, { useEffect, useState, memo } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState, memo, Fragment } from 'react';
+import { connect } from 'react-redux';
+import { createStructuredSelector } from 'reselect';
+import { Link, NavLink } from 'react-router-dom';
 import classNames from 'classnames';
+
+import { selectCurrentUser } from '../../redux/user/userSelectors';
 
 import sprite from '../../assets/svg/svg-sprites.svg';
 import { ReactComponent as LogoCamera } from '../../assets/svg/logo-camera.svg';
 import SearchBox from '../SearchBox/SearchBox';
 import UploadMediaButton from '../UploadMediaButton/UploadMediaButton';
 
-const Header = memo(() => {
+const Header = memo(({ currentUser }) => {
   const [scrollOffset, setScrollOffset] = useState(0);
   useEffect(() => {
-    console.log('hey');
     // Shrink header height and remove logo on scroll
     window.onscroll = () => setScrollOffset(window.pageYOffset);
 
@@ -37,16 +40,38 @@ const Header = memo(() => {
         </Link>
         <SearchBox />
         <div className="header__icons">
-          <svg style={{ maskImage: 'red' }}>
-            <use href={sprite + '#icon-compass'} />
-          </svg>
-          <svg>
-            <use href={sprite + '#icon-heart'} />
-          </svg>
-          <svg>
-            <use href={sprite + '#icon-profile-male'} />
-          </svg>
-          <UploadMediaButton />
+          {currentUser && (
+            <Fragment>
+              <NavLink
+                className="icon"
+                activeClassName="icon--active"
+                to="/oosdosoosos"
+              >
+                <svg style={{ maskImage: 'red' }}>
+                  <use href={sprite + '#icon-compass'} />
+                </svg>
+              </NavLink>
+              <NavLink
+                className="icon"
+                activeClassName="icon--active"
+                to="/lakopoeo"
+              >
+                <svg>
+                  <use href={sprite + '#icon-heart'} />
+                </svg>
+              </NavLink>
+              <NavLink
+                className="icon"
+                activeClassName="icon--active"
+                to={`/${currentUser.username}`}
+              >
+                <svg>
+                  <use href={sprite + '#icon-profile-male'} />
+                </svg>
+              </NavLink>
+              <UploadMediaButton />
+            </Fragment>
+          )}
         </div>
       </div>
     </div>
@@ -55,4 +80,8 @@ const Header = memo(() => {
 
 Header.whyDidYouRender = true;
 
-export default Header;
+const mapStateToProps = createStructuredSelector({
+  currentUser: selectCurrentUser
+});
+
+export default connect(mapStateToProps)(Header);

@@ -4,13 +4,13 @@ import { createStructuredSelector } from 'reselect';
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
 
-import { selectToken } from '../../redux/user/userSelectors';
+import { selectToken, selectCurrentUser } from '../../redux/user/userSelectors';
 
 import sprite from '../../assets/svg/svg-sprites.svg';
 import Loader from '../Loader/Loader';
 import Avatar from '../Avatar/Avatar';
 
-const UploadMediaForm = ({ token, file, hideForm }) => {
+const UploadMediaForm = ({ token, file, hideForm, currentUser }) => {
   const [previewImage, setPreviewImage] = useState(null);
   const [caption, setCaption] = useState('');
   const [formEvents, setFormEvents] = useState({
@@ -59,7 +59,9 @@ const UploadMediaForm = ({ token, file, hideForm }) => {
       setFormEvents({
         isLoading: false,
         error: `Failed to share your post: ${
-          err.response ? err.response.data.error : err.message
+          err.response.status === 429
+            ? err.response.data
+            : err.response.data.error
         }`
       });
     }
@@ -87,7 +89,11 @@ const UploadMediaForm = ({ token, file, hideForm }) => {
             <div className="upload-media-form__avatar">
               <Avatar
                 size="3rem"
-                imageSrc={require('../../assets/img/default-avatar.png')}
+                imageSrc={
+                  currentUser.avatar
+                    ? currentUser.avatar
+                    : require('../../assets/img/default-avatar.png')
+                }
               />
             </div>
             <textarea
@@ -107,7 +113,8 @@ const UploadMediaForm = ({ token, file, hideForm }) => {
 };
 
 const mapStateToProps = createStructuredSelector({
-  token: selectToken
+  token: selectToken,
+  currentUser: selectCurrentUser
 });
 
 export default connect(mapStateToProps)(UploadMediaForm);

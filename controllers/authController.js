@@ -18,7 +18,6 @@ module.exports.verifyJwt = token => {
 module.exports.requireAuth = async (req, res, next) => {
   const { authorization } = req.headers;
   if (!authorization) return res.status(401).send({ error: 'Not authorized' });
-  console.log(authorization);
   try {
     await this.verifyJwt(authorization);
     return next();
@@ -34,7 +33,11 @@ module.exports.loginAuthentication = async (req, res, next) => {
     try {
       const user = await this.verifyJwt(authorization);
       return res.send({
-        user: { email: user.email, username: user.username },
+        user: {
+          email: user.email,
+          username: user.username,
+          avatar: user.avatar
+        },
         token: authorization
       });
     } catch (err) {
@@ -58,7 +61,8 @@ module.exports.loginAuthentication = async (req, res, next) => {
     res.send({
       user: {
         email: user.email,
-        username: user.username
+        username: user.username,
+        avatar: user.avatar
       },
       token: jwt.encode({ id: user._id }, process.env.JWT_SECRET)
     });
