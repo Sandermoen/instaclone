@@ -9,12 +9,14 @@ import { selectCurrentUser } from '../redux/user/userSelectors';
 import Avatar from '../components/Avatar/Avatar';
 import Button from '../components/Button/Button';
 import ProfileCategory from '../components/ProfileCategory/ProfileCategory';
+import PostDialog from '../components/PostDialog/PostDialog';
 
 import sprite from '../assets/svg/svg-sprites.svg';
 
 const ProfilePage = ({ currentUser }) => {
   const { username } = useParams();
   const [profile, setProfile] = useState(undefined);
+  const [postDialog, setPostDialog] = useState(undefined);
 
   useEffect(() => {
     axios
@@ -22,7 +24,7 @@ const ProfilePage = ({ currentUser }) => {
       .then(response => {
         setProfile(response.data);
       })
-      .catch(err => console.log(err.message));
+      .catch(err => console.err(err.message));
   }, [setProfile, username]);
 
   const renderButton = () => {
@@ -82,11 +84,26 @@ const ProfilePage = ({ currentUser }) => {
           <ProfileCategory category="POSTS" svg="#icon-grid" />
           <div className="profile-images">
             {profile.posts.map(({ image }) => (
-              <div key={image} className="profile-images__image">
+              <div
+                onClick={() => setPostDialog(image)}
+                key={image}
+                className="profile-images__image"
+              >
                 <img src={image} alt="User post" />
+                <div className="profile-images__overlay">
+                  <span className="profile-images__content">
+                    <svg className="icon">
+                      <use href={sprite + '#icon-bubbles'} />
+                    </svg>
+                    0
+                  </span>
+                </div>
               </div>
             ))}
           </div>
+          {postDialog && (
+            <PostDialog imageUrl={postDialog} avatar={currentUser.avatar} />
+          )}
         </Fragment>
       )}
     </div>

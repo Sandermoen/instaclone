@@ -7,6 +7,7 @@ const Modal = ({ children }) => {
   el.className = 'modal';
   useEffect(() => {
     modalRoot.appendChild(el);
+    document.querySelector('body').setAttribute('style', 'overflow-y: hidden;');
 
     return () => {
       modalRoot.removeChild(el);

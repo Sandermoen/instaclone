@@ -1,0 +1,16 @@
+.menu-dots {
+  height: 4px;
+  width: 4px;
+  background-color: $color-black;
+  border-radius: 100px;
+  display: flex;
+
+  &::before {
+    content: '';
+    height: 4px;
+    width: 4px;
+    background-color: $color-black;
+    border-radius: 100px;
+    display: inline-block;
+  }
+}

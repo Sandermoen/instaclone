@@ -37,12 +37,9 @@
   }
 
   &__placeholder {
-    position: absolute;
+    @include absoluteCenter;
     color: transparent;
     pointer-events: none;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
     display: flex;
     align-items: center;
 

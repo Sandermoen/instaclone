@@ -2,7 +2,12 @@
   width: $icon-medium-size;
   height: $icon-medium-size;
 
-  &__small {
+  &--large {
+    width: $icon-large-size;
+    height: $icon-large-size;
+  }
+
+  &--small {
     width: $icon-small-size;
     height: $icon-small-size;
   }
