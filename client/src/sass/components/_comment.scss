@@ -1,0 +1,35 @@
+.comments {
+  background-color: $color-white;
+  border-top: 1px solid $color-grey-4;
+  border-bottom: 1px solid $color-grey-4;
+  overflow-y: auto;
+}
+
+.comment {
+  display: flex;
+  padding: 1.5rem;
+  align-items: flex-start;
+  overflow-wrap: anywhere;
+
+  &:nth-child(1) {
+    padding: 2rem 1.5rem 1rem 1.5rem;
+  }
+
+  *:not(:last-child) {
+    margin-right: 1rem;
+  }
+
+  &__content {
+    width: 100%;
+  }
+
+  &__stats {
+    display: flex;
+    margin-top: 5px;
+  }
+
+  &__like {
+    cursor: pointer;
+    margin-top: 1rem;
+  }
+}

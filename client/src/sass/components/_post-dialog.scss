@@ -1,28 +1,32 @@
 .post-dialog {
   display: grid;
-  max-width: 95rem;
   margin: 0 5rem;
-  grid-template-rows: min-content 1fr repeat(2, min-content);
-  grid-template-columns: 30vw 30rem;
+  grid-template-rows: 55rem;
+  grid-template-columns: 35vw 30rem;
 
   &__image {
     width: 100%;
     height: 100%;
     grid-row: 1 / -1;
     grid-column: 1 / span 1;
+    background-color: #000000;
     img {
-      object-fit: cover;
+      object-fit: contain;
       width: 100%;
       height: 100%;
     }
+  }
+
+  &__content {
+    background-color: $color-white;
+    display: grid;
+    grid-template-rows: min-content 1fr repeat(2, min-content);
   }
 
   &__header {
     display: flex;
     align-items: center;
     justify-content: flex-start;
-
-    background-color: $color-white;
     padding: 1rem;
 
     *:not(:last-child) {
@@ -34,11 +38,5 @@
     margin-left: auto;
     display: flex;
     align-items: center;
-  }
-
-  &__comments {
-    background-color: $color-white;
-    border-top: 1px solid $color-grey-4;
-    border-bottom: 1px solid $color-grey-4;
   }
 }

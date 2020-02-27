@@ -2,9 +2,18 @@
   width: $icon-huge-size;
   height: $icon-huge-size;
   img {
-    width: 100%;
-    height: 100%;
+    width: $icon-huge-size;
+    height: $icon-huge-size;
     border-radius: 100px;
     border: 1px solid $color-grey-2;
+  }
+
+  &--small {
+    width: $icon-large-size;
+    height: $icon-large-size;
+    img {
+      width: $icon-large-size;
+      height: $icon-large-size;
+    }
   }
 }

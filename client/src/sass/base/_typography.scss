@@ -42,7 +42,19 @@ body {
 .heading-4 {
   font-size: 1.4rem;
   color: $color-black;
-  font-weight: 600;
+
+  &--bold {
+    font-weight: 600;
+  }
+}
+
+.heading-5 {
+  font-size: 1.2rem;
+  color: $color-black;
+
+  &--light {
+    color: $color-grey-1;
+  }
 }
 
 .error {

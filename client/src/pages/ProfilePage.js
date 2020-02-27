@@ -10,6 +10,7 @@ import Avatar from '../components/Avatar/Avatar';
 import Button from '../components/Button/Button';
 import ProfileCategory from '../components/ProfileCategory/ProfileCategory';
 import PostDialog from '../components/PostDialog/PostDialog';
+import Modal from '../components/Modal/Modal';
 
 import sprite from '../assets/svg/svg-sprites.svg';
 
@@ -24,7 +25,7 @@ const ProfilePage = ({ currentUser }) => {
       .then(response => {
         setProfile(response.data);
       })
-      .catch(err => console.err(err.message));
+      .catch(err => console.warn(err.message));
   }, [setProfile, username]);
 
   const renderButton = () => {
@@ -83,9 +84,9 @@ const ProfilePage = ({ currentUser }) => {
           </header>
           <ProfileCategory category="POSTS" svg="#icon-grid" />
           <div className="profile-images">
-            {profile.posts.map(({ image }) => (
+            {profile.posts.map(({ image, caption }) => (
               <div
-                onClick={() => setPostDialog(image)}
+                onClick={() => setPostDialog({ image, caption })}
                 key={image}
                 className="profile-images__image"
               >
@@ -102,7 +103,14 @@ const ProfilePage = ({ currentUser }) => {
             ))}
           </div>
           {postDialog && (
-            <PostDialog imageUrl={postDialog} avatar={currentUser.avatar} />
+            <Modal hide={() => setPostDialog(undefined)}>
+              <PostDialog
+                imageUrl={postDialog.image}
+                comments={postDialog.caption}
+                avatar={profile.avatar}
+                username={profile.username}
+              />
+            </Modal>
           )}
         </Fragment>
       )}

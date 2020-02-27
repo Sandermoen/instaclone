@@ -20,8 +20,7 @@ postRouter.post(
     dest: 'temp/',
     limits: { fieldSize: 8 * 1024 * 1024, fileSize: 500000 }
   }).single('image'),
-  // uploadFile,
-  (req, res) => res.send()
+  uploadFile
 );
 
 module.exports = postRouter;
