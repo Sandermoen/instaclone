@@ -4,7 +4,6 @@
   background-color: $color-grey-3;
   box-shadow: 0 1rem 2rem $color-black;
   transform: translateY(-15rem);
-  position: relative;
 
   &__header {
     background-color: $color-white;
@@ -15,7 +14,6 @@
   }
 
   &__input {
-    position: relative;
     display: flex;
     justify-content: center;
   }

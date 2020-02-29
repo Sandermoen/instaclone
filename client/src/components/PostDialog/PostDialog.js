@@ -1,10 +1,7 @@
 import React from 'react';
 
-import Modal from '../Modal/Modal';
 import Avatar from '../Avatar/Avatar';
 import Comment from '../Comment/Comment';
-
-import sprite from '../../assets/svg/svg-sprites.svg';
 
 const PostDialog = ({
   imageUrl,
@@ -20,11 +17,13 @@ const PostDialog = ({
     <div className="post-dialog__content">
       <header className="post-dialog__header">
         <Avatar className="avatar--small" imageSrc={avatar} />
-        <p className="heading-4 heading-4--bold">{username}</p>
+        <p className="heading-4 heading-4--bold">
+          <b>{username}</b>
+        </p>
         <div style={{ cursor: 'pointer' }} className="post-dialog__more">
-          <svg className="icon">
-            <use href={sprite + '#icon-more-horizontal'} />
-          </svg>
+          <div className="icon icon--small">
+            <ion-icon name="ellipsis-horizontal"></ion-icon>
+          </div>
         </div>
       </header>
       {/* These will be converted to their own components */}
@@ -37,8 +36,30 @@ const PostDialog = ({
         />
         <Comment avatar={avatar} comment={comments} username={username} />
       </div>
-      <div className="post-dialog__actions"></div>
-      <div className="post-dialog__add-comment"></div>
+      <div className="post-dialog__stats">
+        <div className="post-dialog__actions">
+          <div className="icon">
+            <ion-icon name="heart-outline"></ion-icon>
+          </div>
+          <div className="icon">
+            <ion-icon name="chatbubble-outline"></ion-icon>
+          </div>
+          <div className="icon">
+            <ion-icon name="paper-plane-outline"></ion-icon>
+          </div>
+          <div className="icon">
+            <ion-icon name="bookmark-outline"></ion-icon>
+          </div>
+        </div>
+        <p className="heading-4">
+          Be the first to <b>like this</b>
+        </p>
+        <p className="heading-5 color-light uppercase">february 28</p>
+      </div>
+      <div className="post-dialog__add-comment">
+        <input type="text" placeholder="Add a comment..." />
+        <h2 className="heading-3--button color-blue">Post</h2>
+      </div>
     </div>
   </div>
 );

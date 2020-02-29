@@ -6,11 +6,10 @@ import { useHistory } from 'react-router-dom';
 
 import { selectToken, selectCurrentUser } from '../../redux/user/userSelectors';
 
-import sprite from '../../assets/svg/svg-sprites.svg';
 import Loader from '../Loader/Loader';
 import Avatar from '../Avatar/Avatar';
 
-const UploadMediaForm = ({ token, file, hideForm, currentUser }) => {
+const UploadMediaForm = ({ token, file, currentUser, hideForm }) => {
   const [previewImage, setPreviewImage] = useState(null);
   const [caption, setCaption] = useState('');
   const [formEvents, setFormEvents] = useState({
@@ -53,16 +52,13 @@ const UploadMediaForm = ({ token, file, hideForm, currentUser }) => {
         }
       });
       setFormEvents(previous => ({ ...previous, isLoading: false }));
-      history.push('/');
       hideForm();
+      history.push('/');
     } catch (err) {
       setFormEvents({
         isLoading: false,
-        error: `Failed to share your post: ${
-          err.response.status === 429
-            ? err.response.data
-            : err.response.data.error
-        }`
+        error: `Failed to share your post ${err.response &&
+          `: ${err.response.data}`}`
       });
     }
   };
@@ -70,13 +66,13 @@ const UploadMediaForm = ({ token, file, hideForm, currentUser }) => {
   return (
     <form style={file && { display: 'block' }} className="upload-media-form">
       <header className="upload-media-form__header">
-        <svg className="icon">
-          <use href={sprite + '#icon-arrow_back_ios'} />
-        </svg>
+        <div onClick={hideForm} style={{ cursor: 'pointer' }} className="icon">
+          <ion-icon name="chevron-back"></ion-icon>
+        </div>
         <h2 className="heading-3">New Post</h2>
         <h2
           onClick={event => handleClick(event)}
-          className="heading-3--button heading-3--blue"
+          className="heading-3--button color-blue"
         >
           Share
         </h2>
@@ -89,6 +85,7 @@ const UploadMediaForm = ({ token, file, hideForm, currentUser }) => {
             <div className="upload-media-form__avatar">
               <Avatar
                 size="3rem"
+                className="avatar--small"
                 imageSrc={
                   currentUser.avatar
                     ? currentUser.avatar

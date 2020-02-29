@@ -18,6 +18,12 @@ app.set('trust proxy', 1);
 app.use(morgan('dev'));
 app.use('/api', apiRouter);
 
+app.use((err, req, res, next) => {
+  console.error(err.message);
+  if (!err.statusCode) err.statusCode = 500;
+  res.status(err.statusCode).send(err.message);
+});
+
 (async function() {
   try {
     await mongoose.connect(process.env.MONGO_URI, {

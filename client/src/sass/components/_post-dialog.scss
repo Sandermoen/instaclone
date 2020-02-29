@@ -39,4 +39,35 @@
     display: flex;
     align-items: center;
   }
+
+  &__stats {
+    padding: 1rem;
+    border-bottom: 1px solid #efefef;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-start;
+    *:not(:last-child) {
+      margin-right: 1rem;
+    }
+    *:last-child {
+      margin-left: auto;
+    }
+  }
+
+  &__add-comment {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+
+    input {
+      width: 100%;
+      border: none;
+      background-color: white;
+      font-family: inherit;
+      outline: none;
+    }
+  }
 }

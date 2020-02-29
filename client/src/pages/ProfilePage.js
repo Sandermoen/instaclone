@@ -12,8 +12,6 @@ import ProfileCategory from '../components/ProfileCategory/ProfileCategory';
 import PostDialog from '../components/PostDialog/PostDialog';
 import Modal from '../components/Modal/Modal';
 
-import sprite from '../assets/svg/svg-sprites.svg';
-
 const ProfilePage = ({ currentUser }) => {
   const { username } = useParams();
   const [profile, setProfile] = useState(undefined);
@@ -33,9 +31,9 @@ const ProfilePage = ({ currentUser }) => {
       return currentUser.username === username ? (
         <Fragment>
           <Button inverted>Edit Profile</Button>
-          <svg className="icon">
-            <use href={sprite + '#icon-cog'} />
-          </svg>
+          <div className="icon">
+            <ion-icon name="aperture-outline"></ion-icon>
+          </div>
         </Fragment>
       ) : (
         <Button>Follow</Button>
@@ -93,9 +91,9 @@ const ProfilePage = ({ currentUser }) => {
                 <img src={image} alt="User post" />
                 <div className="profile-images__overlay">
                   <span className="profile-images__content">
-                    <svg className="icon">
-                      <use href={sprite + '#icon-bubbles'} />
-                    </svg>
+                    <div className="icon icon--white">
+                      <ion-icon name="chatbubbles"></ion-icon>
+                    </div>
                     0
                   </span>
                 </div>
@@ -109,6 +107,7 @@ const ProfilePage = ({ currentUser }) => {
                 comments={postDialog.caption}
                 avatar={profile.avatar}
                 username={profile.username}
+                hide={() => setPostDialog(undefined)}
               />
             </Modal>
           )}

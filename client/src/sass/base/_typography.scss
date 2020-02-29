@@ -19,10 +19,6 @@ body {
 .heading-2 {
   font-size: 2rem;
   color: $color-black;
-
-  &--grey {
-    color: $color-grey-1;
-  }
 }
 
 .heading-3 {
@@ -30,31 +26,21 @@ body {
   color: $color-black;
   letter-spacing: 0.5px;
 
-  &--blue {
-    color: $color-secondary;
-  }
-
   &--button {
     cursor: pointer;
+    display: inline-block;
+    text-decoration: none;
   }
 }
 
 .heading-4 {
   font-size: 1.4rem;
   color: $color-black;
-
-  &--bold {
-    font-weight: 600;
-  }
 }
 
 .heading-5 {
   font-size: 1.2rem;
   color: $color-black;
-
-  &--light {
-    color: $color-grey-1;
-  }
 }
 
 .error {

@@ -13,6 +13,7 @@
     width: 100%;
     text-align: center;
     color: $color-grey-1;
+    padding-left: 5rem;
 
     &::placeholder {
       visibility: hidden;
@@ -24,7 +25,7 @@
       text-align: left;
       outline: none;
       border: 1px solid $color-grey-1;
-      padding-left: 2.5rem;
+      padding-left: 2.3rem;
     }
 
     &:focus + .search-box__placeholder {

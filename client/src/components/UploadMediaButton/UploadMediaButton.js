@@ -2,17 +2,17 @@ import React, { useState, Fragment } from 'react';
 
 import UploadMediaForm from '../UploadMediaForm/UploadMediaForm';
 import Modal from '../Modal/Modal';
-import sprite from '../../assets/svg/svg-sprites.svg';
-
 const UploadMediaButton = () => {
   const [file, setFile] = useState(undefined);
 
   return (
     <Fragment>
-      <label className="icon" htmlFor="file-upload">
-        <svg style={{ cursor: 'pointer' }}>
-          <use href={sprite + '#icon-upload'} />
-        </svg>
+      <label
+        style={{ cursor: 'pointer' }}
+        className="icon"
+        htmlFor="file-upload"
+      >
+        <ion-icon name="cloud-upload-outline"></ion-icon>
       </label>
       <input
         id="file-upload"
@@ -23,7 +23,7 @@ const UploadMediaButton = () => {
         onChange={event => setFile(event.target.files[0])}
       />
       {file && (
-        <Modal>
+        <Modal hide={() => setFile(undefined)}>
           <UploadMediaForm file={file} hideForm={() => setFile(undefined)} />
         </Modal>
       )}

@@ -9,7 +9,7 @@ const addPost = async (imageUrl, caption, authorization) => {
     const user = await verifyJwt(authorization);
     await User.updateOne(
       { _id: user._id },
-      { $push: { posts: { image: imageUrl, caption } } }
+      { $push: { posts: { image: imageUrl, caption, date: Date.now() } } }
     );
   } catch (err) {
     throw new Error(err);
@@ -45,4 +45,28 @@ module.exports.uploadFile = (req, res, next) => {
       }
     }
   });
+};
+
+module.exports.likePost = async (req, res, next) => {
+  const { authorization } = req.headers;
+  const { postId } = req.params;
+  if (!postId) {
+    return res
+      .status(400)
+      .send({ error: 'Please provide the post before attempting to like it.' });
+  }
+  try {
+    const { username } = await verifyJwt(authorization);
+    // Need to check if user has already liked the post before.
+    User.updateOne(
+      { 'posts._id': postId },
+      { $push: { 'posts.$.likes': username } },
+      err => {
+        if (err) return next(err);
+        return res.send({ success: true });
+      }
+    );
+  } catch (err) {
+    res.status(401).send({ error: err });
+  }
 };

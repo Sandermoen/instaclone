@@ -13,3 +13,19 @@
 .font-medium {
   font-weight: 400 !important;
 }
+
+.uppercase {
+  text-transform: uppercase !important;
+}
+
+.color-blue {
+  color: $color-secondary;
+}
+
+.color-grey {
+  color: $color-grey-1;
+}
+
+.color-light {
+  color: $color-grey-1;
+}

@@ -1,14 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import sprite from '../../assets/svg/svg-sprites.svg';
-
 const ProfileCategory = ({ category, svg }) => (
   <div className="profile-categories">
     <div className="profile-categories__category">
-      <svg className="icon--small">
-        <use href={sprite + svg} />
-      </svg>
+      <div className="icon icon--small">
+        <ion-icon name="apps"></ion-icon>
+      </div>
       <h3 className="font-medium">{category}</h3>
     </div>
   </div>

@@ -1,15 +1,13 @@
 import React from 'react';
 
-import sprite from '../../assets/svg/svg-sprites.svg';
-
 const SearchBox = () => {
   return (
     <form className="search-box">
       <input className="search-box__input" placeholder="Search" />
       <span className="search-box__placeholder">
-        <svg>
-          <use href={sprite + '#icon-magnifying-glass'} />
-        </svg>
+        <div className="icon icon--tiny icon--grey-1">
+          <ion-icon name="search"></ion-icon>
+        </div>
         Search
       </span>
     </form>

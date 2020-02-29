@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "client": "cd client && npm run start",
+    "server": "nodemon index.js",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
   },
   "repository": {
     "type": "git",
@@ -31,6 +33,7 @@
     "validator": "^12.2.0"
   },
   "devDependencies": {
+    "concurrently": "^5.1.0",
     "dotenv": "^8.2.0",
     "morgan": "^1.9.1"
   }

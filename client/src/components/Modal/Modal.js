@@ -7,13 +7,12 @@ const Modal = ({ children, hide }) => {
   const el = document.createElement('div');
   el.className = 'modal';
 
-  const hideModal = ({ target }) => {
-    if (target === el || !el.contains(target)) {
-      hide();
-    }
-  };
-
   useEffect(() => {
+    const hideModal = ({ target }) => {
+      if (target === el || !el.contains(target)) {
+        hide();
+      }
+    };
     document.addEventListener('click', hideModal, false);
     modalRoot.appendChild(el);
     document.querySelector('body').setAttribute('style', 'overflow: hidden;');
@@ -23,7 +22,7 @@ const Modal = ({ children, hide }) => {
       document.removeEventListener('click', hideModal, false);
       modalRoot.removeChild(el);
     };
-  }, [el, modalRoot, hideModal]);
+  }, [el, modalRoot, hide]);
 
   return ReactDOM.createPortal(children, el);
 };

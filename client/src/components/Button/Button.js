@@ -2,13 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-const Button = ({ children, onClick, inverted }) => {
+const Button = ({ children, onClick, inverted, style }) => {
   const buttonClasses = classNames({
     button: true,
     'button--inverted': inverted
   });
   return (
-    <button className={buttonClasses} onClick={onClick}>
+    <button style={style} className={buttonClasses} onClick={onClick}>
       {children}
     </button>
   );

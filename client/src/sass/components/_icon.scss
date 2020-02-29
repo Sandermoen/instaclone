@@ -1,6 +1,7 @@
 .icon {
   width: $icon-medium-size;
   height: $icon-medium-size;
+  color: $color-black;
 
   &--large {
     width: $icon-large-size;
@@ -12,14 +13,32 @@
     height: $icon-small-size;
   }
 
+  &--tiny {
+    width: $icon-tiny-size;
+    height: $icon-tiny-size;
+  }
+
   &--active {
     fill: none;
     stroke: $color-black;
     stroke-width: 1px;
   }
 
+  &--white {
+    color: $color-white;
+  }
+
+  &--grey-1 {
+    color: $color-grey-1;
+  }
+
   * {
     width: 100%;
     height: 100%;
   }
+}
+
+ion-icon {
+  width: 100%;
+  height: 100%;
 }

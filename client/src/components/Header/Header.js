@@ -6,10 +6,10 @@ import classNames from 'classnames';
 
 import { selectCurrentUser } from '../../redux/user/userSelectors';
 
-import sprite from '../../assets/svg/svg-sprites.svg';
 import { ReactComponent as LogoCamera } from '../../assets/svg/logo-camera.svg';
 import SearchBox from '../SearchBox/SearchBox';
 import UploadMediaButton from '../UploadMediaButton/UploadMediaButton';
+import Button from '../Button/Button';
 
 const Header = memo(({ currentUser }) => {
   const [scrollOffset, setScrollOffset] = useState(0);
@@ -40,36 +40,41 @@ const Header = memo(({ currentUser }) => {
         </Link>
         <SearchBox />
         <div className="header__icons">
-          {currentUser && (
+          {currentUser ? (
             <Fragment>
               <NavLink
                 className="icon"
                 activeClassName="icon--active"
                 to="/oosdosoosos"
               >
-                <svg style={{ maskImage: 'red' }}>
-                  <use href={sprite + '#icon-compass'} />
-                </svg>
+                <ion-icon name="compass-outline"></ion-icon>
               </NavLink>
               <NavLink
                 className="icon"
                 activeClassName="icon--active"
                 to="/lakopoeo"
               >
-                <svg>
-                  <use href={sprite + '#icon-heart'} />
-                </svg>
+                <ion-icon name="heart-outline"></ion-icon>
               </NavLink>
               <NavLink
                 className="icon"
                 activeClassName="icon--active"
                 to={`/${currentUser.username}`}
               >
-                <svg>
-                  <use href={sprite + '#icon-profile-male'} />
-                </svg>
+                <ion-icon name="person-circle-outline"></ion-icon>
               </NavLink>
               <UploadMediaButton />
+            </Fragment>
+          ) : (
+            <Fragment>
+              <Link style={{ marginRight: '1rem' }} to="/login">
+                <Button>Log In</Button>
+              </Link>
+              <Link to="/login">
+                <h3 className="heading-3 heading-3--button color-blue">
+                  Sign Up
+                </h3>
+              </Link>
             </Fragment>
           )}
         </div>

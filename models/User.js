@@ -4,6 +4,8 @@ const bcrypt = require('bcrypt');
 
 const Schema = mongoose.Schema;
 
+const Post = require('./Post');
+
 const userSchema = new Schema({
   email: {
     type: String,
@@ -35,7 +37,7 @@ const userSchema = new Schema({
   },
   followers: Array,
   following: Array,
-  posts: Array,
+  posts: [Post],
   private: {
     type: Boolean,
     default: false
