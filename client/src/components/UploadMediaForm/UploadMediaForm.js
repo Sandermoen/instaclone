@@ -8,6 +8,7 @@ import { selectToken, selectCurrentUser } from '../../redux/user/userSelectors';
 
 import Loader from '../Loader/Loader';
 import Avatar from '../Avatar/Avatar';
+import Icon from '../Icon/Icon';
 
 const UploadMediaForm = ({ token, file, currentUser, hideForm }) => {
   const [previewImage, setPreviewImage] = useState(null);
@@ -67,7 +68,7 @@ const UploadMediaForm = ({ token, file, currentUser, hideForm }) => {
     <form style={file && { display: 'block' }} className="upload-media-form">
       <header className="upload-media-form__header">
         <div onClick={hideForm} style={{ cursor: 'pointer' }} className="icon">
-          <ion-icon name="chevron-back"></ion-icon>
+          <Icon icon="chevron-back" />
         </div>
         <h2 className="heading-3">New Post</h2>
         <h2

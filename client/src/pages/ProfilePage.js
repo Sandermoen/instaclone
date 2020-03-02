@@ -11,16 +11,19 @@ import Button from '../components/Button/Button';
 import ProfileCategory from '../components/ProfileCategory/ProfileCategory';
 import PostDialog from '../components/PostDialog/PostDialog';
 import Modal from '../components/Modal/Modal';
+import Icon from '../components/Icon/Icon';
+import ProfileImage from '../components/ProfileImage/ProfileImage';
 
 const ProfilePage = ({ currentUser }) => {
   const { username } = useParams();
   const [profile, setProfile] = useState(undefined);
-  const [postDialog, setPostDialog] = useState(undefined);
+  const [currentPost, setCurrentPost] = useState(undefined);
 
   useEffect(() => {
     axios
       .get(`/user/${username}`)
       .then(response => {
+        console.log(response);
         setProfile(response.data);
       })
       .catch(err => console.warn(err.message));
@@ -32,7 +35,7 @@ const ProfilePage = ({ currentUser }) => {
         <Fragment>
           <Button inverted>Edit Profile</Button>
           <div className="icon">
-            <ion-icon name="aperture-outline"></ion-icon>
+            <Icon icon="aperture-outline" />
           </div>
         </Fragment>
       ) : (
@@ -80,34 +83,23 @@ const ProfilePage = ({ currentUser }) => {
               </div>
             </div>
           </header>
-          <ProfileCategory category="POSTS" svg="#icon-grid" />
+          <ProfileCategory category="POSTS" />
           <div className="profile-images">
-            {profile.posts.map(({ image, caption }) => (
-              <div
-                onClick={() => setPostDialog({ image, caption })}
-                key={image}
-                className="profile-images__image"
-              >
-                <img src={image} alt="User post" />
-                <div className="profile-images__overlay">
-                  <span className="profile-images__content">
-                    <div className="icon icon--white">
-                      <ion-icon name="chatbubbles"></ion-icon>
-                    </div>
-                    0
-                  </span>
-                </div>
-              </div>
+            {profile.posts.map(post => (
+              <ProfileImage
+                onClick={() => setCurrentPost(post)}
+                image={post.image}
+                likes={post.likes}
+              />
             ))}
           </div>
-          {postDialog && (
-            <Modal hide={() => setPostDialog(undefined)}>
+          {currentPost && (
+            <Modal hide={() => setCurrentPost(undefined)}>
               <PostDialog
-                imageUrl={postDialog.image}
-                comments={postDialog.caption}
+                post={currentPost}
                 avatar={profile.avatar}
                 username={profile.username}
-                hide={() => setPostDialog(undefined)}
+                hide={() => setCurrentPost(undefined)}
               />
             </Modal>
           )}

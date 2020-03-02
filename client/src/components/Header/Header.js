@@ -10,6 +10,7 @@ import { ReactComponent as LogoCamera } from '../../assets/svg/logo-camera.svg';
 import SearchBox from '../SearchBox/SearchBox';
 import UploadMediaButton from '../UploadMediaButton/UploadMediaButton';
 import Button from '../Button/Button';
+import Icon from '../Icon/Icon';
 
 const Header = memo(({ currentUser }) => {
   const [scrollOffset, setScrollOffset] = useState(0);
@@ -47,21 +48,21 @@ const Header = memo(({ currentUser }) => {
                 activeClassName="icon--active"
                 to="/oosdosoosos"
               >
-                <ion-icon name="compass-outline"></ion-icon>
+                <Icon icon="compass-outline" />
               </NavLink>
               <NavLink
                 className="icon"
                 activeClassName="icon--active"
                 to="/lakopoeo"
               >
-                <ion-icon name="heart-outline"></ion-icon>
+                <Icon icon="heart-outline" />
               </NavLink>
               <NavLink
                 className="icon"
                 activeClassName="icon--active"
                 to={`/${currentUser.username}`}
               >
-                <ion-icon name="person-circle-outline"></ion-icon>
+                <Icon icon="person-circle-outline" />
               </NavLink>
               <UploadMediaButton />
             </Fragment>

@@ -32,6 +32,10 @@
     color: $color-grey-1;
   }
 
+  &--button {
+    cursor: pointer;
+  }
+
   * {
     width: 100%;
     height: 100%;

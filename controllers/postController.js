@@ -1,6 +1,8 @@
 const aws = require('aws-sdk');
 const User = require('../models/User');
 const fs = require('fs');
+const { v4: uuidv4 } = require('uuid');
+const short = require('short-uuid')();
 
 const { verifyJwt } = require('./authController');
 
@@ -9,7 +11,16 @@ const addPost = async (imageUrl, caption, authorization) => {
     const user = await verifyJwt(authorization);
     await User.updateOne(
       { _id: user._id },
-      { $push: { posts: { image: imageUrl, caption, date: Date.now() } } }
+      {
+        $push: {
+          posts: {
+            postId: short.fromUUID(uuidv4()),
+            image: imageUrl,
+            caption,
+            date: Date.now()
+          }
+        }
+      }
     );
   } catch (err) {
     throw new Error(err);
@@ -59,7 +70,7 @@ module.exports.likePost = async (req, res, next) => {
     const { username } = await verifyJwt(authorization);
     // Need to check if user has already liked the post before.
     User.updateOne(
-      { 'posts._id': postId },
+      { 'posts.postId': postId },
       { $push: { 'posts.$.likes': username } },
       err => {
         if (err) return next(err);

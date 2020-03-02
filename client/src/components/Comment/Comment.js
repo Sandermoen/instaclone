@@ -1,6 +1,7 @@
 import React from 'react';
 
 import Avatar from '../Avatar/Avatar';
+import Icon from '../Icon/Icon';
 
 const Comment = ({ avatar, comment, username, caption }) => (
   <div className="comment">
@@ -15,8 +16,8 @@ const Comment = ({ avatar, comment, username, caption }) => (
       </div>
     </div>
     {!caption && (
-      <div className="comment__like icon--small">
-        <ion-icon name="heart-outline"></ion-icon>
+      <div className="comment__like">
+        <Icon icon="heart-outline" className="icon--tiny" />
       </div>
     )}
   </div>

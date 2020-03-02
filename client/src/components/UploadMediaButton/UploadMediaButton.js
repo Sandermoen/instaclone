@@ -2,6 +2,8 @@ import React, { useState, Fragment } from 'react';
 
 import UploadMediaForm from '../UploadMediaForm/UploadMediaForm';
 import Modal from '../Modal/Modal';
+import Icon from '../Icon/Icon';
+
 const UploadMediaButton = () => {
   const [file, setFile] = useState(undefined);
 
@@ -12,7 +14,7 @@ const UploadMediaButton = () => {
         className="icon"
         htmlFor="file-upload"
       >
-        <ion-icon name="cloud-upload-outline"></ion-icon>
+        <Icon icon="cloud-upload-outline" />
       </label>
       <input
         id="file-upload"
