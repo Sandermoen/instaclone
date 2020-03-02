@@ -19,13 +19,17 @@
 }
 
 .color-blue {
-  color: $color-secondary;
+  color: $color-secondary !important;
 }
 
 .color-grey {
-  color: $color-grey-1;
+  color: $color-grey-1 !important;
 }
 
 .color-light {
-  color: $color-grey-1;
+  color: $color-grey-1 !important;
+}
+
+.color-red {
+  color: $color-red !important;
 }

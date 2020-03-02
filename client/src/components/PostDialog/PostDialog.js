@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
-import axios from 'axios';
 import { useHistory } from 'react-router-dom';
 
-import { selectToken } from '../../redux/user/userSelectors';
+import { selectToken, selectCurrentUser } from '../../redux/user/userSelectors';
+
+import { likePost } from '../../redux/currentProfile/currentProfileActions';
 
 import Avatar from '../Avatar/Avatar';
 import Comment from '../Comment/Comment';
@@ -14,7 +15,9 @@ const PostDialog = ({
   post: { image, likes, postId, caption },
   avatar = require('../../assets/img/default-avatar.png'),
   username,
-  token
+  token,
+  likePost,
+  currentUser
 }) => {
   const history = useHistory();
 
@@ -26,20 +29,11 @@ const PostDialog = ({
     return () => {
       window.history.pushState(username, caption, history.location.pathname);
     };
-  }, [postId, caption]);
+  }, [postId, caption, history, username]);
 
-  const likeImage = async () => {
-    try {
-      await axios({
-        method: 'POST',
-        url: `/post/${postId}/like`,
-        headers: {
-          authorization: token
-        }
-      });
-    } catch (err) {
-      console.warn(err);
-    }
+  const likeImage = async event => {
+    event.nativeEvent.stopImmediatePropagation();
+    likePost(postId, token, currentUser.username);
   };
 
   return (
@@ -72,8 +66,8 @@ const PostDialog = ({
         <div className="post-dialog__stats">
           <div className="post-dialog__actions">
             <Icon
-              onClick={() => likeImage()}
-              className="icon--button"
+              onClick={event => likeImage(event)}
+              className="icon--button post-dialog__like"
               icon="heart-outline"
             />
             <Icon className="icon--button" icon="chatbubble-outline" />
@@ -106,7 +100,15 @@ const PostDialog = ({
 };
 
 const mapStateToProps = createStructuredSelector({
-  token: selectToken
+  token: selectToken,
+  currentUser: selectCurrentUser
 });
 
-export default connect(mapStateToProps)(PostDialog);
+const mapDispatchToProps = dispatch => ({
+  likePost: (postId, authToken, username) =>
+    dispatch(likePost(postId, authToken, username))
+});
+
+PostDialog.whyDidYouRender = true;
+
+export default connect(mapStateToProps, mapDispatchToProps)(PostDialog);
