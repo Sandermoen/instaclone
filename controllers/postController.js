@@ -58,7 +58,7 @@ module.exports.uploadFile = (req, res, next) => {
   });
 };
 
-module.exports.likePost = async (req, res, next) => {
+module.exports.votePost = async (req, res, next) => {
   const { authorization } = req.headers;
   const { postId } = req.params;
   if (!postId) {
@@ -69,14 +69,29 @@ module.exports.likePost = async (req, res, next) => {
   try {
     const { username } = await verifyJwt(authorization);
     // Need to check if user has already liked the post before.
-    User.updateOne(
-      { 'posts.postId': postId },
-      { $push: { 'posts.$.likes': username } },
-      err => {
-        if (err) return next(err);
-        return res.send({ success: true });
+    User.findOne({ 'posts.postId': postId }, 'posts.$', (err, document) => {
+      if (err) return next(err);
+      if (document.posts[0].likes.includes(username)) {
+        return User.updateOne(
+          { 'posts.postId': postId },
+          { $pull: { 'posts.$.likes': username } },
+          err => {
+            if (err) return next(err);
+            return res.send({ success: true });
+          }
+        );
+      } else {
+        return User.updateOne(
+          { 'posts.postId': postId },
+          { $push: { 'posts.$.likes': username } },
+          err => {
+            if (err) return next(err);
+            return res.send({ success: true });
+          }
+        );
       }
-    );
+      return res.send(document);
+    });
   } catch (err) {
     res.status(401).send({ error: err });
   }

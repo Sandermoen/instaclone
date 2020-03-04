@@ -78,7 +78,14 @@ const PostDialog = ({
                 icon="heart-outline"
               />
             )}
-            <Icon className="icon--button" icon="chatbubble-outline" />
+            <Icon
+              onClick={event => {
+                event.nativeEvent.stopImmediatePropagation();
+                document.querySelector('.add-comment__input').focus();
+              }}
+              className="icon--button"
+              icon="chatbubble-outline"
+            />
             <Icon className="icon--button" icon="paper-plane-outline" />
             <Icon className="icon--button" icon="bookmark-outline" />
           </div>
@@ -99,7 +106,11 @@ const PostDialog = ({
           <p className="heading-5 color-light uppercase">february 28</p>
         </div>
         <div className="post-dialog__add-comment">
-          <input type="text" placeholder="Add a comment..." />
+          <input
+            className="add-comment__input"
+            type="text"
+            placeholder="Add a comment..."
+          />
           <h2 className="heading-3--button color-blue">Post</h2>
         </div>
       </div>

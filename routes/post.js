@@ -4,7 +4,7 @@ const multer = require('multer');
 const rateLimit = require('express-rate-limit');
 
 const { requireAuth } = require('../controllers/authController');
-const { uploadFile, likePost } = require('../controllers/postController');
+const { uploadFile, votePost } = require('../controllers/postController');
 
 const postLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -23,6 +23,5 @@ postRouter.post(
   uploadFile
 );
 
-postRouter.post('/:postId/like', requireAuth, likePost);
-
+postRouter.post('/:postId/vote', requireAuth, votePost);
 module.exports = postRouter;

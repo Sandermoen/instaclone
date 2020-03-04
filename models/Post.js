@@ -7,7 +7,7 @@ const postSchema = new Schema({
   // So we can't just store the amount of likes, we also have to store who liked it
   postId: String,
   likes: Array,
-  replies: Array,
+  comments: Array,
   date: Date,
   image: String
 });

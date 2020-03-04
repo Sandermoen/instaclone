@@ -30,7 +30,7 @@ export const likePost = (postId, authToken, username) => async dispatch => {
     });
     await axios({
       method: 'POST',
-      url: `/post/${postId}/like`,
+      url: `/post/${postId}/vote`,
       headers: {
         authorization: authToken
       }
