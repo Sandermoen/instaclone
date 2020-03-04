@@ -33,7 +33,13 @@ const PostDialog = ({
 
   const likeImage = async event => {
     event.nativeEvent.stopImmediatePropagation();
-    likePost(postId, token, currentUser.username);
+    console.log(likes.includes(currentUser.username));
+    likePost(
+      postId,
+      token,
+      currentUser.username,
+      likes.includes(currentUser.username)
+    );
   };
 
   return (
@@ -124,8 +130,8 @@ const mapStateToProps = createStructuredSelector({
 });
 
 const mapDispatchToProps = dispatch => ({
-  likePost: (postId, authToken, username) =>
-    dispatch(likePost(postId, authToken, username))
+  likePost: (postId, authToken, username, decrement) =>
+    dispatch(likePost(postId, authToken, username, decrement))
 });
 
 PostDialog.whyDidYouRender = true;

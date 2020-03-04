@@ -22,11 +22,16 @@ export const fetchCurrentProfileStart = username => async dispatch => {
   }
 };
 
-export const likePost = (postId, authToken, username) => async dispatch => {
+export const likePost = (
+  postId,
+  authToken,
+  username,
+  decrement
+) => async dispatch => {
   try {
     dispatch({
       type: currentProfileTypes.LIKE_POST,
-      payload: { postId, username }
+      payload: { postId, username, decrement }
     });
     await axios({
       method: 'POST',
@@ -35,5 +40,7 @@ export const likePost = (postId, authToken, username) => async dispatch => {
         authorization: authToken
       }
     });
-  } catch (err) {}
+  } catch (err) {
+    dispatch(fetchProfileFailure(err.data));
+  }
 };

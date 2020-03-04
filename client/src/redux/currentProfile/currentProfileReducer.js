@@ -23,15 +23,23 @@ const currentProfileReducer = (state = INITIAL_STATE, action) => {
       return { ...state, error: action.payload, fetching: false };
     }
     case currentProfileTypes.LIKE_POST: {
-      const { postId, username } = action.payload;
+      const { postId, username, decrement } = action.payload;
       // Copy the posts array to modify it
       // A deep copy of the posts array might not be the best idea
       // Will look into this later
       const posts = JSON.parse(JSON.stringify(state.profile.posts));
+
+      // Increment or decrement the likes by one
       state.profile.posts.find((post, idx) => {
-        // Increment the likes by one
         if (post.postId === postId) {
-          posts[idx].likes.push(username);
+          if (decrement) {
+            const userIdx = posts[idx].likes.findIndex(
+              like => like === username
+            );
+            posts[idx].likes.splice(userIdx, 1);
+          } else {
+            posts[idx].likes.push(username);
+          }
           return posts[idx];
         }
         return null;
