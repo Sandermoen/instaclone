@@ -23,13 +23,13 @@ const PostDialog = ({
 
   // Modify the url so that a user can copy it and share it with others
   // /p will be a route that links directly to the post outside of the users profile
-  useEffect(() => {
-    window.history.pushState(username, caption, `/p/${postId}`);
+  // useEffect(() => {
+  //   window.history.pushState(username, caption, `/p/${postId}`);
 
-    return () => {
-      window.history.pushState(username, caption, history.location.pathname);
-    };
-  }, [postId, caption, history, username]);
+  //   return () => {
+  //     window.history.pushState(username, caption, history.location.pathname);
+  //   };
+  // }, [postId, caption, history, username]);
 
   const likeImage = async event => {
     event.nativeEvent.stopImmediatePropagation();
@@ -65,11 +65,19 @@ const PostDialog = ({
         </div>
         <div className="post-dialog__stats">
           <div className="post-dialog__actions">
-            <Icon
-              onClick={event => likeImage(event)}
-              className="icon--button post-dialog__like"
-              icon="heart-outline"
-            />
+            {likes.includes(currentUser.username) ? (
+              <Icon
+                onClick={event => likeImage(event)}
+                className="icon--button post-dialog__like color-red"
+                icon="heart"
+              />
+            ) : (
+              <Icon
+                onClick={event => likeImage(event)}
+                className="icon--button post-dialog__like"
+                icon="heart-outline"
+              />
+            )}
             <Icon className="icon--button" icon="chatbubble-outline" />
             <Icon className="icon--button" icon="paper-plane-outline" />
             <Icon className="icon--button" icon="bookmark-outline" />

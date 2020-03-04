@@ -99,17 +99,17 @@ const ProfilePage = ({
           <div className="profile-images">
             {currentProfile.posts.map((post, idx) => (
               <ProfileImage
-                onClick={() => setCurrentPost(post)}
+                onClick={() => setCurrentPost(idx)}
                 image={post.image}
                 likes={post.likes}
                 key={idx}
               />
             ))}
           </div>
-          {currentPost && (
+          {currentPost >= 0 && (
             <Modal hide={() => setCurrentPost(undefined)}>
               <PostDialog
-                post={currentPost}
+                post={currentProfile.posts[currentPost]}
                 avatar={currentProfile.avatar}
                 username={currentProfile.username}
                 hide={() => setCurrentPost(undefined)}
