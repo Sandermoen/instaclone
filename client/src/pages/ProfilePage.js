@@ -2,36 +2,49 @@ import React, { useState, useEffect, Fragment } from 'react';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import { useParams } from 'react-router-dom';
+import axios from 'axios';
 
 import { selectCurrentUser } from '../redux/user/userSelectors';
-import {
-  selectProfileState,
-  selectCurrentProfile
-} from '../redux/currentProfile/currentProfileSelectors';
 
-import { fetchCurrentProfileStart } from '../redux/currentProfile/currentProfileActions';
+import { showModal } from '../redux/modal/modalActions';
 
 import Avatar from '../components/Avatar/Avatar';
 import Button from '../components/Button/Button';
 import ProfileCategory from '../components/ProfileCategory/ProfileCategory';
-import PostDialog from '../components/PostDialog/PostDialog';
-import Modal from '../components/Modal/Modal';
 import Icon from '../components/Icon/Icon';
 import ProfileImage from '../components/ProfileImage/ProfileImage';
 import Loader from '../components/Loader/Loader';
 
-const ProfilePage = ({
-  currentUser,
-  fetchCurrentProfileStart,
-  profileState,
-  currentProfile
-}) => {
+const ProfilePage = ({ currentUser, showModal }) => {
   const { username } = useParams();
+  const [currentProfile, setCurrentProfile] = useState({
+    fetching: false,
+    error: false,
+    data: undefined
+  });
   const [currentPost, setCurrentPost] = useState(undefined);
 
   useEffect(() => {
-    fetchCurrentProfileStart(username);
-  }, [username, fetchCurrentProfileStart]);
+    setCurrentProfile({ fetching: true });
+    axios
+      .get(`/user/${username}`)
+      .then(response => {
+        setCurrentProfile({
+          fetching: false,
+          data: { ...response.data }
+        });
+      })
+      .catch(err =>
+        setCurrentProfile({
+          fetching: false,
+          error: err.data
+        })
+      );
+  }, [username]);
+
+  useEffect(() => {
+    currentPost && showModal(null, 'PostDialog');
+  }, [currentPost, showModal]);
 
   const renderButton = () => {
     if (currentUser) {
@@ -50,72 +63,65 @@ const ProfilePage = ({
   };
 
   const renderProfile = () => {
-    if (profileState.fetching) {
+    if (currentProfile.fetching) {
       return <Loader />;
-    } else if (profileState.error) {
+    } else if (currentProfile.error) {
       return <h1 className="heading-1">This page does not exist</h1>;
     }
-    if (currentProfile) {
+    if (currentProfile.data) {
+      const {
+        avatar,
+        username,
+        postCount,
+        followersCount,
+        bio,
+        posts
+      } = currentProfile.data;
       return (
         <Fragment>
           <header className="profile-header">
             <Avatar
               imageSrc={
-                currentProfile.avatar
-                  ? currentProfile.avatar
-                  : require('../assets/img/default-avatar.png')
+                avatar ? avatar : require('../assets/img/default-avatar.png')
               }
             />
             <div className="profile-header__info">
               <div className="profile-buttons">
-                <h1 className="heading-1 font-thin">
-                  {currentProfile.username}
-                </h1>
+                <h1 className="heading-1 font-thin">{username}</h1>
                 {renderButton()}
               </div>
               <div className="profile-stats">
                 <p className="heading-3">
-                  <b>{currentProfile.postCount}</b> posts
+                  <b>{postCount}</b> posts
                 </p>
                 <p className="heading-3">
-                  <b>{currentProfile.followersCount}</b>{' '}
-                  {currentProfile.followersCount > 1 ||
-                  currentProfile.followersCount === 0
+                  <b>{followersCount}</b>{' '}
+                  {followersCount > 1 || followersCount === 0
                     ? 'followers'
                     : 'follower'}
                 </p>
                 <p className="heading-3">
-                  <b>{currentProfile.followingCount}</b> following
+                  <b>{followersCount}</b> following
                 </p>
               </div>
               <div>
                 <p className="heading-3">
-                  <b>{currentProfile.bio}</b>
+                  <b>{bio}</b>
                 </p>
               </div>
             </div>
           </header>
           <ProfileCategory category="POSTS" icon="apps" />
           <div className="profile-images">
-            {currentProfile.posts.map((post, idx) => (
+            {posts.map((post, idx) => (
               <ProfileImage
-                onClick={() => setCurrentPost(idx)}
+                onClick={() => setCurrentPost(post.postId)}
                 image={post.image}
-                likes={post.likes}
+                likes={post.likesCount}
                 key={idx}
               />
             ))}
           </div>
-          {currentPost >= 0 && (
-            <Modal hide={() => setCurrentPost(undefined)}>
-              <PostDialog
-                post={currentProfile.posts[currentPost]}
-                avatar={currentProfile.avatar}
-                username={currentProfile.username}
-                hide={() => setCurrentPost(undefined)}
-              />
-            </Modal>
-          )}
         </Fragment>
       );
     }
@@ -125,16 +131,11 @@ const ProfilePage = ({
 };
 
 const mapStateToProps = createStructuredSelector({
-  currentUser: selectCurrentUser,
-  profileState: selectProfileState,
-  currentProfile: selectCurrentProfile
+  currentUser: selectCurrentUser
 });
 
 const mapDispatchToProps = dispatch => ({
-  fetchCurrentProfileStart: username =>
-    dispatch(fetchCurrentProfileStart(username))
+  showModal: (props, component) => dispatch(showModal(props, component))
 });
-
-ProfilePage.whyDidYouRender = true;
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProfilePage);

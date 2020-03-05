@@ -1,45 +1,27 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
-import { useHistory } from 'react-router-dom';
 
 import { selectToken, selectCurrentUser } from '../../redux/user/userSelectors';
 
-import { likePost } from '../../redux/currentProfile/currentProfileActions';
+// import { likePost } from '../../redux/currentProfile/currentProfileActions';
 
 import Avatar from '../Avatar/Avatar';
 import Comment from '../Comment/Comment';
 import Icon from '../Icon/Icon';
 
 const PostDialog = ({
-  post: { image, likes, postId, caption },
+  image = '',
+  likes = [],
+  postId = '5e5f43fe2182123600c81bac',
+  caption = 'hmm',
   avatar = require('../../assets/img/default-avatar.png'),
-  username,
+  username = 'snader',
   token,
-  likePost,
   currentUser
 }) => {
-  const history = useHistory();
-
-  // Modify the url so that a user can copy it and share it with others
-  // /p will be a route that links directly to the post outside of the users profile
-  // useEffect(() => {
-  //   window.history.pushState(username, caption, `/p/${postId}`);
-
-  //   return () => {
-  //     window.history.pushState(username, caption, history.location.pathname);
-  //   };
-  // }, [postId, caption, history, username]);
-
   const likeImage = async event => {
     event.nativeEvent.stopImmediatePropagation();
-    console.log(likes.includes(currentUser.username));
-    likePost(
-      postId,
-      token,
-      currentUser.username,
-      likes.includes(currentUser.username)
-    );
   };
 
   return (
@@ -71,7 +53,7 @@ const PostDialog = ({
         </div>
         <div className="post-dialog__stats">
           <div className="post-dialog__actions">
-            {likes.includes(currentUser.username) ? (
+            {currentUser && likes.includes(currentUser.username) ? (
               <Icon
                 onClick={event => likeImage(event)}
                 className="icon--button post-dialog__like color-red"
@@ -99,13 +81,18 @@ const PostDialog = ({
             {likes.length === 0 ? (
               <span>
                 Be the first to{' '}
-                <b style={{ cursor: 'pointer' }} onClick={() => likeImage()}>
+                <b
+                  style={{ cursor: 'pointer' }}
+                  onClick={event => likeImage(event)}
+                >
                   like this
                 </b>
               </span>
             ) : (
               <span>
-                <b>{likes.length} likes</b>
+                <b>
+                  {likes.length} {likes.length === 1 ? 'like' : 'likes'}
+                </b>
               </span>
             )}
           </p>
@@ -129,11 +116,6 @@ const mapStateToProps = createStructuredSelector({
   currentUser: selectCurrentUser
 });
 
-const mapDispatchToProps = dispatch => ({
-  likePost: (postId, authToken, username, decrement) =>
-    dispatch(likePost(postId, authToken, username, decrement))
-});
-
 PostDialog.whyDidYouRender = true;
 
-export default connect(mapStateToProps, mapDispatchToProps)(PostDialog);
+export default connect(mapStateToProps)(PostDialog);

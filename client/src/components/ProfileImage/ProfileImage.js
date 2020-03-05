@@ -8,10 +8,10 @@ const ProfileImage = ({ onClick, image, likes }) => (
     <img src={image} alt="User post" />
     <div className="profile-image__overlay">
       <span className="profile-image__content">
-        {likes.length > 0 && (
+        {likes > 0 && (
           <div className="profile-image__icon">
             <Icon icon="heart" className="icon--white" />
-            <span>{likes.length}</span>
+            <span>{likes}</span>
           </div>
         )}
         <div className="profile-image__icon">
@@ -26,7 +26,7 @@ const ProfileImage = ({ onClick, image, likes }) => (
 ProfileImage.propTypes = {
   onClick: PropTypes.func,
   image: PropTypes.string.isRequired,
-  likes: PropTypes.array.isRequired
+  likes: PropTypes.number.isRequired
 };
 
 export default ProfileImage;

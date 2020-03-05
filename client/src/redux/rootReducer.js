@@ -1,11 +1,11 @@
 import { combineReducers } from 'redux';
 
 import userReducer from './user/userReducer.js';
-import currentProfileReducer from './currentProfile/currentProfileReducer';
+import modalReducer from './modal/modalReducer';
 
 const rootReducer = combineReducers({
   user: userReducer,
-  currentProfile: currentProfileReducer
+  modal: modalReducer
 });
 
 export default rootReducer;

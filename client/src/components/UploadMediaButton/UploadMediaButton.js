@@ -1,12 +1,20 @@
-import React, { useState, Fragment } from 'react';
+import React, { useState, Fragment, useEffect } from 'react';
+import { connect } from 'react-redux';
 
-import UploadMediaForm from '../UploadMediaForm/UploadMediaForm';
-import Modal from '../Modal/Modal';
+import { showModal } from '../../redux/modal/modalActions';
+
 import Icon from '../Icon/Icon';
 
-const UploadMediaButton = () => {
+const UploadMediaButton = ({ showModal }) => {
   const [file, setFile] = useState(undefined);
-
+  useEffect(() => {
+    if (file) {
+      showModal(
+        { file, hideForm: () => setFile(undefined) },
+        'UploadMediaForm'
+      );
+    }
+  }, [file]);
   return (
     <Fragment>
       <label
@@ -24,13 +32,12 @@ const UploadMediaButton = () => {
         // Get the first selected file
         onChange={event => setFile(event.target.files[0])}
       />
-      {file && (
-        <Modal hide={() => setFile(undefined)}>
-          <UploadMediaForm file={file} hideForm={() => setFile(undefined)} />
-        </Modal>
-      )}
     </Fragment>
   );
 };
 
-export default UploadMediaButton;
+const mapDispatchToProps = dispatch => ({
+  showModal: (props, component) => dispatch(showModal(props, component))
+});
+
+export default connect(null, mapDispatchToProps)(UploadMediaButton);

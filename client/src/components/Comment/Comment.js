@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 
 import Avatar from '../Avatar/Avatar';
 import Icon from '../Icon/Icon';
@@ -12,7 +12,12 @@ const Comment = ({ avatar, comment, username, caption }) => (
       </p>
       <div className="comment__stats">
         <p className="heading-5 color-light">4 d</p>
-        {!caption && <p className="heading-5 color-light">10 likes</p>}
+        {!caption && (
+          <Fragment>
+            <p className="heading-5 color-light">10 likes</p>
+            <p className="heading-5 color-light">reply</p>
+          </Fragment>
+        )}
       </div>
     </div>
     {!caption && (

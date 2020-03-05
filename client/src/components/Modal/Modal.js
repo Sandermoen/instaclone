@@ -1,35 +1,48 @@
-import { useEffect } from 'react';
+import React, { useEffect, memo } from 'react';
+import { connect } from 'react-redux';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 
-const Modal = ({ children, hide }) => {
+import { hideModal } from '../../redux/modal/modalActions';
+
+const Modal = memo(({ component, hideModal, ...additionalProps }) => {
   const modalRoot = document.querySelector('#modal-root');
   const el = document.createElement('div');
+  const Child = require(`../../components/${component}/${component}`).default;
   el.className = 'modal';
 
   useEffect(() => {
-    const hideModal = ({ target }) => {
+    const hide = ({ target }) => {
       if (target === el || !el.contains(target)) {
-        hide();
+        hideModal();
       }
     };
-    document.addEventListener('click', hideModal, false);
+    document.addEventListener('click', hide, false);
     modalRoot.appendChild(el);
     document.querySelector('body').setAttribute('style', 'overflow: hidden;');
 
     return () => {
       document.querySelector('body').setAttribute('style', '');
-      document.removeEventListener('click', hideModal, false);
+      document.removeEventListener('click', hide, false);
       modalRoot.removeChild(el);
     };
-  }, [el, modalRoot, hide]);
+  }, [el, modalRoot, hideModal]);
 
-  return ReactDOM.createPortal(children, el);
-};
+  return ReactDOM.createPortal(
+    <Child hide={() => hideModal()} {...additionalProps} />,
+    el
+  );
+});
+
+Modal.whyDidYouRender = true;
 
 Modal.propTypes = {
-  children: PropTypes.node.isRequired,
-  hide: PropTypes.func.isRequired
+  component: PropTypes.string.isRequired,
+  props: PropTypes.object
 };
 
-export default Modal;
+const mapDispatchToProps = dispatch => ({
+  hideModal: () => dispatch(hideModal())
+});
+
+export default connect(null, mapDispatchToProps)(Modal);

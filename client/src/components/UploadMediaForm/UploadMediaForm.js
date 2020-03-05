@@ -10,7 +10,7 @@ import Loader from '../Loader/Loader';
 import Avatar from '../Avatar/Avatar';
 import Icon from '../Icon/Icon';
 
-const UploadMediaForm = ({ token, file, currentUser, hideForm }) => {
+const UploadMediaForm = ({ token, file, currentUser, hide }) => {
   const [previewImage, setPreviewImage] = useState(null);
   const [caption, setCaption] = useState('');
   const [formEvents, setFormEvents] = useState({
@@ -53,7 +53,7 @@ const UploadMediaForm = ({ token, file, currentUser, hideForm }) => {
         }
       });
       setFormEvents(previous => ({ ...previous, isLoading: false }));
-      hideForm();
+      hide();
       history.push('/');
     } catch (err) {
       setFormEvents({
@@ -67,7 +67,7 @@ const UploadMediaForm = ({ token, file, currentUser, hideForm }) => {
   return (
     <form style={file && { display: 'block' }} className="upload-media-form">
       <header className="upload-media-form__header">
-        <div onClick={hideForm} style={{ cursor: 'pointer' }} className="icon">
+        <div onClick={hide} style={{ cursor: 'pointer' }} className="icon">
           <Icon icon="chevron-back" />
         </div>
         <h2 className="heading-3">New Post</h2>
