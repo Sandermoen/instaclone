@@ -92,7 +92,6 @@ module.exports.votePost = async (req, res, next) => {
   }
   try {
     const { username } = await verifyJwt(authorization);
-    let postCount = undefined;
 
     Post.findOne(
       { [`posts.${postId}`]: { $exists: true } },
@@ -100,37 +99,30 @@ module.exports.votePost = async (req, res, next) => {
         if (err) return next(err);
         if (!document) return res.status(404).send('Could not find the post.');
 
-        const post = document.posts.get(postId);
+        let post = document.posts.get(postId);
         if (post.likes.includes(username)) {
-          // Post is already liked so unlike it
-          Post.updateOne(
-            { [`posts.${postId}`]: { $exists: true } },
-            { $pull: { [`posts.${postId}.likes`]: username } },
-            err => {
-              if (err) return next(err);
-            }
-          );
-          postCount = post.likes.length - 1;
+          // Post is already liked so remove user from like array
+          const userIndex = post.likes.findIndex(user => user === username);
+          post.likes.splice(userIndex, 1);
+          document.posts.set(postId, post);
         } else {
-          // Post has not been liked so like it
-          Post.updateOne(
-            { [`posts.${postId}`]: { $exists: true } },
-            { $push: { [`posts.${postId}.likes`]: username } },
-            (err, document) => {
-              if (err) return next(err);
-              if (!document) return res.status(404).send();
-            }
-          );
-          postCount = post.likes.length + 1;
+          // Post has not been liked so add user to like array
+          post.likes.push(username);
+          document.posts.set(postId, post);
         }
+
+        document.save((err, updatedDocument) => {
+          if (err) return next(err);
+          post = updatedDocument.posts.get(postId);
+        });
 
         // Update the user collection with the updated like number
         return User.updateOne(
           { 'posts.postId': postId },
-          { 'posts.$.likesCount': postCount },
+          { 'posts.$.likesCount': post.likes.length },
           err => {
             if (err) return next(err);
-            return res.send({ success: true });
+            return res.send({ likes: post.likes });
           }
         );
       }
@@ -150,10 +142,10 @@ module.exports.getPost = (req, res, next) => {
 
   Post.findOne({ [`posts.${postId}`]: { $exists: true } }, (err, document) => {
     if (err) return next(err);
+    if (!document || !document.posts.get(postId))
+      return res.status(404).send('That user or post does not exist.');
     // Use the postId to get the post from the Map using .get
     const post = document.posts.get(postId);
-    if (!post || !document)
-      return res.status(404).send('That user or post does not exist.');
-    res.send(post);
+    res.send({ ...post, postId });
   });
 };

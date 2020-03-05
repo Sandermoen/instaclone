@@ -15,10 +15,9 @@ const postLimiter = rateLimit({
   max: 5
 });
 
-postRouter.use('/', postLimiter);
-
 postRouter.post(
   '/',
+  postLimiter,
   requireAuth,
   multer({
     dest: 'temp/',

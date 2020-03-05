@@ -1,4 +1,3 @@
-import React from 'react';
 import { assertPropTypes } from 'check-prop-types';
 import { createStore, applyMiddleware } from 'redux';
 
@@ -39,6 +38,7 @@ export const findByTestAttribute = (wrapper, attributeName) => {
  * @param {object} expectedProps Expected props.
  * @returns {undefined | Error}
  */
+/* eslint react/forbid-foreign-prop-types: 0 */
 export const checkProps = (Component, expectedProps) => {
   const result = assertPropTypes(
     Component.propTypes,

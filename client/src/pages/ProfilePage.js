@@ -22,9 +22,10 @@ const ProfilePage = ({ currentUser, showModal }) => {
     error: false,
     data: undefined
   });
-  const [currentPost, setCurrentPost] = useState(undefined);
+  const [currentPostId, setCurrentPostId] = useState(undefined);
 
   useEffect(() => {
+    // Fetch the user's profile
     setCurrentProfile({ fetching: true });
     axios
       .get(`/user/${username}`)
@@ -43,8 +44,19 @@ const ProfilePage = ({ currentUser, showModal }) => {
   }, [username]);
 
   useEffect(() => {
-    currentPost && showModal(null, 'PostDialog');
-  }, [currentPost, showModal]);
+    // Show the PostDialog in a Modal
+    if (currentPostId) {
+      showModal(
+        {
+          currentPostId,
+          avatar: currentProfile.data.avatar,
+          setCurrentProfile
+        },
+        'PostDialog'
+      );
+      setCurrentPostId(undefined);
+    }
+  }, [currentPostId, showModal, username]);
 
   const renderButton = () => {
     if (currentUser) {
@@ -115,7 +127,7 @@ const ProfilePage = ({ currentUser, showModal }) => {
           <div className="profile-images">
             {posts.map((post, idx) => (
               <ProfileImage
-                onClick={() => setCurrentPost(post.postId)}
+                onClick={() => setCurrentPostId(post.postId)}
                 image={post.image}
                 likes={post.likesCount}
                 key={idx}

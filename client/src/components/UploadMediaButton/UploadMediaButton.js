@@ -14,7 +14,7 @@ const UploadMediaButton = ({ showModal }) => {
         'UploadMediaForm'
       );
     }
-  }, [file]);
+  }, [file, showModal]);
   return (
     <Fragment>
       <label
