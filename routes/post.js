@@ -7,7 +7,8 @@ const { requireAuth } = require('../controllers/authController');
 const {
   uploadFile,
   votePost,
-  getPost
+  getPost,
+  addComment
 } = require('../controllers/postController');
 
 const postLimiter = rateLimit({
@@ -25,8 +26,8 @@ postRouter.post(
   }).single('image'),
   uploadFile
 );
-
 postRouter.post('/:postId/vote', requireAuth, votePost);
+postRouter.post('/:postId/comment', requireAuth, addComment);
 
 postRouter.get('/:postId', getPost);
 module.exports = postRouter;

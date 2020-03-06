@@ -5,11 +5,8 @@ const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 const short = require('short-uuid')();
 
-const { verifyJwt } = require('./authController');
-
-const addPost = async (imageUrl, caption, authorization) => {
+const addPost = async (imageUrl, caption, user) => {
   try {
-    const user = await verifyJwt(authorization);
     const postId = short.fromUUID(uuidv4());
     // Update the user's profile with the basic post information
     await User.updateOne(
@@ -49,7 +46,6 @@ const addPost = async (imageUrl, caption, authorization) => {
 // Upload the received file to amazon s3
 // Might switch to cloudinary instead
 module.exports.uploadFile = (req, res, next) => {
-  const { authorization } = req.headers;
   const { caption } = req.body;
 
   aws.config.setPromisesDependency();
@@ -73,7 +69,7 @@ module.exports.uploadFile = (req, res, next) => {
       fs.unlinkSync(req.file.path);
       const resourceLocation = data.Location;
       try {
-        addPost(resourceLocation, caption, authorization);
+        addPost(resourceLocation, caption, res.locals.user);
         return res.status(201).send(resourceLocation);
       } catch (err) {
         return res.status(401).send({ error: err });
@@ -82,8 +78,19 @@ module.exports.uploadFile = (req, res, next) => {
   });
 };
 
+const findPost = async postId => {
+  if (!postId) throw new Error('Please provide a post to retrieve.');
+  try {
+    const postDocument = await Post.findOne({
+      [`posts.${postId}`]: { $exists: true }
+    });
+    return postDocument;
+  } catch (err) {
+    throw new Error(err);
+  }
+};
+
 module.exports.votePost = async (req, res, next) => {
-  const { authorization } = req.headers;
   const { postId } = req.params;
   if (!postId) {
     return res
@@ -91,40 +98,32 @@ module.exports.votePost = async (req, res, next) => {
       .send({ error: 'Please provide the post before attempting to like it.' });
   }
   try {
-    const { username } = await verifyJwt(authorization);
+    const { username } = res.locals.user;
+    const postDocument = await findPost(postId);
+    let post = postDocument.posts.get(postId);
+    if (post.likes.includes(username)) {
+      // Post is already liked so remove user from like array
+      const userIndex = post.likes.findIndex(user => user === username);
+      post.likes.splice(userIndex, 1);
+      postDocument.posts.set(postId, post);
+    } else {
+      // Post has not been liked so add user to like array
+      post.likes.push(username);
+      postDocument.posts.set(postId, post);
+    }
 
-    Post.findOne(
-      { [`posts.${postId}`]: { $exists: true } },
-      (err, document) => {
+    postDocument.save((err, updatedDocument) => {
+      if (err) return next(err);
+      post = updatedDocument.posts.get(postId);
+    });
+
+    // Update the user collection with the updated like number
+    return User.updateOne(
+      { 'posts.postId': postId },
+      { 'posts.$.likesCount': post.likes.length },
+      err => {
         if (err) return next(err);
-        if (!document) return res.status(404).send('Could not find the post.');
-
-        let post = document.posts.get(postId);
-        if (post.likes.includes(username)) {
-          // Post is already liked so remove user from like array
-          const userIndex = post.likes.findIndex(user => user === username);
-          post.likes.splice(userIndex, 1);
-          document.posts.set(postId, post);
-        } else {
-          // Post has not been liked so add user to like array
-          post.likes.push(username);
-          document.posts.set(postId, post);
-        }
-
-        document.save((err, updatedDocument) => {
-          if (err) return next(err);
-          post = updatedDocument.posts.get(postId);
-        });
-
-        // Update the user collection with the updated like number
-        return User.updateOne(
-          { 'posts.postId': postId },
-          { 'posts.$.likesCount': post.likes.length },
-          err => {
-            if (err) return next(err);
-            return res.send({ likes: post.likes });
-          }
-        );
+        return res.send({ likes: post.likes });
       }
     );
   } catch (err) {
@@ -133,19 +132,42 @@ module.exports.votePost = async (req, res, next) => {
 };
 
 // Get post details (caption, likes, comments) etc..
-module.exports.getPost = (req, res, next) => {
+module.exports.getPost = async (req, res, next) => {
   const { postId } = req.params;
-  if (!postId)
+  try {
+    const postDocument = await findPost(postId);
+    const post = postDocument.posts.get(postId);
+    return res.send({ ...post, postId });
+  } catch (err) {
+    return res.status(400).send({ error: err.message });
+  }
+};
+
+module.exports.addComment = async (req, res, next) => {
+  const { postId } = req.params;
+  let { comment } = req.body;
+  const user = res.locals.user;
+
+  if (!comment) {
     return res
       .status(400)
-      .send({ error: 'Please provide a post to retrieve.' });
+      .send({ error: 'You cannot post and empty comment.' });
+  }
 
-  Post.findOne({ [`posts.${postId}`]: { $exists: true } }, (err, document) => {
-    if (err) return next(err);
-    if (!document || !document.posts.get(postId))
-      return res.status(404).send('That user or post does not exist.');
-    // Use the postId to get the post from the Map using .get
-    const post = document.posts.get(postId);
-    res.send({ ...post, postId });
-  });
+  try {
+    const postDocument = await findPost(postId);
+    const post = postDocument.posts.get(postId);
+    comment = { comment, username: user.username };
+    post.comments.push(comment);
+    postDocument.posts.set(postId, post);
+
+    return postDocument.save(err => {
+      if (err) next(err);
+      res
+        .status(201)
+        .send({ success: true, comment: { ...comment, avatar: user.avatar } });
+    });
+  } catch (err) {
+    return res.status(400).send({ error: err.message });
+  }
 };

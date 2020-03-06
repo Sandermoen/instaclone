@@ -20,7 +20,9 @@ module.exports.requireAuth = async (req, res, next) => {
   const { authorization } = req.headers;
   if (!authorization) return res.status(401).send({ error: 'Not authorized' });
   try {
-    await this.verifyJwt(authorization);
+    const user = await this.verifyJwt(authorization);
+    // Allow other middlewares to access the authenticated user details.
+    res.locals.user = user;
     return next();
   } catch (err) {
     return res.status(401).send({ error: err });
