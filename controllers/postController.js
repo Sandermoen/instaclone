@@ -149,24 +149,33 @@ module.exports.addComment = async (req, res, next) => {
   const user = res.locals.user;
 
   if (!comment) {
-    return res
-      .status(400)
-      .send({ error: 'You cannot post and empty comment.' });
+    return res.status(400).send({ error: 'You cannot post an empty comment.' });
   }
 
   try {
     const postDocument = await findPost(postId);
     const post = postDocument.posts.get(postId);
-    comment = { comment, username: user.username };
+
+    // Not including the user's avatar in the database because they can change it.
+    comment = { message: comment, username: user.username, date: Date.now() };
     post.comments.push(comment);
     postDocument.posts.set(postId, post);
 
-    return postDocument.save(err => {
+    postDocument.save(err => {
       if (err) next(err);
-      res
-        .status(201)
-        .send({ success: true, comment: { ...comment, avatar: user.avatar } });
     });
+
+    return User.updateOne(
+      { 'posts.postId': postId },
+      { 'posts.$.commentsCount': post.comments.length },
+      err => {
+        if (err) return next(err);
+        res.status(201).send({
+          success: true,
+          comment: { ...comment, avatar: user.avatar }
+        });
+      }
+    );
   } catch (err) {
     return res.status(400).send({ error: err.message });
   }

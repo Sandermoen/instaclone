@@ -22,7 +22,10 @@ const ProfilePage = ({ currentUser, showModal }) => {
     error: false,
     data: undefined
   });
-  const [currentPostId, setCurrentPostId] = useState(undefined);
+
+  useEffect(() => {
+    console.log(currentProfile);
+  }, [currentProfile]);
 
   useEffect(() => {
     // Fetch the user's profile
@@ -43,20 +46,17 @@ const ProfilePage = ({ currentUser, showModal }) => {
       );
   }, [username]);
 
-  useEffect(() => {
-    // Show the PostDialog in a Modal
-    if (currentPostId) {
-      showModal(
-        {
-          currentPostId,
-          avatar: currentProfile.data.avatar,
-          setCurrentProfile
-        },
-        'PostDialog'
-      );
-      setCurrentPostId(undefined);
-    }
-  }, [currentPostId, showModal, username]);
+  const handleClick = postId => {
+    showModal(
+      {
+        currentPostId: postId,
+        avatar: currentProfile.data.avatar,
+        setCurrentProfile,
+        username
+      },
+      'PostDialog'
+    );
+  };
 
   const renderButton = () => {
     if (currentUser) {
@@ -92,11 +92,7 @@ const ProfilePage = ({ currentUser, showModal }) => {
       return (
         <Fragment>
           <header className="profile-header">
-            <Avatar
-              imageSrc={
-                avatar ? avatar : require('../assets/img/default-avatar.png')
-              }
-            />
+            <Avatar imageSrc={avatar} />
             <div className="profile-header__info">
               <div className="profile-buttons">
                 <h1 className="heading-1 font-thin">{username}</h1>
@@ -127,9 +123,10 @@ const ProfilePage = ({ currentUser, showModal }) => {
           <div className="profile-images">
             {posts.map((post, idx) => (
               <ProfileImage
-                onClick={() => setCurrentPostId(post.postId)}
+                onClick={() => handleClick(post.postId)}
                 image={post.image}
                 likes={post.likesCount}
+                comments={post.commentsCount}
                 key={idx}
               />
             ))}
@@ -141,6 +138,8 @@ const ProfilePage = ({ currentUser, showModal }) => {
 
   return <div className="profile-page grid">{renderProfile()}</div>;
 };
+
+ProfilePage.whyDidYouRender = true;
 
 const mapStateToProps = createStructuredSelector({
   currentUser: selectCurrentUser

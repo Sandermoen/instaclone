@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import Icon from '../Icon/Icon';
 
-const ProfileImage = ({ onClick, image, likes }) => (
+const ProfileImage = ({ onClick, image, likes, comments }) => (
   <div onClick={onClick} key={image} className="profile-image">
     <img src={image} alt="User post" />
     <div className="profile-image__overlay">
@@ -16,7 +16,7 @@ const ProfileImage = ({ onClick, image, likes }) => (
         )}
         <div className="profile-image__icon">
           <Icon icon="chatbubbles" className="icon--white" />
-          <span>0</span>
+          <span>{comments}</span>
         </div>
       </span>
     </div>

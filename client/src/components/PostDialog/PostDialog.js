@@ -6,9 +6,11 @@ import axios from 'axios';
 import { selectToken, selectCurrentUser } from '../../redux/user/userSelectors';
 
 import Avatar from '../Avatar/Avatar';
-import Comment from '../Comment/Comment';
 import Icon from '../Icon/Icon';
 import Loader from '../Loader/Loader';
+import Comments from '../Comments/Comments';
+import PostDialogCommentForm from './PostDialogCommentForm/PostDialogCommentForm';
+import PostDialogStats from './PostDialogStats/PostDialogStats';
 
 const PostDialog = ({
   currentPostId,
@@ -19,30 +21,6 @@ const PostDialog = ({
   setCurrentProfile
 }) => {
   const [post, setPost] = useState({ fetching: false, data: undefined });
-  const likeImage = async event => {
-    event.nativeEvent.stopImmediatePropagation();
-    try {
-      const response = await axios.post(`/post/${currentPostId}/vote`, null, {
-        headers: {
-          authorization: token
-        }
-      });
-      setPost(previous => ({
-        ...previous,
-        data: { ...previous.data, likes: response.data.likes }
-      }));
-      setCurrentProfile(previous => {
-        const posts = previous.data.posts;
-        const postIndex = posts.findIndex(
-          post => post.postId === currentPostId
-        );
-        posts[postIndex].likesCount = response.data.likes.length;
-        return { ...previous, data: { ...previous.data, posts } };
-      });
-    } catch (err) {
-      console.warn(err.data);
-    }
-  };
 
   useEffect(() => {
     setPost({ fetching: true });
@@ -56,7 +34,7 @@ const PostDialog = ({
         });
       })
       .catch(err => setPost({ fetching: false }));
-  }, []);
+  }, [currentPostId]);
 
   return (
     <div className="post-dialog">
@@ -79,77 +57,32 @@ const PostDialog = ({
                 </div>
               </div>
             </header>
-            {/* These will be converted to their own components */}
-            <div className="comments">
-              <Comment
-                avatar={avatar}
-                comment={post.data.caption}
-                username={username}
-                caption
-              />
-              <Comment
-                avatar={avatar}
-                comment={post.data.caption}
-                username={username}
-              />
-            </div>
-            <div className="post-dialog__stats">
-              <div className="post-dialog__actions">
-                {currentUser &&
-                post.data.likes.includes(currentUser.username) ? (
-                  <Icon
-                    onClick={event => likeImage(event)}
-                    className="icon--button post-dialog__like color-red"
-                    icon="heart"
-                  />
-                ) : (
-                  <Icon
-                    onClick={event => likeImage(event)}
-                    className="icon--button post-dialog__like"
-                    icon="heart-outline"
-                  />
-                )}
-                <Icon
-                  onClick={event => {
-                    event.nativeEvent.stopImmediatePropagation();
-                    document.querySelector('.add-comment__input').focus();
-                  }}
-                  className="icon--button"
-                  icon="chatbubble-outline"
-                />
-                <Icon className="icon--button" icon="paper-plane-outline" />
-                <Icon className="icon--button" icon="bookmark-outline" />
-              </div>
-              <p className="heading-4">
-                {post.data.likes.length === 0 ? (
-                  <span>
-                    Be the first to{' '}
-                    <b
-                      style={{ cursor: 'pointer' }}
-                      onClick={event => likeImage(event)}
-                    >
-                      like this
-                    </b>
-                  </span>
-                ) : (
-                  <span>
-                    <b>
-                      {post.data.likes.length}{' '}
-                      {post.data.likes.length === 1 ? 'like' : 'likes'}
-                    </b>
-                  </span>
-                )}
-              </p>
-              <p className="heading-5 color-light uppercase">february 28</p>
-            </div>
-            <div className="post-dialog__add-comment">
-              <input
-                className="add-comment__input"
-                type="text"
-                placeholder="Add a comment..."
-              />
-              <h2 className="heading-3--button color-blue">Post</h2>
-            </div>
+            <Comments
+              caption={
+                post.data.caption
+                  ? {
+                      message: post.data.caption,
+                      avatar,
+                      username
+                    }
+                  : null
+              }
+              comments={post.data.comments}
+            />
+            <PostDialogStats
+              currentUser={currentUser}
+              post={post}
+              setCurrentProfile={setCurrentProfile}
+              setPost={setPost}
+              currentPostId={currentPostId}
+              token={token}
+            />
+            <PostDialogCommentForm
+              currentPostId={currentPostId}
+              token={token}
+              setPost={setPost}
+              setCurrentProfile={setCurrentProfile}
+            />
           </div>
         </Fragment>
       )}

@@ -2,7 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-const Avatar = ({ imageSrc, size, className }) => {
+const Avatar = ({
+  imageSrc = require('../../assets/img/default-avatar.png'),
+  size,
+  className
+}) => {
   const avatarClasses = classNames({
     avatar: true,
     [className]: className
@@ -20,7 +24,7 @@ const Avatar = ({ imageSrc, size, className }) => {
 };
 
 Avatar.propTypes = {
-  imageSrc: PropTypes.string.isRequired,
+  imageSrc: PropTypes.string,
   size: PropTypes.string,
   className: PropTypes.string
 };

@@ -7,6 +7,7 @@
 
   position: absolute;
   top: 0;
+  left: 0;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -14,5 +15,6 @@
   svg {
     position: absolute;
     top: 50%;
+    transform: translateY(-50%);
   }
 }
