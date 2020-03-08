@@ -1,6 +1,5 @@
 const jwt = require('jwt-simple');
 const User = require('../models/User');
-const Post = require('../models/Post');
 
 module.exports.verifyJwt = token => {
   return new Promise(async (resolve, reject) => {
@@ -85,8 +84,6 @@ module.exports.register = async (req, res, next) => {
   try {
     const user = new User({ username, email, password });
     await user.save();
-    const post = new Post({ username });
-    await post.save();
     res.status(201).send({
       user: {
         email: user.email,

@@ -24,10 +24,6 @@ const ProfilePage = ({ currentUser, showModal }) => {
   });
 
   useEffect(() => {
-    console.log(currentProfile);
-  }, [currentProfile]);
-
-  useEffect(() => {
     // Fetch the user's profile
     setCurrentProfile({ fetching: true });
     axios
@@ -138,8 +134,6 @@ const ProfilePage = ({ currentUser, showModal }) => {
 
   return <div className="profile-page grid">{renderProfile()}</div>;
 };
-
-ProfilePage.whyDidYouRender = true;
 
 const mapStateToProps = createStructuredSelector({
   currentUser: selectCurrentUser

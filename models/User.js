@@ -2,6 +2,9 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcrypt');
 
+const commentSchema = require('./Comment');
+const postSchema = require('./Post');
+
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
@@ -35,20 +38,8 @@ const userSchema = new Schema({
   },
   followers: Array,
   following: Array,
-  posts: [
-    {
-      postId: String,
-      likesCount: {
-        type: Number,
-        default: 0
-      },
-      commentsCount: {
-        type: Number,
-        default: 0
-      },
-      image: String
-    }
-  ],
+  posts: [postSchema],
+  comments: [commentSchema],
   private: {
     type: Boolean,
     default: false
@@ -57,14 +48,17 @@ const userSchema = new Schema({
 
 userSchema.pre('save', function(next) {
   const saltRounds = 10;
-  bcrypt.genSalt(saltRounds, (err, salt) => {
-    if (err) return next(err);
-    bcrypt.hash(this.password, salt, (err, hash) => {
+  // Check if the password has been modified
+  if (this.modifiedPaths().includes('password')) {
+    bcrypt.genSalt(saltRounds, (err, salt) => {
       if (err) return next(err);
-      this.password = hash;
-      next();
+      bcrypt.hash(this.password, salt, (err, hash) => {
+        if (err) return next(err);
+        this.password = hash;
+        next();
+      });
     });
-  });
+  }
 });
 
 userSchema.statics.findByCredentials = async function(

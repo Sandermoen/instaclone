@@ -2,13 +2,18 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const postSchema = new Schema({
-  username: String,
-  posts: {
-    type: Map,
-    default: {}
-  }
+  likesCount: {
+    type: Number,
+    default: 0
+  },
+  commentsCount: {
+    type: Number,
+    default: 0
+  },
+  image: String,
+  caption: String,
+  date: Date,
+  likes: Array
 });
 
-const postModel = mongoose.model('post', postSchema);
-
-module.exports = postModel;
+module.exports = postSchema;

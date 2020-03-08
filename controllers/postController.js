@@ -1,41 +1,20 @@
 const aws = require('aws-sdk');
 const User = require('../models/User');
-const Post = require('../models/Post');
 const fs = require('fs');
-const { v4: uuidv4 } = require('uuid');
-const short = require('short-uuid')();
 
 const addPost = async (imageUrl, caption, user) => {
   try {
-    const postId = short.fromUUID(uuidv4());
-    // Update the user's profile with the basic post information
+    // Update the user's profile with the post
     await User.updateOne(
       { _id: user._id },
       {
         $push: {
           posts: {
-            postId,
-            image: imageUrl
-          }
-        }
-      }
-    );
-    // Update the posts document with the post and all the comments and likes etc..
-    await Post.updateOne(
-      { username: user.username },
-      {
-        $set: {
-          [`posts.${postId}`]: {
-            caption,
             image: imageUrl,
-            date: Date.now(),
-            likes: [],
-            comments: []
+            caption,
+            date: Date.now()
           }
         }
-      },
-      err => {
-        if (err) return next(err);
       }
     );
   } catch (err) {
@@ -81,9 +60,13 @@ module.exports.uploadFile = (req, res, next) => {
 const findPost = async postId => {
   if (!postId) throw new Error('Please provide a post to retrieve.');
   try {
-    const postDocument = await Post.findOne({
-      [`posts.${postId}`]: { $exists: true }
-    });
+    const postDocument = await User.findOne(
+      {
+        'posts._id': postId
+      },
+      { 'posts.$': 1, username: 1, avatar: 1 }
+    );
+    if (!postDocument) throw new Error('Could not find post.');
     return postDocument;
   } catch (err) {
     throw new Error(err);
@@ -100,34 +83,23 @@ module.exports.votePost = async (req, res, next) => {
   try {
     const { username } = res.locals.user;
     const postDocument = await findPost(postId);
-    let post = postDocument.posts.get(postId);
+    const post = postDocument.posts[0];
+
     if (post.likes.includes(username)) {
       // Post is already liked so remove user from like array
       const userIndex = post.likes.findIndex(user => user === username);
       post.likes.splice(userIndex, 1);
-      postDocument.posts.set(postId, post);
+      post.likesCount -= 1;
     } else {
       // Post has not been liked so add user to like array
       post.likes.push(username);
-      postDocument.posts.set(postId, post);
+      post.likesCount += 1;
     }
-
-    postDocument.save((err, updatedDocument) => {
-      if (err) return next(err);
-      post = updatedDocument.posts.get(postId);
-    });
-
-    // Update the user collection with the updated like number
-    return User.updateOne(
-      { 'posts.postId': postId },
-      { 'posts.$.likesCount': post.likes.length },
-      err => {
-        if (err) return next(err);
-        return res.send({ likes: post.likes });
-      }
-    );
+    // Update post
+    await postDocument.update({ posts: post });
+    res.send({ success: true, likes: post.likes, likesCount: post.likesCount });
   } catch (err) {
-    res.status(401).send({ error: err });
+    res.status(401).send({ error: err.message });
   }
 };
 
@@ -136,8 +108,8 @@ module.exports.getPost = async (req, res, next) => {
   const { postId } = req.params;
   try {
     const postDocument = await findPost(postId);
-    const post = postDocument.posts.get(postId);
-    return res.send({ ...post, postId });
+    const post = postDocument.posts[0];
+    return res.send(post);
   } catch (err) {
     return res.status(400).send({ error: err.message });
   }
@@ -153,26 +125,27 @@ module.exports.addComment = async (req, res, next) => {
   }
 
   try {
-    const postDocument = await findPost(postId);
-    const post = postDocument.posts.get(postId);
-
-    // Not including the user's avatar in the database because they can change it.
-    comment = { message: comment, username: user.username, date: Date.now() };
-    post.comments.push(comment);
-    postDocument.posts.set(postId, post);
-
-    postDocument.save(err => {
-      if (err) next(err);
-    });
-
-    return User.updateOne(
-      { 'posts.postId': postId },
-      { 'posts.$.commentsCount': post.comments.length },
+    User.updateOne(
+      { _id: user._id },
+      {
+        $push: {
+          comments: {
+            postId,
+            userId: user._id,
+            date: Date.now(),
+            message: comment
+          }
+        }
+      },
       err => {
         if (err) return next(err);
         res.status(201).send({
           success: true,
-          comment: { ...comment, avatar: user.avatar }
+          comment: {
+            message: comment,
+            username: user.username,
+            avatar: user.avatar
+          }
         });
       }
     );
