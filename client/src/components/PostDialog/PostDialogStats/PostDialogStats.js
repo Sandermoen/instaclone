@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import { useTransition } from 'react-spring';
 
 import Icon from '../../Icon/Icon';
 
@@ -11,6 +12,27 @@ const PostDialogStats = ({
   token,
   currentPostId
 }) => {
+  const [likedPost, setLikedPost] = useState(
+    post.data.likes.includes(currentUser.username)
+  );
+  const ref = useRef();
+  const transitions = useTransition(likedPost, null, {
+    from: { transform: 'scale(1.3)' },
+    enter: { transform: 'scale(1)' },
+    leave: { display: 'none' },
+    config: {
+      mass: 1,
+      tension: 500,
+      friction: 20
+    },
+    // Prevent animating on initial render
+    immediate: !ref.current
+  });
+
+  useEffect(() => {
+    setLikedPost(post.data.likes.includes(currentUser.username));
+  }, [post]);
+
   const likePost = async () => {
     try {
       const response = await axios.post(`/post/${currentPostId}/vote`, null, {
@@ -34,20 +56,24 @@ const PostDialogStats = ({
   };
 
   return (
-    <div className="post-dialog__stats">
+    <div ref={ref} className="post-dialog__stats">
       <div className="post-dialog__actions">
-        {currentUser && post.data.likes.includes(currentUser.username) ? (
-          <Icon
-            onClick={() => likePost()}
-            className="icon--button post-dialog__like color-red"
-            icon="heart"
-          />
-        ) : (
-          <Icon
-            onClick={() => likePost()}
-            className="icon--button post-dialog__like"
-            icon="heart-outline"
-          />
+        {transitions.map(({ item, key, props }) =>
+          item ? (
+            <Icon
+              style={props}
+              onClick={() => likePost()}
+              className="icon--button post-dialog__like color-red"
+              icon="heart"
+            />
+          ) : (
+            <Icon
+              style={props}
+              onClick={() => likePost()}
+              className="icon--button post-dialog__like"
+              icon="heart-outline"
+            />
+          )
         )}
         <Icon
           onClick={() => document.querySelector('.add-comment__input').focus()}

@@ -1,17 +1,18 @@
 import React from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
+import { animated } from 'react-spring';
 
-const Icon = ({ onClick, className, icon }) => {
+const Icon = ({ onClick, className, icon, style }) => {
   const iconClassNames = classNames({
     icon: true,
     [className]: className
   });
 
   return (
-    <div onClick={onClick} className={iconClassNames}>
+    <animated.div style={style} onClick={onClick} className={iconClassNames}>
       <ion-icon name={icon}></ion-icon>
-    </div>
+    </animated.div>
   );
 };
 

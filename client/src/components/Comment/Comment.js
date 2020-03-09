@@ -15,7 +15,9 @@ const Comment = ({ avatar, comment, username, caption }) => (
         {!caption && (
           <Fragment>
             <p className="heading-5 color-light">10 likes</p>
-            <p className="heading-5 color-light">reply</p>
+            <button className="heading-5 heading--button color-light">
+              reply
+            </button>
           </Fragment>
         )}
       </div>

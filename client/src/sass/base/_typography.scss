@@ -25,12 +25,6 @@ body {
   font-size: 1.5rem;
   color: $color-black;
   letter-spacing: 0.5px;
-
-  &--button {
-    cursor: pointer;
-    display: inline-block;
-    text-decoration: none;
-  }
 }
 
 .heading-4 {
@@ -41,6 +35,15 @@ body {
 .heading-5 {
   font-size: 1.2rem;
   color: $color-black;
+}
+
+.heading--button {
+  cursor: pointer;
+  display: inline-block;
+  text-decoration: none;
+  font-family: inherit;
+  background-color: transparent;
+  border: none;
 }
 
 .error {

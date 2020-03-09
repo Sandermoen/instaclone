@@ -30,7 +30,7 @@ const PostDialogCommentForm = ({
       // Update the comment array
       setPost(previous => {
         const comments = [...previous.data.comments];
-        comments.unshift(response.data.comment);
+        comments.push(response.data.comment);
         return { ...previous, data: { ...previous.data, comments } };
       });
       // Update the comment count
@@ -43,6 +43,10 @@ const PostDialogCommentForm = ({
         return { ...previous, data: { ...previous.data, posts } };
       });
       setComment({ fetching: false, data: '' });
+
+      // Scroll to bottom to see posted comments
+      const comments = document.querySelector('.comments');
+      comments.scrollTop = comments.scrollHeight;
     } catch (err) {
       console.warn(err.data);
     }
@@ -64,7 +68,12 @@ const PostDialogCommentForm = ({
           }
           value={comment.data}
         />
-        <h2 className="heading-3--button color-blue">Post</h2>
+        <button
+          type="submit"
+          className="heading-3 heading--button font-bold color-blue"
+        >
+          Post
+        </button>
       </Fragment>
     </form>
   );

@@ -108,8 +108,7 @@ module.exports.getPost = async (req, res, next) => {
   const { postId } = req.params;
   try {
     const postDocument = await findPost(postId);
-    // Query for posts with the same postId and filter them by postId
-    // and sort by most recent.
+    // Query for posts with the same postId and filter them by postId.
     const commentsDocument = await User.aggregate([
       { $match: { 'comments.postId': postId } },
       {
@@ -125,7 +124,15 @@ module.exports.getPost = async (req, res, next) => {
           }
         }
       },
-      { $sort: { 'comments.date': -1 } }
+      { $unwind: '$comments' },
+      {
+        $group: {
+          _id: '$_id',
+          username: { $first: '$username' },
+          avatar: { $first: '$avatar' },
+          comments: { $push: '$comments' }
+        }
+      }
     ]);
     const post = postDocument.posts[0];
 
@@ -134,11 +141,14 @@ module.exports.getPost = async (req, res, next) => {
       .map(document => {
         return document.comments.map(comment => {
           comment.username = document.username;
-          comment.avatar = document.avatar;
+          if (document.avatar) comment.avatar = document.avatar;
           return comment;
         });
       })
       .flat();
+
+    // Sort comments by most recent.
+    comments.sort((a, b) => new Date(b.date) - new Date(a.date)).reverse();
 
     return res.send({
       ...post.toObject(),
@@ -151,7 +161,7 @@ module.exports.getPost = async (req, res, next) => {
 
 module.exports.addComment = async (req, res, next) => {
   const { postId } = req.params;
-  let { comment } = req.body;
+  const { comment } = req.body;
   const user = res.locals.user;
 
   if (!comment) {

@@ -73,7 +73,7 @@ const UploadMediaForm = ({ token, file, currentUser, hide }) => {
         <h2 className="heading-3">New Post</h2>
         <h2
           onClick={event => handleClick(event)}
-          className="heading-3--button color-blue"
+          className="heading-3 heading--button color-blue"
         >
           Share
         </h2>
