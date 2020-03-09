@@ -119,7 +119,7 @@ const ProfilePage = ({ currentUser, showModal }) => {
           <div className="profile-images">
             {posts.map((post, idx) => (
               <ProfileImage
-                onClick={() => handleClick(post.postId)}
+                onClick={() => handleClick(post._id)}
                 image={post.image}
                 likes={post.likesCount}
                 comments={post.commentsCount}

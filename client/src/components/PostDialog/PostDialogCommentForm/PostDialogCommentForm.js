@@ -30,16 +30,16 @@ const PostDialogCommentForm = ({
       // Update the comment array
       setPost(previous => {
         const comments = [...previous.data.comments];
-        comments.push(response.data.comment);
+        comments.unshift(response.data.comment);
         return { ...previous, data: { ...previous.data, comments } };
       });
       // Update the comment count
       setCurrentProfile(previous => {
         const posts = [...JSON.parse(JSON.stringify(previous.data.posts))];
         const postIndex = previous.data.posts.findIndex(
-          post => post.postId === currentPostId
+          post => post._id === currentPostId
         );
-        posts[postIndex].commentCount += 1;
+        posts[postIndex].commentsCount += 1;
         return { ...previous, data: { ...previous.data, posts } };
       });
       setComment({ fetching: false, data: '' });

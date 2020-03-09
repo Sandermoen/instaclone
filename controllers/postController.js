@@ -103,13 +103,47 @@ module.exports.votePost = async (req, res, next) => {
   }
 };
 
-// Get post details (caption, likes, comments) etc..
+// Get a specific post with comments.
 module.exports.getPost = async (req, res, next) => {
   const { postId } = req.params;
   try {
     const postDocument = await findPost(postId);
+    // Query for posts with the same postId and filter them by postId
+    // and sort by most recent.
+    const commentsDocument = await User.aggregate([
+      { $match: { 'comments.postId': postId } },
+      {
+        $project: {
+          username: 1,
+          avatar: 1,
+          comments: {
+            $filter: {
+              input: '$comments',
+              as: 'comment',
+              cond: { $eq: ['$$comment.postId', postId] }
+            }
+          }
+        }
+      },
+      { $sort: { 'comments.date': -1 } }
+    ]);
     const post = postDocument.posts[0];
-    return res.send(post);
+
+    // This could probably be done more efficiently.
+    const comments = commentsDocument
+      .map(document => {
+        return document.comments.map(comment => {
+          comment.username = document.username;
+          comment.avatar = document.avatar;
+          return comment;
+        });
+      })
+      .flat();
+
+    return res.send({
+      ...post.toObject(),
+      comments
+    });
   } catch (err) {
     return res.status(400).send({ error: err.message });
   }
@@ -137,15 +171,20 @@ module.exports.addComment = async (req, res, next) => {
           }
         }
       },
-      err => {
+      async err => {
         if (err) return next(err);
-        res.status(201).send({
-          success: true,
-          comment: {
-            message: comment,
-            username: user.username,
-            avatar: user.avatar
-          }
+        const postDocument = await findPost(postId);
+        postDocument.update({ $inc: { 'posts.0.commentsCount': 1 } }, err => {
+          if (err) return next(err);
+
+          res.status(201).send({
+            success: true,
+            comment: {
+              message: comment,
+              username: user.username,
+              avatar: user.avatar
+            }
+          });
         });
       }
     );

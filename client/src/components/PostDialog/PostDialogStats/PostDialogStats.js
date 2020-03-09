@@ -24,9 +24,7 @@ const PostDialogStats = ({
       }));
       setCurrentProfile(previous => {
         const posts = [...JSON.parse(JSON.stringify(previous.data.posts))];
-        const postIndex = posts.findIndex(
-          post => post.postId === currentPostId
-        );
+        const postIndex = posts.findIndex(post => post._id === currentPostId);
         posts[postIndex].likesCount = response.data.likes.length;
         return { ...previous, data: { ...previous.data, posts } };
       });
