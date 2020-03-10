@@ -15,7 +15,16 @@ const Comment = ({ avatar, comment, username, caption }) => (
         {!caption && (
           <Fragment>
             <p className="heading-5 color-light">10 likes</p>
-            <button className="heading-5 heading--button color-light">
+            <button
+              onClick={() => {
+                const inputField = document.querySelector(
+                  '.add-comment__input'
+                );
+                inputField.focus();
+                inputField.value = `@${username} `;
+              }}
+              className="heading-5 heading--button color-light"
+            >
               reply
             </button>
           </Fragment>

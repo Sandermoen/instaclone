@@ -5,7 +5,11 @@ const commentSchema = new Schema({
   postId: String,
   userId: String,
   date: Date,
-  message: String
+  message: String,
+  commentCount: {
+    type: Number,
+    default: 0
+  }
 });
 
 module.exports = commentSchema;

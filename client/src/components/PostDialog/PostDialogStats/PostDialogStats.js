@@ -65,6 +65,7 @@ const PostDialogStats = ({
               onClick={() => likePost()}
               className="icon--button post-dialog__like color-red"
               icon="heart"
+              key={key}
             />
           ) : (
             <Icon
@@ -72,6 +73,7 @@ const PostDialogStats = ({
               onClick={() => likePost()}
               className="icon--button post-dialog__like"
               icon="heart-outline"
+              key={key}
             />
           )
         )}

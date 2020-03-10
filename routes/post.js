@@ -8,7 +8,8 @@ const {
   uploadFile,
   votePost,
   getPost,
-  addComment
+  addComment,
+  getComments
 } = require('../controllers/postController');
 
 const postLimiter = rateLimit({
@@ -30,4 +31,5 @@ postRouter.post('/:postId/vote', requireAuth, votePost);
 postRouter.post('/:postId/comment', requireAuth, addComment);
 
 postRouter.get('/:postId', getPost);
+postRouter.get('/:commentId/comments', getComments);
 module.exports = postRouter;

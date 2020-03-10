@@ -72,7 +72,9 @@ const Header = memo(({ currentUser }) => {
                 <Button>Log In</Button>
               </Link>
               <Link to="/login">
-                <h3 className="heading-3 heading-button color-blue">Sign Up</h3>
+                <h3 className="heading-3 heading--button color-blue">
+                  Sign Up
+                </h3>
               </Link>
             </Fragment>
           )}
