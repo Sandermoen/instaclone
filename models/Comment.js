@@ -6,7 +6,7 @@ const commentSchema = new Schema({
   userId: String,
   date: Date,
   message: String,
-  commentCount: {
+  commentsCount: {
     type: Number,
     default: 0
   }

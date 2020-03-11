@@ -16,7 +16,7 @@ const Comments = ({ comments, caption }) => (
     {comments.map((comment, idx) => (
       <Comment
         avatar={comment.avatar}
-        comment={comment.message}
+        comment={comment}
         username={comment.username}
         key={idx}
       />

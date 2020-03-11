@@ -101,21 +101,6 @@ const findComments = async parentId => {
   }
 };
 
-const findComment = async commentId => {
-  try {
-    const commentDocument = await User.findOne(
-      { 'comments._id': commentId },
-      'comments.$.0'
-    );
-    if (!commentDocument) {
-      throw new Error('Could not find comment.');
-    }
-    return commentDocument;
-  } catch (err) {
-    throw new Error(err.message);
-  }
-};
-
 // Upload the received file to amazon s3
 // Might switch to cloudinary instead
 module.exports.uploadFile = (req, res, next) => {
@@ -210,17 +195,26 @@ module.exports.addComment = async (req, res, next) => {
   const { postId } = req.params;
   const { comment, reply } = req.body;
   const user = res.locals.user;
+  // If it is a reply update the comments document
+  // Otherwise update the posts subdocument
+  const query = reply ? 'comments' : 'posts';
 
   if (!comment) {
     return res.status(400).send({ error: 'You cannot post an empty comment.' });
   }
 
-  // return findComment(postId)
-  //   .then(commentDocument => res.send(commentDocument))
-  //   .catch(err => next(err));
-
   try {
-    User.updateOne(
+    let parent = await User.findOne({ [`${query}._id`]: postId }, [
+      `${query}.$`
+    ]);
+    if (!parent) {
+      return res
+        .status(404)
+        .send({ error: 'Could not find a parent to post a comment to.' });
+    }
+    parent = parent[query][0];
+
+    const commentUpdate = await User.updateOne(
       { _id: user._id },
       {
         $push: {
@@ -231,37 +225,48 @@ module.exports.addComment = async (req, res, next) => {
             message: comment
           }
         }
-      },
-      async err => {
-        if (err) return next(err);
-
-        if (reply) {
-          // Increment parent comment commentCount
-          const update = await User.updateOne(
-            { 'comments._id': postId },
-            { $inc: { 'comments.$.commentCount': 1 } }
-          );
-          Promise.reject();
-          if (!update.ok) return next('Could not update comment count.');
-        } else {
-          // Increment parent post commentCount
-          const update = await User.updateOne(
-            { 'posts._id': postId },
-            { $inc: { 'posts.$.commentCount': 1 } }
-          );
-          if (!update.ok) return next('Could not update comment count.');
-        }
-
-        return res.status(201).send({
-          success: true,
-          comment: {
-            message: comment,
-            username: user.username,
-            avatar: user.avatar
-          }
-        });
       }
     );
+
+    if (!commentUpdate.nModified)
+      return res.status(500).send({ error: 'Could not post comment.' });
+
+    // Update post comment count
+    const postCommentCountUpdate = await User.updateOne(
+      { 'posts._id': parent.postId ? parent.postId : postId },
+      { $inc: { 'posts.$.commentsCount': 1 } }
+    );
+
+    if (!postCommentCountUpdate.nModified) {
+      return res.status(500).send({
+        error: 'Could not update post comments count.',
+        postCommentCountUpdate
+      });
+    }
+
+    // If it it is a reply to a comment update the parent comment count aswell
+    if (reply) {
+      const commentCountUpdate = await User.updateOne(
+        { 'comments._id': postId },
+        { $inc: { 'comments.$.commentsCount': 1 } }
+      );
+
+      if (!commentCountUpdate.nModified) {
+        return res.status(500).send({
+          error: 'Could not update parent comment comments count.',
+          commentCountUpdate
+        });
+      }
+    }
+
+    return res.status(201).send({
+      success: true,
+      comment: {
+        message: comment,
+        username: user.username,
+        avatar: user.avatar
+      }
+    });
   } catch (err) {
     next(err);
   }
