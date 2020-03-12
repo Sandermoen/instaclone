@@ -1,9 +1,11 @@
-import React, { useState, useEffect, Fragment } from 'react';
+import React, { useEffect, Fragment } from 'react';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
-import axios from 'axios';
 
 import { selectToken, selectCurrentUser } from '../../redux/user/userSelectors';
+import { selectPost } from '../../redux/posts/postsSelectors';
+
+import { fetchPostComments } from '../../redux/posts/postsActions';
 
 import Avatar from '../Avatar/Avatar';
 import Icon from '../Icon/Icon';
@@ -18,32 +20,22 @@ const PostDialog = ({
   username,
   token,
   currentUser,
-  setCurrentProfile
+  setCurrentProfile,
+  post,
+  fetchPostComments
 }) => {
-  const [post, setPost] = useState({ fetching: false, data: undefined });
-
   useEffect(() => {
-    setPost({ fetching: true });
-    axios
-      .get(`/post/${currentPostId}`)
-      .then(response => {
-        const { caption, image, date, likes, comments, postId } = response.data;
-        setPost({
-          fetching: false,
-          data: { caption, image, date, likes, comments, postId }
-        });
-      })
-      .catch(err => setPost({ fetching: false }));
+    fetchPostComments(currentPostId);
   }, [currentPostId]);
 
   return (
     <div className="post-dialog">
-      {!post.data ? (
+      {!post.comments ? (
         <Loader />
       ) : (
         <Fragment>
           <div className="post-dialog__image">
-            <img src={post.data.image} alt="Post" />
+            <img src={post.image} alt="Post" />
           </div>
           <div className="post-dialog__content">
             <header className="post-dialog__header">
@@ -59,28 +51,27 @@ const PostDialog = ({
             </header>
             <Comments
               caption={
-                post.data.caption
+                post.caption
                   ? {
-                      message: post.data.caption,
+                      message: post.caption,
                       avatar,
                       username
                     }
                   : null
               }
-              comments={post.data.comments}
+              comments={post.comments}
+              post={post}
             />
             <PostDialogStats
               currentUser={currentUser}
               post={post}
               setCurrentProfile={setCurrentProfile}
-              setPost={setPost}
               currentPostId={currentPostId}
               token={token}
             />
             <PostDialogCommentForm
               currentPostId={currentPostId}
               token={token}
-              setPost={setPost}
               setCurrentProfile={setCurrentProfile}
             />
           </div>
@@ -92,9 +83,14 @@ const PostDialog = ({
 
 const mapStateToProps = createStructuredSelector({
   token: selectToken,
-  currentUser: selectCurrentUser
+  currentUser: selectCurrentUser,
+  post: selectPost
+});
+
+const mapDispatchToProps = dispatch => ({
+  fetchPostComments: postId => dispatch(fetchPostComments(postId))
 });
 
 PostDialog.whyDidYouRender = true;
 
-export default connect(mapStateToProps)(PostDialog);
+export default connect(mapStateToProps, mapDispatchToProps)(PostDialog);

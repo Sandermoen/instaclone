@@ -5,8 +5,10 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 
 import { selectCurrentUser } from '../redux/user/userSelectors';
+import { selectPosts } from '../redux/posts/postsSelectors';
 
 import { showModal } from '../redux/modal/modalActions';
+import { addPosts } from '../redux/posts/postsActions';
 
 import Avatar from '../components/Avatar/Avatar';
 import Button from '../components/Button/Button';
@@ -15,7 +17,7 @@ import Icon from '../components/Icon/Icon';
 import ProfileImage from '../components/ProfileImage/ProfileImage';
 import Loader from '../components/Loader/Loader';
 
-const ProfilePage = ({ currentUser, showModal }) => {
+const ProfilePage = ({ currentUser, showModal, posts, addPosts }) => {
   const { username } = useParams();
   const [currentProfile, setCurrentProfile] = useState({
     fetching: false,
@@ -29,10 +31,19 @@ const ProfilePage = ({ currentUser, showModal }) => {
     axios
       .get(`/user/${username}`)
       .then(response => {
+        const {
+          username,
+          followersCount,
+          followingCount,
+          postCount,
+          posts
+        } = response.data;
         setCurrentProfile({
           fetching: false,
-          data: { ...response.data }
+          data: { username, followersCount, followingCount, postCount }
         });
+        // Add all posts to state
+        addPosts(posts);
       })
       .catch(err =>
         setCurrentProfile({
@@ -47,7 +58,6 @@ const ProfilePage = ({ currentUser, showModal }) => {
       {
         currentPostId: postId,
         avatar: currentProfile.data.avatar,
-        setCurrentProfile,
         username
       },
       'PostDialog'
@@ -82,8 +92,7 @@ const ProfilePage = ({ currentUser, showModal }) => {
         username,
         postCount,
         followersCount,
-        bio,
-        posts
+        bio
       } = currentProfile.data;
       return (
         <Fragment>
@@ -117,15 +126,18 @@ const ProfilePage = ({ currentUser, showModal }) => {
           </header>
           <ProfileCategory category="POSTS" icon="apps" />
           <div className="profile-images">
-            {posts.map((post, idx) => (
-              <ProfileImage
-                onClick={() => handleClick(post._id)}
-                image={post.image}
-                likes={post.likesCount}
-                comments={post.commentsCount}
-                key={idx}
-              />
-            ))}
+            {Object.entries(posts).map((postArray, idx) => {
+              const post = postArray[1];
+              return (
+                <ProfileImage
+                  onClick={() => handleClick(post._id)}
+                  image={post.image}
+                  likes={post.likesCount}
+                  comments={post.commentsCount}
+                  key={idx}
+                />
+              );
+            })}
           </div>
         </Fragment>
       );
@@ -136,11 +148,13 @@ const ProfilePage = ({ currentUser, showModal }) => {
 };
 
 const mapStateToProps = createStructuredSelector({
-  currentUser: selectCurrentUser
+  currentUser: selectCurrentUser,
+  posts: selectPosts
 });
 
 const mapDispatchToProps = dispatch => ({
-  showModal: (props, component) => dispatch(showModal(props, component))
+  showModal: (props, component) => dispatch(showModal(props, component)),
+  addPosts: posts => dispatch(addPosts(posts))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProfilePage);

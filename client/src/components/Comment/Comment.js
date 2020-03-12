@@ -1,16 +1,18 @@
 import React, { Fragment, useState, useEffect } from 'react';
+import { connect } from 'react-redux';
 import axios from 'axios';
+
+import { setReplyCommentId } from '../../redux/posts/postsActions';
 
 import Avatar from '../Avatar/Avatar';
 import Icon from '../Icon/Icon';
 
-const Comment = ({ avatar, comment, username, caption }) => {
+const Comment = ({ avatar, comment, username, caption, setReplyCommentId }) => {
   const [replies, setReplies] = useState(null);
   const [toggleReplies, setToggleReplies] = useState(false);
 
   useEffect(() => {
     if (toggleReplies === true && !replies) {
-      console.log('yes');
       axios
         .get(`/post/${comment._id}/comments`)
         .then(response => setReplies(response.data))
@@ -41,6 +43,7 @@ const Comment = ({ avatar, comment, username, caption }) => {
                   );
                   inputField.focus();
                   inputField.value = `@${username} `;
+                  setReplyCommentId(comment._id);
                 }}
                 className="heading-5 heading--button color-light"
               >
@@ -89,4 +92,8 @@ const Comment = ({ avatar, comment, username, caption }) => {
   );
 };
 
-export default Comment;
+const mapDispatchToProps = dispatch => ({
+  setReplyCommentId: commentId => dispatch(setReplyCommentId(commentId))
+});
+
+export default connect(null, mapDispatchToProps)(Comment);

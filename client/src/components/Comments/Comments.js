@@ -3,12 +3,12 @@ import PropTypes from 'prop-types';
 
 import Comment from '../Comment/Comment';
 
-const Comments = ({ comments, caption }) => (
+const Comments = ({ comments, caption, post }) => (
   <div className="comments">
     {caption && (
       <Comment
         avatar={caption.avatar}
-        comment={caption.message}
+        comment={caption}
         username={caption.username}
         caption
       />
@@ -19,6 +19,7 @@ const Comments = ({ comments, caption }) => (
         comment={comment}
         username={comment.username}
         key={idx}
+        post={post}
       />
     ))}
   </div>

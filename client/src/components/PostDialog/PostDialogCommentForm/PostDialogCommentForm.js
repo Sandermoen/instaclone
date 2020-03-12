@@ -1,13 +1,20 @@
 import React, { useState, Fragment } from 'react';
+import { createStructuredSelector } from 'reselect';
+import { connect } from 'react-redux';
 import axios from 'axios';
+
+import {
+  addComment,
+  clearReplyCommentId
+} from '../../../redux/posts/postsActions';
 
 import Loader from '../../Loader/Loader';
 
 const PostDialogCommentForm = ({
   currentPostId,
   token,
-  setPost,
-  setCurrentProfile
+  addComment,
+  clearReplyCommentId
 }) => {
   const [comment, setComment] = useState({ fetching: false, data: '' });
 
@@ -27,21 +34,8 @@ const PostDialogCommentForm = ({
           }
         }
       );
-      // Update the comment array
-      setPost(previous => {
-        const comments = [...previous.data.comments];
-        comments.push(response.data.comment);
-        return { ...previous, data: { ...previous.data, comments } };
-      });
-      // Update the comment count
-      setCurrentProfile(previous => {
-        const posts = [...JSON.parse(JSON.stringify(previous.data.posts))];
-        const postIndex = previous.data.posts.findIndex(
-          post => post._id === currentPostId
-        );
-        posts[postIndex].commentsCount += 1;
-        return { ...previous, data: { ...previous.data, posts } };
-      });
+      addComment(currentPostId, response.data.comment);
+      clearReplyCommentId();
       setComment({ fetching: false, data: '' });
 
       // Scroll to bottom to see posted comments
@@ -79,4 +73,9 @@ const PostDialogCommentForm = ({
   );
 };
 
-export default PostDialogCommentForm;
+const mapDispatchToProps = dispatch => ({
+  addComment: (postId, comment) => dispatch(addComment(postId, comment)),
+  clearReplyCommentId: () => dispatch(clearReplyCommentId())
+});
+
+export default connect(null, mapDispatchToProps)(PostDialogCommentForm);

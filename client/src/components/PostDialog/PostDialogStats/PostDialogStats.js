@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { connect } from 'react-redux';
 import axios from 'axios';
 import { useTransition } from 'react-spring';
+
+import { likePost } from '../../../redux/posts/postsActions';
 
 import Icon from '../../Icon/Icon';
 
@@ -10,10 +13,11 @@ const PostDialogStats = ({
   setCurrentProfile,
   setPost,
   token,
-  currentPostId
+  currentPostId,
+  likePost
 }) => {
   const [likedPost, setLikedPost] = useState(
-    post.data.likes.includes(currentUser.username)
+    post.likes.includes(currentUser.username)
   );
   const ref = useRef();
   const transitions = useTransition(likedPost, null, {
@@ -30,29 +34,10 @@ const PostDialogStats = ({
   });
 
   useEffect(() => {
-    setLikedPost(post.data.likes.includes(currentUser.username));
+    setLikedPost(post.likes.includes(currentUser.username));
   }, [post]);
-
-  const likePost = async () => {
-    try {
-      const response = await axios.post(`/post/${currentPostId}/vote`, null, {
-        headers: {
-          authorization: token
-        }
-      });
-      setPost(previous => ({
-        ...previous,
-        data: { ...previous.data, likes: response.data.likes }
-      }));
-      setCurrentProfile(previous => {
-        const posts = [...JSON.parse(JSON.stringify(previous.data.posts))];
-        const postIndex = posts.findIndex(post => post._id === currentPostId);
-        posts[postIndex].likesCount = response.data.likes.length;
-        return { ...previous, data: { ...previous.data, posts } };
-      });
-    } catch (err) {
-      console.warn(err.data);
-    }
+  const handleClick = async () => {
+    likePost(currentPostId, token);
   };
 
   return (
@@ -62,7 +47,7 @@ const PostDialogStats = ({
           item ? (
             <Icon
               style={props}
-              onClick={() => likePost()}
+              onClick={() => handleClick()}
               className="icon--button post-dialog__like color-red"
               icon="heart"
               key={key}
@@ -70,7 +55,7 @@ const PostDialogStats = ({
           ) : (
             <Icon
               style={props}
-              onClick={() => likePost()}
+              onClick={() => handleClick()}
               className="icon--button post-dialog__like"
               icon="heart-outline"
               key={key}
@@ -86,18 +71,17 @@ const PostDialogStats = ({
         <Icon className="icon--button" icon="bookmark-outline" />
       </div>
       <p className="heading-4">
-        {post.data.likes.length === 0 ? (
+        {post.likes.length === 0 ? (
           <span>
             Be the first to{' '}
-            <b style={{ cursor: 'pointer' }} onClick={() => likePost()}>
+            <b style={{ cursor: 'pointer' }} onClick={() => handleClick()}>
               like this
             </b>
           </span>
         ) : (
           <span>
             <b>
-              {post.data.likes.length}{' '}
-              {post.data.likes.length === 1 ? 'like' : 'likes'}
+              {post.likes.length} {post.likes.length === 1 ? 'like' : 'likes'}
             </b>
           </span>
         )}
@@ -107,4 +91,8 @@ const PostDialogStats = ({
   );
 };
 
-export default PostDialogStats;
+const mapDispatchToProps = dispatch => ({
+  likePost: (postId, authToken) => dispatch(likePost(postId, authToken))
+});
+
+export default connect(null, mapDispatchToProps)(PostDialogStats);
