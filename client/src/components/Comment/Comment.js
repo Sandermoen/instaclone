@@ -1,24 +1,30 @@
-import React, { Fragment, useState, useEffect } from 'react';
+import React, { Fragment, useEffect } from 'react';
 import { connect } from 'react-redux';
-import axios from 'axios';
 
-import { setReplyCommentId } from '../../redux/posts/postsActions';
+import {
+  setReplyComment,
+  fetchCommentReplies,
+  toggleShowComments
+} from '../../redux/posts/postsActions';
 
 import Avatar from '../Avatar/Avatar';
 import Icon from '../Icon/Icon';
 
-const Comment = ({ avatar, comment, username, caption, setReplyCommentId }) => {
-  const [replies, setReplies] = useState(null);
-  const [toggleReplies, setToggleReplies] = useState(false);
-
+const Comment = ({
+  avatar,
+  comment,
+  username,
+  caption,
+  setReplyComment,
+  post,
+  fetchCommentReplies,
+  toggleShowComments
+}) => {
   useEffect(() => {
-    if (toggleReplies === true && !replies) {
-      axios
-        .get(`/post/${comment._id}/comments`)
-        .then(response => setReplies(response.data))
-        .catch(err => console.warn(err));
+    if (comment.toggleComments === true) {
+      fetchCommentReplies(post._id, comment._id);
     }
-  }, [toggleReplies, replies]);
+  }, [comment]);
 
   const renderComment = (avatar, comment, username, reply, caption, key) => (
     <div
@@ -37,14 +43,9 @@ const Comment = ({ avatar, comment, username, caption, setReplyCommentId }) => {
             <Fragment>
               <p className="heading-5 color-light">10 likes</p>
               <button
-                onClick={() => {
-                  const inputField = document.querySelector(
-                    '.add-comment__input'
-                  );
-                  inputField.focus();
-                  inputField.value = `@${username} `;
-                  setReplyCommentId(comment._id);
-                }}
+                onClick={() =>
+                  setReplyComment(comment._id, username, comment.toggleComments)
+                }
                 className="heading-5 heading--button color-light"
               >
                 reply
@@ -54,12 +55,12 @@ const Comment = ({ avatar, comment, username, caption, setReplyCommentId }) => {
         </div>
         {!caption && comment.commentsCount ? (
           <p
-            onClick={() => setToggleReplies(previous => !previous)}
+            onClick={() => toggleShowComments(post._id, comment._id)}
             style={{ display: 'flex', alignItems: 'center', marginTop: '1rem' }}
             className="heading-5 heading--button color-light"
           >
             <span className="dash mr-lg" />
-            {toggleReplies
+            {comment.toggleComments
               ? 'Hide replies'
               : `View replies (${comment.commentsCount})`}
           </p>
@@ -76,16 +77,17 @@ const Comment = ({ avatar, comment, username, caption, setReplyCommentId }) => {
   return (
     <Fragment>
       {renderComment(avatar, comment, username, false, caption, comment._id)}
-      {replies && toggleReplies
-        ? replies.map(({ message, commentsCount, avatar, username, _id }) =>
-            renderComment(
-              avatar,
-              { message, commentsCount },
-              username,
-              true,
-              false,
-              _id
-            )
+      {comment.replies && comment.toggleComments
+        ? comment.replies.map(
+            ({ message, commentsCount, avatar, username, _id }) =>
+              renderComment(
+                avatar,
+                { message, commentsCount },
+                username,
+                true,
+                false,
+                _id
+              )
           )
         : null}
     </Fragment>
@@ -93,7 +95,12 @@ const Comment = ({ avatar, comment, username, caption, setReplyCommentId }) => {
 };
 
 const mapDispatchToProps = dispatch => ({
-  setReplyCommentId: commentId => dispatch(setReplyCommentId(commentId))
+  setReplyComment: (commentId, username, showComments) =>
+    dispatch(setReplyComment(commentId, username, showComments)),
+  fetchCommentReplies: (postId, commentId) =>
+    dispatch(fetchCommentReplies(postId, commentId)),
+  toggleShowComments: (postId, commentId) =>
+    dispatch(toggleShowComments(postId, commentId))
 });
 
 export default connect(null, mapDispatchToProps)(Comment);

@@ -16,13 +16,16 @@ const fetchPostCommentsSuccess = (postId, comments) => ({
   payload: { postId, comments }
 });
 
-export const fetchPostComments = postId => async dispatch => {
-  dispatch(fetchPostCommentsStart());
-  try {
-    const response = await axios.get(`/post/${postId}/comments`);
-    dispatch(fetchPostCommentsSuccess(postId, response.data));
-  } catch (err) {
-    dispatch(fetchPostCommentsFailure(err.data));
+export const fetchPostComments = postId => async (dispatch, getState) => {
+  const state = getState();
+  if (!state.posts.data[postId].comments) {
+    dispatch(fetchPostCommentsStart());
+    try {
+      const response = await axios.get(`/post/${postId}/comments`);
+      dispatch(fetchPostCommentsSuccess(postId, response.data));
+    } catch (err) {
+      dispatch(fetchPostCommentsFailure(err.data));
+    }
   }
 };
 
@@ -48,16 +51,56 @@ export const likePost = (postId, authToken) => async dispatch => {
   }
 };
 
-export const addComment = (postId, comment) => ({
-  type: postsTypes.ADD_COMMENT,
-  payload: { postId, comment }
+export const addCommentReply = (postId, commentId, comment) => ({
+  type: postsTypes.ADD_COMMENT_REPLY,
+  payload: { postId, commentId, comment }
 });
 
-export const setReplyCommentId = commentId => ({
-  type: postsTypes.SET_REPLY_ID,
-  payload: commentId
+export const addComment = (postId, comment) => (dispatch, getState) => {
+  const state = getState();
+  const replyComment = state.posts.replyComment;
+  if (replyComment) {
+    dispatch(addCommentReply(postId, replyComment.commentId, comment));
+  } else {
+    dispatch({
+      type: postsTypes.ADD_COMMENT,
+      payload: { postId, comment }
+    });
+  }
+};
+
+export const setReplyComment = (commentId, username, toggleComments) => ({
+  type: postsTypes.SET_REPLY_COMMENT,
+  payload: { commentId, username, toggleComments }
 });
 
-export const clearReplyCommentId = () => ({
-  type: postsTypes.CLEAR_REPLY_ID
+export const clearReplyComment = () => ({
+  type: postsTypes.CLEAR_REPLY_COMMENT
+});
+
+export const fetchCommentReplies = (postId, commentId) => async (
+  dispatch,
+  getState
+) => {
+  const state = getState();
+  const comment = state.posts.data[postId].comments.find(
+    comment => comment._id === commentId
+  );
+  // Prevent refetch on toggle if comments have already been fetched
+  if (!comment.hasOwnProperty('replies')) {
+    try {
+      const response = await axios.get(`/post/${commentId}/comments`);
+      dispatch({
+        type: postsTypes.SET_COMMENT_REPLIES,
+        payload: { postId, commentId, comments: response.data }
+      });
+    } catch (err) {
+      console.warn(err);
+    }
+  }
+};
+
+export const toggleShowComments = (postId, commentId) => ({
+  type: postsTypes.TOGGLE_SHOW_COMMENTS,
+  payload: { postId, commentId }
 });

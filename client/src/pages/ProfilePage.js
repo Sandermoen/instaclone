@@ -36,11 +36,12 @@ const ProfilePage = ({ currentUser, showModal, posts, addPosts }) => {
           followersCount,
           followingCount,
           postCount,
-          posts
+          posts,
+          avatar
         } = response.data;
         setCurrentProfile({
           fetching: false,
-          data: { username, followersCount, followingCount, postCount }
+          data: { username, followersCount, followingCount, postCount, avatar }
         });
         // Add all posts to state
         addPosts(posts);

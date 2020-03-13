@@ -1,12 +1,15 @@
-import React, { useState, Fragment } from 'react';
+import React, { useState, Fragment, useEffect, useRef } from 'react';
 import { createStructuredSelector } from 'reselect';
 import { connect } from 'react-redux';
 import axios from 'axios';
 
 import {
   addComment,
-  clearReplyCommentId
+  clearReplyComment,
+  toggleShowComments
 } from '../../../redux/posts/postsActions';
+
+import { selectReplyComment } from '../../../redux/posts/postsSelectors';
 
 import Loader from '../../Loader/Loader';
 
@@ -14,9 +17,22 @@ const PostDialogCommentForm = ({
   currentPostId,
   token,
   addComment,
-  clearReplyCommentId
+  clearReplyComment,
+  replyComment,
+  toggleShowComments
 }) => {
   const [comment, setComment] = useState({ fetching: false, data: '' });
+  const commentInput = useRef();
+
+  useEffect(() => {
+    if (replyComment) {
+      setComment(previous => ({
+        ...previous,
+        data: `@${replyComment.username} `
+      }));
+      commentInput.current.focus();
+    }
+  }, [replyComment]);
 
   const postComment = async event => {
     event.preventDefault();
@@ -24,9 +40,12 @@ const PostDialogCommentForm = ({
     setComment(previous => ({ ...previous, fetching: true }));
     try {
       const response = await axios.post(
-        `/post/${currentPostId}/comment`,
+        `/post/${
+          replyComment ? replyComment.commentId : currentPostId
+        }/comment`,
         {
-          comment: comment.data
+          comment: comment.data,
+          reply: replyComment ? true : false
         },
         {
           headers: {
@@ -35,14 +54,18 @@ const PostDialogCommentForm = ({
         }
       );
       addComment(currentPostId, response.data.comment);
-      clearReplyCommentId();
+      !replyComment.toggleComments &&
+        toggleShowComments(currentPostId, replyComment.commentId);
+      clearReplyComment();
       setComment({ fetching: false, data: '' });
 
-      // Scroll to bottom to see posted comments
-      const comments = document.querySelector('.comments');
-      comments.scrollTop = comments.scrollHeight;
+      if (!replyComment) {
+        // Scroll to bottom to see posted comments
+        const comments = document.querySelector('.comments');
+        comments.scrollTop = comments.scrollHeight;
+      }
     } catch (err) {
-      console.warn(err.data);
+      console.warn(err);
     }
   };
 
@@ -61,6 +84,7 @@ const PostDialogCommentForm = ({
             setComment({ fetching: false, data: event.target.value })
           }
           value={comment.data}
+          ref={commentInput}
         />
         <button
           type="submit"
@@ -75,7 +99,16 @@ const PostDialogCommentForm = ({
 
 const mapDispatchToProps = dispatch => ({
   addComment: (postId, comment) => dispatch(addComment(postId, comment)),
-  clearReplyCommentId: () => dispatch(clearReplyCommentId())
+  clearReplyComment: () => dispatch(clearReplyComment()),
+  toggleShowComments: (postId, commentId) =>
+    dispatch(toggleShowComments(postId, commentId))
 });
 
-export default connect(null, mapDispatchToProps)(PostDialogCommentForm);
+const mapStateToProps = createStructuredSelector({
+  replyComment: selectReplyComment
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(PostDialogCommentForm);

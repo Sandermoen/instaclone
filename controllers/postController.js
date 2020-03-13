@@ -214,7 +214,7 @@ module.exports.addComment = async (req, res, next) => {
     }
     parent = parent[query][0];
 
-    const commentUpdate = await User.updateOne(
+    const commentUpdate = await User.findOneAndUpdate(
       { _id: user._id },
       {
         $push: {
@@ -225,11 +225,15 @@ module.exports.addComment = async (req, res, next) => {
             message: comment
           }
         }
-      }
+      },
+      { new: true, useFindAndModify: false }
     );
 
-    if (!commentUpdate.nModified)
+    if (!commentUpdate)
       return res.status(500).send({ error: 'Could not post comment.' });
+
+    const commentId =
+      commentUpdate.comments[commentUpdate.comments.length - 1]._id;
 
     // Update post comment count
     const postCommentCountUpdate = await User.updateOne(
@@ -262,6 +266,10 @@ module.exports.addComment = async (req, res, next) => {
     return res.status(201).send({
       success: true,
       comment: {
+        _id: commentId,
+        postId,
+        date: Date.now(),
+        commentsCount: 0,
         message: comment,
         username: user.username,
         avatar: user.avatar
