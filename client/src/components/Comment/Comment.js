@@ -1,11 +1,15 @@
 import React, { Fragment, useEffect } from 'react';
+import { createStructuredSelector } from 'reselect';
 import { connect } from 'react-redux';
 
 import {
   setReplyComment,
   fetchCommentReplies,
-  toggleShowComments
+  toggleShowComments,
+  likePost
 } from '../../redux/posts/postsActions';
+
+import { selectToken } from '../../redux/user/userSelectors';
 
 import Avatar from '../Avatar/Avatar';
 import Icon from '../Icon/Icon';
@@ -18,7 +22,9 @@ const Comment = ({
   setReplyComment,
   post,
   fetchCommentReplies,
-  toggleShowComments
+  toggleShowComments,
+  token,
+  likePost
 }) => {
   useEffect(() => {
     if (comment.toggleComments === true) {
@@ -41,11 +47,20 @@ const Comment = ({
           <p className="heading-5 color-light">4 d</p>
           {!caption && (
             <Fragment>
-              <p className="heading-5 color-light">10 likes</p>
+              {comment.likesCount > 0 && (
+                <p className="heading-5 color-light">
+                  {comment.likesCount}{' '}
+                  {comment.likesCount === 1 ? 'like' : 'likes'}
+                </p>
+              )}
               <button
-                onClick={() =>
-                  setReplyComment(comment._id, username, comment.toggleComments)
-                }
+                onClick={() => {
+                  setReplyComment(
+                    comment._id ? comment._id : comment.postId,
+                    username,
+                    comment._id ? comment.toggleComments : true
+                  );
+                }}
                 className="heading-5 heading--button color-light"
               >
                 reply
@@ -79,10 +94,10 @@ const Comment = ({
       {renderComment(avatar, comment, username, false, caption, comment._id)}
       {comment.replies && comment.toggleComments
         ? comment.replies.map(
-            ({ message, commentsCount, avatar, username, _id }) =>
+            ({ message, commentsCount, avatar, username, _id, postId }) =>
               renderComment(
                 avatar,
-                { message, commentsCount },
+                { message, commentsCount, postId },
                 username,
                 true,
                 false,
@@ -100,7 +115,12 @@ const mapDispatchToProps = dispatch => ({
   fetchCommentReplies: (postId, commentId) =>
     dispatch(fetchCommentReplies(postId, commentId)),
   toggleShowComments: (postId, commentId) =>
-    dispatch(toggleShowComments(postId, commentId))
+    dispatch(toggleShowComments(postId, commentId)),
+  likePost: (postId, token) => dispatch(likePost(postId, token))
+});
+
+const mapStateToProps = createStructuredSelector({
+  token: selectToken
 });
 
 export default connect(null, mapDispatchToProps)(Comment);

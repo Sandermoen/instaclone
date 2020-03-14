@@ -1,67 +1,65 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useReducer, useRef } from 'react';
 import { connect } from 'react-redux';
-import axios from 'axios';
-import { useTransition } from 'react-spring';
 
 import { likePost } from '../../../redux/posts/postsActions';
 
 import Icon from '../../Icon/Icon';
+import PulsatingIcon from '../../Icon/PulsatingIcon/PulsatingIcon';
 
 const PostDialogStats = ({
   currentUser,
   post,
-  setCurrentProfile,
-  setPost,
   token,
   currentPostId,
   likePost
 }) => {
-  const [likedPost, setLikedPost] = useState(
-    post.likes.includes(currentUser.username)
-  );
   const ref = useRef();
-  const transitions = useTransition(likedPost, null, {
-    from: { transform: 'scale(1.3)' },
-    enter: { transform: 'scale(1)' },
-    leave: { display: 'none' },
-    config: {
-      mass: 1,
-      tension: 500,
-      friction: 20
-    },
-    // Prevent animating on initial render
-    immediate: !ref.current
-  });
 
-  useEffect(() => {
-    setLikedPost(post.likes.includes(currentUser.username));
-  }, [post]);
+  const INITIAL_STATE = {
+    likesCount: post.likesCount,
+    liked: post.likes.includes(currentUser.username)
+  };
+
+  const likesReducer = (state, action) => {
+    switch (action.type) {
+      case 'LIKE_POST': {
+        return { likesCount: state.likesCount++, liked: true };
+      }
+      case 'UNLIKE_POST': {
+        return { likesCount: state.likesCount--, liked: false };
+      }
+    }
+  };
+
+  const [state, dispatch] = useReducer(likesReducer, INITIAL_STATE);
+
   const handleClick = async () => {
+    // We want this to happen instantly since it's non-crucial data
+    // We can assume that the server will respond with 200 and be fine
+    state.liked
+      ? dispatch({ type: 'UNLIKE_POST' })
+      : dispatch({ type: 'LIKE_POST' });
     likePost(currentPostId, token);
   };
 
   return (
     <div ref={ref} className="post-dialog__stats">
       <div className="post-dialog__actions">
-        {transitions.map(({ item, key, props }) =>
-          item ? (
-            <Icon
-              style={props}
-              onClick={() => handleClick()}
-              className="icon--button post-dialog__like color-red"
-              icon="heart"
-              key={key}
-            />
-          ) : (
-            <Icon
-              style={props}
-              onClick={() => handleClick()}
-              className="icon--button post-dialog__like"
-              icon="heart-outline"
-              key={key}
-            />
-          )
-        )}
+        <PulsatingIcon
+          toggle={state.liked}
+          inputRef={ref}
+          constantProps={{ onClick: () => handleClick() }}
+          toggledProps={[
+            {
+              className: 'icon--button post-dialog__like color-red',
+              icon: 'heart'
+            },
+            {
+              className: 'icon--button post-dialog__like',
+              icon: 'heart-outline'
+            }
+          ]}
+        />
         <Icon
           onClick={() => document.querySelector('.add-comment__input').focus()}
           className="icon--button"
@@ -71,17 +69,23 @@ const PostDialogStats = ({
         <Icon className="icon--button" icon="bookmark-outline" />
       </div>
       <p className="heading-4">
-        {post.likes.length === 0 ? (
+        {state.likesCount === 0 ? (
           <span>
             Be the first to{' '}
-            <b style={{ cursor: 'pointer' }} onClick={() => handleClick()}>
+            <b
+              style={{ cursor: 'pointer' }}
+              onClick={event => {
+                event.nativeEvent.stopImmediatePropagation();
+                handleClick();
+              }}
+            >
               like this
             </b>
           </span>
         ) : (
           <span>
             <b>
-              {post.likes.length} {post.likes.length === 1 ? 'like' : 'likes'}
+              {state.likesCount} {state.likesCount === 1 ? 'like' : 'likes'}
             </b>
           </span>
         )}

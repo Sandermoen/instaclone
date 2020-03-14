@@ -9,6 +9,11 @@ const commentSchema = new Schema({
   commentsCount: {
     type: Number,
     default: 0
+  },
+  likes: Array,
+  likesCount: {
+    type: Number,
+    default: 0
   }
 });
 

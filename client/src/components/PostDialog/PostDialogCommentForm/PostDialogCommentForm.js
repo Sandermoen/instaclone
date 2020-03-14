@@ -54,13 +54,14 @@ const PostDialogCommentForm = ({
         }
       );
       addComment(currentPostId, response.data.comment);
-      !replyComment.toggleComments &&
+      if (replyComment && !replyComment.toggleComments) {
         toggleShowComments(currentPostId, replyComment.commentId);
+      }
       clearReplyComment();
       setComment({ fetching: false, data: '' });
 
       if (!replyComment) {
-        // Scroll to bottom to see posted comments
+        // Scroll to bottom to see posted comment
         const comments = document.querySelector('.comments');
         comments.scrollTop = comments.scrollHeight;
       }
