@@ -8,7 +8,7 @@ const PulsatingIcon = ({
   toggle,
   constantProps = {},
   toggledProps,
-  inputRef
+  elementRef
 }) => {
   const transitions = useTransition(toggle, null, {
     from: { transform: 'scale(1.3)' },
@@ -20,7 +20,7 @@ const PulsatingIcon = ({
       friction: 20
     },
     // Prevent animating on initial render
-    immediate: !inputRef.current
+    immediate: !elementRef.current
   });
 
   return (
@@ -50,7 +50,7 @@ PulsatingIcon.propTypes = {
   toggle: PropTypes.bool.isRequired,
   constantProps: PropTypes.object,
   toggledProps: PropTypes.arrayOf(PropTypes.object).isRequired,
-  inputRef: PropTypes.shape({ current: PropTypes.instanceOf(Element) })
+  elementRef: PropTypes.shape({ current: PropTypes.instanceOf(Element) })
     .isRequired
 };
 

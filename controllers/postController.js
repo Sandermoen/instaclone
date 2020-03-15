@@ -138,6 +138,9 @@ module.exports.uploadFile = (req, res, next) => {
 
 module.exports.votePost = async (req, res, next) => {
   const { postId } = req.params;
+  const { comment } = req.body;
+  const query = comment ? 'comments' : 'posts';
+
   if (!postId) {
     return res
       .status(400)
@@ -145,8 +148,18 @@ module.exports.votePost = async (req, res, next) => {
   }
   try {
     const { username } = res.locals.user;
-    const postDocument = await findPost(postId);
-    const post = postDocument.posts[0];
+    let post = undefined;
+
+    if (comment) {
+      const document = await User.findOne(
+        { 'comments._id': postId },
+        'comments.$'
+      );
+      post = document.comments[0];
+    } else {
+      const document = await findPost(postId);
+      post = document.posts[0];
+    }
 
     if (post.likes.includes(username)) {
       // Post is already liked so remove user from like array
@@ -160,8 +173,11 @@ module.exports.votePost = async (req, res, next) => {
     }
     // Update post
     const update = await User.updateOne(
-      { 'posts._id': postId },
-      { 'posts.$.likes': post.likes, 'posts.$.likesCount': post.likesCount }
+      { [`${query}._id`]: postId },
+      {
+        [`${query}.$.likes`]: post.likes,
+        [`${query}.$.likesCount`]: post.likesCount
+      }
     );
 
     if (!update.ok) return next('Failed to like post.');
@@ -270,6 +286,8 @@ module.exports.addComment = async (req, res, next) => {
         postId,
         date: Date.now(),
         commentsCount: 0,
+        likesCount: 0,
+        likes: [],
         message: comment,
         username: user.username,
         avatar: user.avatar

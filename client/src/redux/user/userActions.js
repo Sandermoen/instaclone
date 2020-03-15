@@ -1,8 +1,11 @@
 import userTypes from './userTypes';
 import axios from 'axios';
 
-const signOut = () => {
+import { clearPosts } from '../posts/postsActions';
+
+const signOut = () => dispatch => {
   localStorage.removeItem('token');
+  dispatch(clearPosts);
   return {
     type: userTypes.SIGN_OUT
   };

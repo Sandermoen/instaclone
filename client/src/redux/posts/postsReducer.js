@@ -35,7 +35,7 @@ const postsReducer = (state = INITIAL_STATE, action) => {
       return { ...state, fetching: false, error: action.payload };
     }
 
-    case postsTypes.LIKE_POST: {
+    case postsTypes.VOTE_POST: {
       const { postId, response } = action.payload;
       const post = JSON.parse(JSON.stringify(state.data[postId]));
       post.likes = response.likes;
@@ -47,6 +47,33 @@ const postsReducer = (state = INITIAL_STATE, action) => {
           [postId]: post
         }
       };
+    }
+
+    case postsTypes.VOTE_COMMENT: {
+      const { postId, commentId, parentCommentId, response } = action.payload;
+      const post = JSON.parse(JSON.stringify(state.data[postId]));
+      let commentIndex = undefined;
+
+      if (parentCommentId) {
+        const parentCommentIndex = post.comments.findIndex(
+          comment => comment._id === parentCommentId
+        );
+
+        commentIndex = post.comments[parentCommentIndex].replies.findIndex(
+          comment => comment._id === commentId
+        );
+        post.comments[parentCommentIndex].replies[commentIndex].likes =
+          response.likes;
+        post.comments[parentCommentIndex].replies[commentIndex].likesCount =
+          response.likesCount;
+      } else {
+        commentIndex = post.comments.findIndex(
+          comment => comment._id === commentId
+        );
+        post.comments[commentIndex].likes = response.likes;
+        post.comments[commentIndex].likesCount = response.likesCount;
+      }
+      return { ...state, data: { ...state.data, [postId]: post } };
     }
 
     case postsTypes.ADD_COMMENT: {
@@ -63,16 +90,6 @@ const postsReducer = (state = INITIAL_STATE, action) => {
       };
     }
 
-    case postsTypes.SET_COMMENT_REPLIES: {
-      const { postId, commentId, comments } = action.payload;
-      const post = JSON.parse(JSON.stringify(state.data[postId]));
-      const commentIndex = post.comments.findIndex(
-        comment => comment._id === commentId
-      );
-      post.comments[commentIndex].replies = comments;
-      return { ...state, data: { ...state.data, [postId]: post } };
-    }
-
     case postsTypes.ADD_COMMENT_REPLY: {
       const { postId, commentId, comment } = action.payload;
       const post = JSON.parse(JSON.stringify(state.data[postId]));
@@ -86,6 +103,16 @@ const postsReducer = (state = INITIAL_STATE, action) => {
       postComment.replies
         ? postComment.replies.push(comment)
         : (postComment.replies = [comment]);
+      return { ...state, data: { ...state.data, [postId]: post } };
+    }
+
+    case postsTypes.SET_COMMENT_REPLIES: {
+      const { postId, commentId, comments } = action.payload;
+      const post = JSON.parse(JSON.stringify(state.data[postId]));
+      const commentIndex = post.comments.findIndex(
+        comment => comment._id === commentId
+      );
+      post.comments[commentIndex].replies = comments;
       return { ...state, data: { ...state.data, [postId]: post } };
     }
 
@@ -118,6 +145,10 @@ const postsReducer = (state = INITIAL_STATE, action) => {
         ...state,
         data: { ...state.data, [postId]: post }
       };
+    }
+
+    case postsTypes.CLEAR_POSTS: {
+      return INITIAL_STATE;
     }
 
     default: {

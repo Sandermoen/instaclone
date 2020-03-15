@@ -1,7 +1,7 @@
 import React, { useReducer, useRef } from 'react';
 import { connect } from 'react-redux';
 
-import { likePost } from '../../../redux/posts/postsActions';
+import { votePost } from '../../../redux/posts/postsActions';
 
 import Icon from '../../Icon/Icon';
 import PulsatingIcon from '../../Icon/PulsatingIcon/PulsatingIcon';
@@ -11,7 +11,7 @@ const PostDialogStats = ({
   post,
   token,
   currentPostId,
-  likePost
+  votePost
 }) => {
   const ref = useRef();
 
@@ -28,6 +28,9 @@ const PostDialogStats = ({
       case 'UNLIKE_POST': {
         return { likesCount: state.likesCount--, liked: false };
       }
+      default: {
+        throw new Error('Invalid action type issued to likesReducer');
+      }
     }
   };
 
@@ -39,7 +42,7 @@ const PostDialogStats = ({
     state.liked
       ? dispatch({ type: 'UNLIKE_POST' })
       : dispatch({ type: 'LIKE_POST' });
-    likePost(currentPostId, token);
+    votePost(currentPostId, token);
   };
 
   return (
@@ -47,7 +50,7 @@ const PostDialogStats = ({
       <div className="post-dialog__actions">
         <PulsatingIcon
           toggle={state.liked}
-          inputRef={ref}
+          elementRef={ref}
           constantProps={{ onClick: () => handleClick() }}
           toggledProps={[
             {
@@ -96,7 +99,7 @@ const PostDialogStats = ({
 };
 
 const mapDispatchToProps = dispatch => ({
-  likePost: (postId, authToken) => dispatch(likePost(postId, authToken))
+  votePost: (postId, authToken) => dispatch(votePost(postId, authToken))
 });
 
 export default connect(null, mapDispatchToProps)(PostDialogStats);

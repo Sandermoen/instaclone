@@ -26,7 +26,7 @@ const PostDialog = ({
 }) => {
   useEffect(() => {
     fetchPostComments(currentPostId);
-  }, [currentPostId]);
+  }, [currentPostId, fetchPostComments]);
 
   return (
     <div className="post-dialog">

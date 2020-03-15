@@ -16,6 +16,23 @@ const fetchPostCommentsSuccess = (postId, comments) => ({
   payload: { postId, comments }
 });
 
+const vote = async (postId, authToken, comment) => {
+  try {
+    const response = await axios.post(
+      `/post/${postId}/vote`,
+      comment ? { comment } : null,
+      {
+        headers: {
+          authorization: authToken
+        }
+      }
+    );
+    return response;
+  } catch (err) {
+    throw new Error('Unable to vote on the post.');
+  }
+};
+
 export const fetchPostComments = postId => async (dispatch, getState) => {
   const state = getState();
   if (!state.posts.data[postId].comments) {
@@ -34,19 +51,37 @@ export const addPosts = posts => ({
   payload: posts
 });
 
-export const likePost = (postId, authToken) => async dispatch => {
+export const votePost = (postId, authToken) => async dispatch => {
   try {
-    const response = await axios.post(`/post/${postId}/vote`, null, {
-      headers: {
-        authorization: authToken
-      }
-    });
+    const response = await vote(postId, authToken);
     dispatch({
-      type: postsTypes.LIKE_POST,
+      type: postsTypes.VOTE_POST,
       payload: { postId, response: response.data }
     });
   } catch (err) {
     // TODO: Make notification system to handle errors like these
+    console.warn(err);
+  }
+};
+
+export const voteComment = (
+  postId,
+  commentId,
+  parentCommentId,
+  authToken
+) => async dispatch => {
+  try {
+    const response = await vote(commentId, authToken, true);
+    dispatch({
+      type: postsTypes.VOTE_COMMENT,
+      payload: {
+        postId,
+        commentId,
+        parentCommentId,
+        response: response.data
+      }
+    });
+  } catch (err) {
     console.warn(err);
   }
 };
@@ -57,6 +92,7 @@ export const addCommentReply = (postId, commentId, comment) => ({
 });
 
 export const addComment = (postId, comment) => (dispatch, getState) => {
+  console.log(comment);
   const state = getState();
   const replyComment = state.posts.replyComment;
   if (replyComment) {
@@ -103,4 +139,8 @@ export const fetchCommentReplies = (postId, commentId) => async (
 export const toggleShowComments = (postId, commentId) => ({
   type: postsTypes.TOGGLE_SHOW_COMMENTS,
   payload: { postId, commentId }
+});
+
+export const clearPosts = () => ({
+  type: postsTypes.CLEAR_POSTS
 });

@@ -8,7 +8,7 @@ import { selectCurrentUser } from '../redux/user/userSelectors';
 import { selectPosts } from '../redux/posts/postsSelectors';
 
 import { showModal } from '../redux/modal/modalActions';
-import { addPosts } from '../redux/posts/postsActions';
+import { addPosts, clearPosts } from '../redux/posts/postsActions';
 
 import Avatar from '../components/Avatar/Avatar';
 import Button from '../components/Button/Button';
@@ -17,7 +17,13 @@ import Icon from '../components/Icon/Icon';
 import ProfileImage from '../components/ProfileImage/ProfileImage';
 import Loader from '../components/Loader/Loader';
 
-const ProfilePage = ({ currentUser, showModal, posts, addPosts }) => {
+const ProfilePage = ({
+  currentUser,
+  showModal,
+  posts,
+  addPosts,
+  clearPosts
+}) => {
   const { username } = useParams();
   const [currentProfile, setCurrentProfile] = useState({
     fetching: false,
@@ -52,7 +58,11 @@ const ProfilePage = ({ currentUser, showModal, posts, addPosts }) => {
           error: err.data
         })
       );
-  }, [username]);
+
+    return () => {
+      clearPosts();
+    };
+  }, [username, addPosts]);
 
   const handleClick = postId => {
     showModal(
@@ -155,7 +165,8 @@ const mapStateToProps = createStructuredSelector({
 
 const mapDispatchToProps = dispatch => ({
   showModal: (props, component) => dispatch(showModal(props, component)),
-  addPosts: posts => dispatch(addPosts(posts))
+  addPosts: posts => dispatch(addPosts(posts)),
+  clearPosts: () => dispatch(clearPosts())
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProfilePage);

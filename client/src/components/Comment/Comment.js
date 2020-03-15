@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect } from 'react';
+import React, { Fragment, useEffect, useRef, useState } from 'react';
 import { createStructuredSelector } from 'reselect';
 import { connect } from 'react-redux';
 
@@ -6,13 +6,13 @@ import {
   setReplyComment,
   fetchCommentReplies,
   toggleShowComments,
-  likePost
+  voteComment
 } from '../../redux/posts/postsActions';
 
-import { selectToken } from '../../redux/user/userSelectors';
+import { selectToken, selectCurrentUser } from '../../redux/user/userSelectors';
 
 import Avatar from '../Avatar/Avatar';
-import Icon from '../Icon/Icon';
+import PulsatingIcon from '../Icon/PulsatingIcon/PulsatingIcon';
 
 const Comment = ({
   avatar,
@@ -24,19 +24,23 @@ const Comment = ({
   fetchCommentReplies,
   toggleShowComments,
   token,
-  likePost
+  voteComment,
+  currentUser
 }) => {
   useEffect(() => {
     if (comment.toggleComments === true) {
       fetchCommentReplies(post._id, comment._id);
     }
-  }, [comment]);
+  }, [comment, fetchCommentReplies, post]);
+
+  const commentRef = useRef();
 
   const renderComment = (avatar, comment, username, reply, caption, key) => (
     <div
       style={reply ? { marginLeft: '5rem' } : {}}
       className="comment"
       key={key}
+      ref={commentRef}
     >
       <Avatar imageSrc={avatar} className="avatar--small" />
       <div className="comment__content">
@@ -83,7 +87,23 @@ const Comment = ({
       </div>
       {!caption && (
         <div className="comment__like">
-          <Icon icon="heart-outline" className="icon--tiny" />
+          <PulsatingIcon
+            toggle={comment.likes.includes(currentUser.username)}
+            constantProps={{
+              onClick: () =>
+                voteComment(
+                  post._id,
+                  comment._id,
+                  reply ? comment.postId : null,
+                  token
+                )
+            }}
+            toggledProps={[
+              { icon: 'heart', className: 'icon--tiny color-red' },
+              { icon: 'heart-outline', className: 'icon--tiny' }
+            ]}
+            elementRef={commentRef}
+          />
         </div>
       )}
     </div>
@@ -93,16 +113,16 @@ const Comment = ({
     <Fragment>
       {renderComment(avatar, comment, username, false, caption, comment._id)}
       {comment.replies && comment.toggleComments
-        ? comment.replies.map(
-            ({ message, commentsCount, avatar, username, _id, postId }) =>
-              renderComment(
-                avatar,
-                { message, commentsCount, postId },
-                username,
-                true,
-                false,
-                _id
-              )
+        ? comment.replies.map(commentReply =>
+            renderComment(
+              commentReply.avatar,
+              commentReply,
+              commentReply.username,
+              true,
+              false,
+              commentReply._id,
+              true
+            )
           )
         : null}
     </Fragment>
@@ -116,11 +136,13 @@ const mapDispatchToProps = dispatch => ({
     dispatch(fetchCommentReplies(postId, commentId)),
   toggleShowComments: (postId, commentId) =>
     dispatch(toggleShowComments(postId, commentId)),
-  likePost: (postId, token) => dispatch(likePost(postId, token))
+  voteComment: (postId, commentId, parentCommentId, authToken) =>
+    dispatch(voteComment(postId, commentId, parentCommentId, authToken))
 });
 
 const mapStateToProps = createStructuredSelector({
-  token: selectToken
+  token: selectToken,
+  currentUser: selectCurrentUser
 });
 
-export default connect(null, mapDispatchToProps)(Comment);
+export default connect(mapStateToProps, mapDispatchToProps)(Comment);
