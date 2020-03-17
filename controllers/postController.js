@@ -2,104 +2,12 @@ const aws = require('aws-sdk');
 const User = require('../models/User');
 const fs = require('fs');
 
-/**
- * Add post with uploaded AWS url and caption
- * @function addPost
- * @param {string} imageUrl Url of the image to post.
- * @param {string} caption The caption to be included with the post.
- * @param {object} user The user object.
- */
-const addPost = async (imageUrl, caption, user) => {
-  try {
-    // Update the user's profile with the post
-    await User.updateOne(
-      { _id: user._id },
-      {
-        $push: {
-          posts: {
-            image: imageUrl,
-            caption,
-            date: Date.now()
-          }
-        }
-      }
-    );
-  } catch (err) {
-    throw new Error(err);
-  }
-};
-
-/**
- * Query for a post.
- * @param {string} postId Id of post to retrieve.
- * @returns {object} The post document.
- */
-const findPost = async postId => {
-  if (!postId) throw new Error('Please provide a post to retrieve.');
-  try {
-    const postDocument = await User.findOne(
-      {
-        'posts._id': postId
-      },
-      { 'posts.$': 1, username: 1, avatar: 1 }
-    );
-    if (!postDocument) throw new Error('Could not find post.');
-    return postDocument;
-  } catch (err) {
-    throw new Error(err);
-  }
-};
-
-/**
- * Query a parent for its comments
- * @function findComments
- * @param {string} parentId The id of the parent to query for comments.
- * @returns {array} Array of comments
- */
-const findComments = async parentId => {
-  // Query for a parent with the same postId and filter them by postId.
-  try {
-    const commentsDocument = await User.aggregate([
-      { $match: { 'comments.postId': parentId } },
-      {
-        $project: {
-          username: 1,
-          avatar: 1,
-          comments: {
-            $filter: {
-              input: '$comments',
-              as: 'comment',
-              cond: { $eq: ['$$comment.postId', parentId] }
-            }
-          }
-        }
-      },
-      { $unwind: '$comments' },
-      {
-        $group: {
-          _id: '$_id',
-          username: { $first: '$username' },
-          avatar: { $first: '$avatar' },
-          comments: { $push: '$comments' }
-        }
-      }
-    ]);
-
-    // Might be able to improve this
-    const comments = commentsDocument
-      .map(document => {
-        return document.comments.map(comment => {
-          comment.username = document.username;
-          if (document.avatar) comment.avatar = document.avatar;
-          return comment;
-        });
-      })
-      .flat();
-    return comments;
-  } catch (err) {
-    throw new Error(err.message);
-  }
-};
+const {
+  addPost,
+  findPost,
+  findComments,
+  postComment
+} = require('./utils/postControllerUtils');
 
 // Upload the received file to amazon s3
 // Might switch to cloudinary instead
@@ -209,81 +117,109 @@ module.exports.getPost = async (req, res, next) => {
 
 module.exports.addComment = async (req, res, next) => {
   const { postId } = req.params;
-  const { comment, reply } = req.body;
+  const { comment } = req.body;
   const user = res.locals.user;
-  // If it is a reply update the comments document
-  // Otherwise update the posts subdocument
-  const query = reply ? 'comments' : 'posts';
 
   if (!comment) {
     return res.status(400).send({ error: 'You cannot post an empty comment.' });
   }
 
   try {
-    let parent = await User.findOne({ [`${query}._id`]: postId }, [
-      `${query}.$`
-    ]);
+    const parent = await User.findOne({ 'posts._id': postId }, 'posts.$');
     if (!parent) {
       return res
         .status(404)
         .send({ error: 'Could not find a parent to post a comment to.' });
     }
-    parent = parent[query][0];
 
-    const commentUpdate = await User.findOneAndUpdate(
-      { _id: user._id },
-      {
-        $push: {
-          comments: {
-            postId,
-            userId: user._id,
-            date: Date.now(),
-            message: comment
-          }
-        }
-      },
-      { new: true, useFindAndModify: false }
+    const updatedComments = await postComment(
+      { postId, userId: user._id, date: Date.now(), message: comment },
+      user._id,
+      postId
     );
 
-    if (!commentUpdate)
-      return res.status(500).send({ error: 'Could not post comment.' });
+    const postedCommentId =
+      updatedComments.comments[updatedComments.comments.length - 1]._id;
 
-    const commentId =
-      commentUpdate.comments[commentUpdate.comments.length - 1]._id;
+    return res.status(201).send({
+      success: true,
+      comment: {
+        _id: postedCommentId,
+        postId,
+        date: Date.now(),
+        commentsCount: 0,
+        likesCount: 0,
+        likes: [],
+        message: comment,
+        username: user.username,
+        avatar: user.avatar
+      }
+    });
+  } catch (err) {
+    next(err);
+  }
+};
 
-    // Update post comment count
-    const postCommentCountUpdate = await User.updateOne(
-      { 'posts._id': parent.postId ? parent.postId : postId },
-      { $inc: { 'posts.$.commentsCount': 1 } }
+module.exports.addReply = async (req, res, next) => {
+  const { comment, nested } = req.body;
+  let { postId, commentId } = req.params;
+  const user = res.locals.user;
+
+  if (!commentId || !postId) {
+    return res.status(400).send({
+      error:
+        'Please provide the required comment id and post id when replying to a comment.'
+    });
+  }
+  if (!comment) {
+    return res.status(400).send({ error: 'You cannot post an empty comment.' });
+  }
+
+  try {
+    const parent = await User.findOne(
+      { 'comments._id': commentId },
+      'comments.$'
     );
-
-    if (!postCommentCountUpdate.nModified) {
-      return res.status(500).send({
-        error: 'Could not update post comments count.',
-        postCommentCountUpdate
-      });
+    if (!parent) {
+      return res
+        .status(404)
+        .send({ error: 'Could not find a parent to post a comment to.' });
     }
 
-    // If it it is a reply to a comment update the parent comment count aswell
-    if (reply) {
-      const commentCountUpdate = await User.updateOne(
-        { 'comments._id': postId },
-        { $inc: { 'comments.$.commentsCount': 1 } }
-      );
+    if (nested) {
+      commentId = parent.comments[0].postId;
+    }
 
-      if (!commentCountUpdate.nModified) {
-        return res.status(500).send({
-          error: 'Could not update parent comment comments count.',
-          commentCountUpdate
-        });
-      }
+    const updatedComments = await postComment(
+      {
+        postId: commentId,
+        userId: user._id,
+        date: Date.now(),
+        message: comment
+      },
+      user._id,
+      postId
+    );
+    const postedCommentId =
+      updatedComments.comments[updatedComments.comments.length - 1]._id;
+
+    // Update the parent comment's commentsCount
+    const parentCommentUpdate = await User.updateOne(
+      { 'comments._id': commentId },
+      { $inc: { 'comments.$.commentsCount': 1 } }
+    );
+    if (!parentCommentUpdate.nModified) {
+      return res.status(500).send({
+        error: 'Could not update parent comment commentCount.',
+        parentCommentUpdate
+      });
     }
 
     return res.status(201).send({
       success: true,
       comment: {
-        _id: commentId,
-        postId,
+        _id: postedCommentId,
+        postId: commentId,
         date: Date.now(),
         commentsCount: 0,
         likesCount: 0,

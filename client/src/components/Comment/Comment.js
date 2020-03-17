@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useRef, useState } from 'react';
+import React, { Fragment, useEffect, useRef } from 'react';
 import { createStructuredSelector } from 'reselect';
 import { connect } from 'react-redux';
 
@@ -35,7 +35,15 @@ const Comment = ({
 
   const commentRef = useRef();
 
-  const renderComment = (avatar, comment, username, reply, caption, key) => (
+  const renderComment = (
+    avatar,
+    comment,
+    username,
+    reply,
+    caption,
+    key,
+    nested
+  ) => (
     <div
       style={reply ? { marginLeft: '5rem' } : {}}
       className="comment"
@@ -60,9 +68,11 @@ const Comment = ({
               <button
                 onClick={() => {
                   setReplyComment(
-                    comment._id ? comment._id : comment.postId,
+                    comment._id,
                     username,
-                    comment._id ? comment.toggleComments : true
+                    comment._id ? comment.toggleComments : true,
+                    nested ? true : false,
+                    comment.postId
                   );
                 }}
                 className="heading-5 heading--button color-light"
@@ -130,8 +140,22 @@ const Comment = ({
 };
 
 const mapDispatchToProps = dispatch => ({
-  setReplyComment: (commentId, username, showComments) =>
-    dispatch(setReplyComment(commentId, username, showComments)),
+  setReplyComment: (
+    commentId,
+    username,
+    showComments,
+    nested,
+    parentCommentId
+  ) =>
+    dispatch(
+      setReplyComment(
+        commentId,
+        username,
+        showComments,
+        nested,
+        parentCommentId
+      )
+    ),
   fetchCommentReplies: (postId, commentId) =>
     dispatch(fetchCommentReplies(postId, commentId)),
   toggleShowComments: (postId, commentId) =>

@@ -92,7 +92,6 @@ export const addCommentReply = (postId, commentId, comment) => ({
 });
 
 export const addComment = (postId, comment) => (dispatch, getState) => {
-  console.log(comment);
   const state = getState();
   const replyComment = state.posts.replyComment;
   if (replyComment) {
@@ -105,9 +104,15 @@ export const addComment = (postId, comment) => (dispatch, getState) => {
   }
 };
 
-export const setReplyComment = (commentId, username, toggleComments) => ({
+export const setReplyComment = (
+  commentId,
+  username,
+  toggleComments,
+  nested = false,
+  parentCommentId
+) => ({
   type: postsTypes.SET_REPLY_COMMENT,
-  payload: { commentId, username, toggleComments }
+  payload: { commentId, username, toggleComments, nested, parentCommentId }
 });
 
 export const clearReplyComment = () => ({

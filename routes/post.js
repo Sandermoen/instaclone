@@ -9,6 +9,7 @@ const {
   votePost,
   getPost,
   addComment,
+  addReply,
   getComments
 } = require('../controllers/postController');
 
@@ -29,6 +30,7 @@ postRouter.post(
 );
 postRouter.post('/:postId/vote', requireAuth, votePost);
 postRouter.post('/:postId/comment', requireAuth, addComment);
+postRouter.post('/:postId/:commentId/reply', requireAuth, addReply);
 
 postRouter.get('/:postId', getPost);
 postRouter.get('/:commentId/comments', getComments);

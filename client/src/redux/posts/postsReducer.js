@@ -93,9 +93,18 @@ const postsReducer = (state = INITIAL_STATE, action) => {
     case postsTypes.ADD_COMMENT_REPLY: {
       const { postId, commentId, comment } = action.payload;
       const post = JSON.parse(JSON.stringify(state.data[postId]));
-      const commentIndex = post.comments.findIndex(
-        comment => comment._id === commentId
-      );
+      let commentIndex = undefined;
+
+      if (state.replyComment.nested) {
+        commentIndex = post.comments.findIndex(
+          comment => comment._id === state.replyComment.parentCommentId
+        );
+      } else {
+        commentIndex = post.comments.findIndex(
+          comment => comment._id === commentId
+        );
+      }
+
       const postComment = post.comments[commentIndex];
       post.commentsCount++;
       postComment.commentsCount++;
@@ -117,10 +126,9 @@ const postsReducer = (state = INITIAL_STATE, action) => {
     }
 
     case postsTypes.SET_REPLY_COMMENT: {
-      const { commentId, username, toggleComments } = action.payload;
       return {
         ...state,
-        replyComment: { commentId, username, toggleComments }
+        replyComment: { ...action.payload }
       };
     }
 

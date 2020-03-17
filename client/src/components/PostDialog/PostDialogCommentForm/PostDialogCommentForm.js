@@ -39,22 +39,34 @@ const PostDialogCommentForm = ({
     if (!comment.data) return console.warn('Cannot post an empty comment.');
     setComment(previous => ({ ...previous, fetching: true }));
     try {
-      const response = await axios.post(
-        `/post/${
-          replyComment ? replyComment.commentId : currentPostId
-        }/comment`,
-        {
-          comment: comment.data,
-          reply: replyComment ? true : false
-        },
-        {
-          headers: {
-            authorization: token
+      let response = undefined;
+      if (replyComment) {
+        response = await axios.post(
+          `/post/${currentPostId}/${replyComment.commentId}/reply`,
+          { comment: comment.data, nested: replyComment.nested },
+          {
+            headers: { authorization: token }
           }
-        }
-      );
+        );
+      } else {
+        response = await axios.post(
+          `/post/${
+            replyComment ? replyComment.commentId : currentPostId
+          }/comment`,
+          { comment: comment.data },
+          {
+            headers: {
+              authorization: token
+            }
+          }
+        );
+      }
       addComment(currentPostId, response.data.comment);
-      if (replyComment && !replyComment.toggleComments) {
+      if (
+        replyComment &&
+        !replyComment.toggleComments &&
+        !replyComment.nested
+      ) {
         toggleShowComments(currentPostId, replyComment.commentId);
       }
       clearReplyComment();
