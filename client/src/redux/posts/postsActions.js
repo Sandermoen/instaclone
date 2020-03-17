@@ -146,6 +146,14 @@ export const toggleShowComments = (postId, commentId) => ({
   payload: { postId, commentId }
 });
 
+export const toggleBookmark = (postId, authToken) => async dispatch => {
+  // Immediately dispatch bookmark action as the interaction has to be fast
+  dispatch({ type: postsTypes.TOGGLE_BOOKMARK, payload: postId });
+  await axios.post(`/post/${postId}/bookmark`, null, {
+    headers: { authorization: authToken }
+  });
+};
+
 export const clearPosts = () => ({
   type: postsTypes.CLEAR_POSTS
 });

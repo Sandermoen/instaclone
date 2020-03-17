@@ -3,6 +3,10 @@
   border-top: 1px solid $color-grey-4;
   border-bottom: 1px solid $color-grey-4;
   overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .comment {

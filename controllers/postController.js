@@ -254,3 +254,33 @@ module.exports.getComments = async (req, res, next) => {
     next(err);
   }
 };
+
+module.exports.toggleBookmark = async (req, res, next) => {
+  const user = res.locals.user;
+  const { postId } = req.params;
+  try {
+    const userDocument = await User.findOne({
+      _id: user._id,
+      bookmarks: postId
+    });
+    // Has already bookmarked the post
+    if (userDocument) {
+      const bookmarkIndex = userDocument.bookmarks.findIndex(
+        bookmark => bookmark === postId
+      );
+      userDocument.bookmarks.splice(bookmarkIndex, 1);
+      await userDocument.save();
+    } else {
+      const bookmarkUpdate = await User.updateOne(
+        { _id: user._id },
+        { $push: { bookmarks: postId } }
+      );
+      if (!bookmarkUpdate.nModified)
+        return res.status(500).send({ error: 'Could not update bookmarks.' });
+    }
+
+    return res.send({ success: true });
+  } catch (err) {
+    next(err);
+  }
+};

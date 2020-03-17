@@ -40,6 +40,7 @@ const userSchema = new Schema({
   following: Array,
   posts: [postSchema],
   comments: [commentSchema],
+  bookmarks: Array,
   private: {
     type: Boolean,
     default: false
@@ -58,6 +59,8 @@ userSchema.pre('save', function(next) {
         next();
       });
     });
+  } else {
+    next();
   }
 });
 

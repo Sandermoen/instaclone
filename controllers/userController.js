@@ -18,3 +18,13 @@ module.exports.retrieveUser = async (req, res, next) => {
     res.status(404).send(err.message);
   }
 };
+
+module.exports.getBookmarks = async (req, res, next) => {
+  const user = res.locals.user;
+  try {
+    const response = await User.findOne({ _id: user._id }, 'bookmarks');
+    res.send(response.bookmarks);
+  } catch (err) {
+    next(err);
+  }
+};

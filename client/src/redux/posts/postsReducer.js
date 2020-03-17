@@ -155,6 +155,10 @@ const postsReducer = (state = INITIAL_STATE, action) => {
       };
     }
 
+    case postsTypes.TOGGLE_BOOKMARK: {
+      const { postId } = action.payload;
+    }
+
     case postsTypes.CLEAR_POSTS: {
       return INITIAL_STATE;
     }
