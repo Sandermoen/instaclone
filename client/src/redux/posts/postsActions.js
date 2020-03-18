@@ -2,18 +2,46 @@ import axios from 'axios';
 
 import postsTypes from './postsTypes';
 
-const fetchPostCommentsStart = () => ({
-  type: postsTypes.FETCH_POST_COMMENTS_START
-});
-
-const fetchPostCommentsFailure = error => ({
-  type: postsTypes.FETCH_POST_COMMENTS_FAILURE,
+const fetchPostDetailsFailure = error => ({
+  type: postsTypes.FETCH_POST_DETAILS_FAILURE,
   payload: error
 });
 
-const fetchPostCommentsSuccess = (postId, comments) => ({
-  type: postsTypes.FETCH_POST_COMMENTS_SUCCESS,
+const fetchPostDetailsSuccess = () => ({
+  type: postsTypes.FETCH_POST_DETAILS_SUCCESS
+});
+
+export const fetchPostDetailsStart = (postId, username, authToken) => (
+  dispatch,
+  getState
+) => {
+  const state = getState();
+  if (
+    !state.posts.data[postId].comments &&
+    !state.posts.data[postId].bookmarked
+  ) {
+    dispatch({ type: 'FETCH_POST_DETAILS_START' });
+    Promise.all([
+      fetchBookmark(postId, username, authToken),
+      fetchPostComments(postId)
+    ])
+      .then(([bookmarked, comments]) => {
+        dispatch(setBookmarked(postId, bookmarked));
+        dispatch(setPostComments(postId, comments));
+        dispatch(fetchPostDetailsSuccess());
+      })
+      .catch(err => dispatch(fetchPostDetailsFailure(err)));
+  }
+};
+
+const setPostComments = (postId, comments) => ({
+  type: postsTypes.SET_POST_COMMENTS,
   payload: { postId, comments }
+});
+
+const setBookmarked = (postId, bookmarked) => ({
+  type: postsTypes.SET_BOOKMARKED,
+  payload: { postId, bookmarked }
 });
 
 const vote = async (postId, authToken, comment) => {
@@ -33,17 +61,35 @@ const vote = async (postId, authToken, comment) => {
   }
 };
 
-export const fetchPostComments = postId => async (dispatch, getState) => {
-  const state = getState();
-  if (!state.posts.data[postId].comments) {
-    dispatch(fetchPostCommentsStart());
-    try {
-      const response = await axios.get(`/post/${postId}/comments`);
-      dispatch(fetchPostCommentsSuccess(postId, response.data));
-    } catch (err) {
-      dispatch(fetchPostCommentsFailure(err.data));
-    }
+export const fetchPostComments = async postId => {
+  try {
+    const response = await axios.get(`/post/${postId}/comments`);
+    return response.data;
+  } catch (err) {
+    throw new Error(err);
   }
+};
+
+export const fetchBookmark = async (postId, username, authToken) => {
+  try {
+    const response = await axios.get(`/user/${username}/bookmarks`, {
+      headers: { authorization: authToken }
+    });
+    if (response.data.includes(postId)) {
+      return true;
+    }
+    return false;
+  } catch (err) {
+    throw new Error(err);
+  }
+};
+
+export const toggleBookmark = (postId, authToken) => async dispatch => {
+  // Immediately dispatch bookmark action as the interaction has to be fast
+  dispatch({ type: postsTypes.TOGGLE_BOOKMARK, payload: postId });
+  await axios.post(`/post/${postId}/bookmark`, null, {
+    headers: { authorization: authToken }
+  });
 };
 
 export const addPosts = posts => ({
@@ -145,14 +191,6 @@ export const toggleShowComments = (postId, commentId) => ({
   type: postsTypes.TOGGLE_SHOW_COMMENTS,
   payload: { postId, commentId }
 });
-
-export const toggleBookmark = (postId, authToken) => async dispatch => {
-  // Immediately dispatch bookmark action as the interaction has to be fast
-  dispatch({ type: postsTypes.TOGGLE_BOOKMARK, payload: postId });
-  await axios.post(`/post/${postId}/bookmark`, null, {
-    headers: { authorization: authToken }
-  });
-};
 
 export const clearPosts = () => ({
   type: postsTypes.CLEAR_POSTS

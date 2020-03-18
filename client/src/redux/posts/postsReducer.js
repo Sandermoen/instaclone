@@ -15,24 +15,40 @@ const postsReducer = (state = INITIAL_STATE, action) => {
       return { ...state, data: { ...state.data, ...posts } };
     }
 
-    case postsTypes.FETCH_POST_COMMENTS_START: {
+    case postsTypes.FETCH_POST_DETAILS_START: {
       return { ...state, fetching: true, error: false };
     }
 
-    case postsTypes.FETCH_POST_COMMENTS_SUCCESS: {
+    case postsTypes.FETCH_POST_DETAILS_FAILURE: {
+      return { ...state, fetching: false, error: action.payload };
+    }
+
+    case postsTypes.FETCH_POST_DETAILS_SUCCESS: {
+      return { ...state, fetching: false, error: false };
+    }
+
+    case postsTypes.SET_POST_COMMENTS: {
       const { postId, comments } = action.payload;
       const post = JSON.parse(JSON.stringify(state.data[postId]));
       post.comments = comments;
       return {
         ...state,
-        fetching: false,
-        error: false,
         data: { ...state.data, [postId]: post }
       };
     }
 
-    case postsTypes.FETCH_POST_COMMENTS_FAILURE: {
-      return { ...state, fetching: false, error: action.payload };
+    case postsTypes.SET_BOOKMARKED: {
+      const { postId, bookmarked } = action.payload;
+      const post = { ...state.data[postId] };
+      post.bookmarked = bookmarked;
+      return { ...state, data: { ...state.data, [postId]: post } };
+    }
+
+    case postsTypes.TOGGLE_BOOKMARK: {
+      const postId = action.payload;
+      const post = { ...state.data[postId] };
+      post.bookmarked = !post.bookmarked;
+      return { ...state, data: { ...state.data, [postId]: post } };
     }
 
     case postsTypes.VOTE_POST: {
@@ -153,10 +169,6 @@ const postsReducer = (state = INITIAL_STATE, action) => {
         ...state,
         data: { ...state.data, [postId]: post }
       };
-    }
-
-    case postsTypes.TOGGLE_BOOKMARK: {
-      const { postId } = action.payload;
     }
 
     case postsTypes.CLEAR_POSTS: {

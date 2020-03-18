@@ -1,7 +1,7 @@
 import React, { useReducer, useRef } from 'react';
 import { connect } from 'react-redux';
 
-import { votePost } from '../../../redux/posts/postsActions';
+import { votePost, toggleBookmark } from '../../../redux/posts/postsActions';
 
 import Icon from '../../Icon/Icon';
 import PulsatingIcon from '../../Icon/PulsatingIcon/PulsatingIcon';
@@ -11,7 +11,8 @@ const PostDialogStats = ({
   post,
   token,
   currentPostId,
-  votePost
+  votePost,
+  toggleBookmark
 }) => {
   const ref = useRef();
 
@@ -69,7 +70,11 @@ const PostDialogStats = ({
           icon="chatbubble-outline"
         />
         <Icon className="icon--button" icon="paper-plane-outline" />
-        <Icon className="icon--button" icon="bookmark-outline" />
+        <Icon
+          className="icon--button"
+          icon={post.bookmarked ? 'bookmark' : 'bookmark-outline'}
+          onClick={() => toggleBookmark(currentPostId, token)}
+        />
       </div>
       <p className="heading-4">
         {state.likesCount === 0 ? (
@@ -99,7 +104,9 @@ const PostDialogStats = ({
 };
 
 const mapDispatchToProps = dispatch => ({
-  votePost: (postId, authToken) => dispatch(votePost(postId, authToken))
+  votePost: (postId, authToken) => dispatch(votePost(postId, authToken)),
+  toggleBookmark: (postId, authToken) =>
+    dispatch(toggleBookmark(postId, authToken))
 });
 
 export default connect(null, mapDispatchToProps)(PostDialogStats);

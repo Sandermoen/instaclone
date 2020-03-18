@@ -1,6 +1,7 @@
 import React, { Fragment, useEffect, useRef } from 'react';
 import { createStructuredSelector } from 'reselect';
 import { connect } from 'react-redux';
+import { formatDate } from '../../utils/timeUtils';
 
 import {
   setReplyComment,
@@ -56,7 +57,9 @@ const Comment = ({
           <b>{username}</b> {comment.message}
         </p>
         <div className="comment__stats">
-          <p className="heading-5 color-light">4 d</p>
+          <p className="heading-5 color-light">
+            {formatDate(comment.date ? comment.date : post.date)}
+          </p>
           {!caption && (
             <Fragment>
               {comment.likesCount > 0 && (

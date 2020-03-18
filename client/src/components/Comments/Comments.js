@@ -11,6 +11,7 @@ const Comments = ({ comments, caption, post }) => (
         comment={caption}
         username={caption.username}
         caption
+        post={post}
       />
     )}
     {comments.map((comment, idx) => (

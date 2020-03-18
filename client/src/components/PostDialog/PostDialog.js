@@ -5,7 +5,7 @@ import { createStructuredSelector } from 'reselect';
 import { selectToken, selectCurrentUser } from '../../redux/user/userSelectors';
 import { selectPost } from '../../redux/posts/postsSelectors';
 
-import { fetchPostComments } from '../../redux/posts/postsActions';
+import { fetchPostDetailsStart } from '../../redux/posts/postsActions';
 
 import Avatar from '../Avatar/Avatar';
 import Icon from '../Icon/Icon';
@@ -22,11 +22,11 @@ const PostDialog = ({
   currentUser,
   setCurrentProfile,
   post,
-  fetchPostComments
+  fetchPostDetailsStart
 }) => {
   useEffect(() => {
-    fetchPostComments(currentPostId);
-  }, [currentPostId, fetchPostComments]);
+    fetchPostDetailsStart(currentPostId, currentUser.username, token);
+  }, [currentPostId, fetchPostDetailsStart]);
 
   return (
     <div className="post-dialog">
@@ -88,7 +88,8 @@ const mapStateToProps = createStructuredSelector({
 });
 
 const mapDispatchToProps = dispatch => ({
-  fetchPostComments: postId => dispatch(fetchPostComments(postId))
+  fetchPostDetailsStart: (postId, username, authToken) =>
+    dispatch(fetchPostDetailsStart(postId, username, authToken))
 });
 
 PostDialog.whyDidYouRender = true;
