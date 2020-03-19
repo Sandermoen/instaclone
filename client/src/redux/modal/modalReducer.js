@@ -1,19 +1,24 @@
 import modalTypes from './modalTypes';
 
 const INITIAL_STATE = {
-  show: false,
-  props: undefined,
-  component: undefined
+  modals: []
+  // show: false,
+  // props: undefined,
+  // component: undefined
 };
 
 const modalReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
     case modalTypes.HIDE_MODAL: {
-      return { ...state, ...INITIAL_STATE };
+      const modals = state.modals;
+      const modifiedModals = modals.filter(
+        modal => modal.component !== action.payload
+      );
+      return { modals: modifiedModals };
     }
     case modalTypes.SHOW_MODAL: {
       const { props, component } = action.payload;
-      return { ...state, show: true, props, component };
+      return { modals: [...state.modals, { props, component }] };
     }
     default: {
       return state;

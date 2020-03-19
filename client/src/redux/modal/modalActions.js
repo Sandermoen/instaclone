@@ -1,11 +1,12 @@
 import modalTypes from './modalTypes';
 
 /**
- * Hides a show Modal
+ * Hides a shown Modal
  * @function hideModal
  */
-export const hideModal = () => ({
-  type: modalTypes.HIDE_MODAL
+export const hideModal = componentName => ({
+  type: modalTypes.HIDE_MODAL,
+  payload: componentName
 });
 
 /**

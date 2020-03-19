@@ -14,22 +14,22 @@ const Modal = memo(({ component, hideModal, ...additionalProps }) => {
   useEffect(() => {
     const hide = ({ target }) => {
       if (target === el || !el.contains(target)) {
-        hideModal();
+        hideModal(component);
       }
     };
-    document.addEventListener('click', hide, false);
+    el.addEventListener('click', hide, false);
     modalRoot.appendChild(el);
     document.querySelector('body').setAttribute('style', 'overflow: hidden;');
 
     return () => {
       document.querySelector('body').setAttribute('style', '');
-      document.removeEventListener('click', hide, false);
+      el.removeEventListener('click', hide, false);
       modalRoot.removeChild(el);
     };
   }, [el, modalRoot, hideModal]);
 
   return ReactDOM.createPortal(
-    <Child hide={() => hideModal()} {...additionalProps} />,
+    <Child hide={() => hideModal(component)} {...additionalProps} />,
     el
   );
 });
@@ -42,7 +42,7 @@ Modal.propTypes = {
 };
 
 const mapDispatchToProps = dispatch => ({
-  hideModal: () => dispatch(hideModal())
+  hideModal: component => dispatch(hideModal(component))
 });
 
 export default connect(null, mapDispatchToProps)(Modal);

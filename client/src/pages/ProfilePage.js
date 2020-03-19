@@ -62,7 +62,7 @@ const ProfilePage = ({
     return () => {
       clearPosts();
     };
-  }, [username, addPosts]);
+  }, [username, addPosts, clearPosts]);
 
   const handleClick = postId => {
     showModal(

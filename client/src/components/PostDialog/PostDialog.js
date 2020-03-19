@@ -26,7 +26,7 @@ const PostDialog = ({
 }) => {
   useEffect(() => {
     fetchPostDetailsStart(currentPostId, currentUser.username, token);
-  }, [currentPostId, fetchPostDetailsStart]);
+  }, [currentPostId, fetchPostDetailsStart, currentUser, token]);
 
   return (
     <div className="post-dialog">

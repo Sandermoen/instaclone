@@ -17,7 +17,10 @@ export function UnconnectedApp({ signInStart, modal }) {
   }, [signInStart, token]);
   return (
     <div className="app" data-test="component-app">
-      {modal.show && <Modal component={modal.component} {...modal.props} />}
+      {modal.modals.length > 0 &&
+        modal.modals.map((modal, idx) => (
+          <Modal key={idx} component={modal.component} {...modal.props} />
+        ))}
       <Switch>
         {!token && (
           <Route path="/login">

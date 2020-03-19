@@ -1,0 +1,32 @@
+.options-dialog {
+  width: 40rem;
+  background-color: $color-white;
+  border-radius: 10px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  & > :not(:last-child) {
+    border-bottom: 1px solid $color-grey-2;
+  }
+
+  &__button {
+    padding: 1.5rem;
+    font-family: inherit;
+    font-size: 1.4rem;
+    border: none;
+    background-color: transparent;
+    outline: none;
+    cursor: pointer;
+
+    &:active {
+      background-color: $color-grey-2;
+    }
+
+    &--warning {
+      font-weight: 700;
+      color: $color-red;
+    }
+  }
+}

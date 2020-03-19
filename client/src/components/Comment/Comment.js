@@ -3,12 +3,16 @@ import { createStructuredSelector } from 'reselect';
 import { connect } from 'react-redux';
 import { formatDate } from '../../utils/timeUtils';
 
+import Icon from '../Icon/Icon';
+
 import {
   setReplyComment,
   fetchCommentReplies,
   toggleShowComments,
   voteComment
 } from '../../redux/posts/postsActions';
+
+import { showModal } from '../../redux/modal/modalActions';
 
 import { selectToken, selectCurrentUser } from '../../redux/user/userSelectors';
 
@@ -26,7 +30,8 @@ const Comment = ({
   toggleShowComments,
   token,
   voteComment,
-  currentUser
+  currentUser,
+  showModal
 }) => {
   useEffect(() => {
     if (comment.toggleComments === true) {
@@ -56,6 +61,30 @@ const Comment = ({
         <p className="heading-4">
           <b>{username}</b> {comment.message}
         </p>
+        {!caption && (
+          <div
+            className="comment__menu-dots"
+            style={{ marginRight: '0' }}
+            onClick={event => {
+              event.nativeEvent.stopImmediatePropagation();
+              showModal(
+                {
+                  options: [
+                    { warning: true, text: 'Delete' },
+                    { warning: true, text: 'Report' }
+                  ]
+                },
+                'OptionsDialog'
+              );
+            }}
+          >
+            <Icon
+              className="icon--small icon--button color-grey"
+              icon="ellipsis-horizontal"
+              style={{ height: '3rem' }}
+            />
+          </div>
+        )}
         <div className="comment__stats">
           <p className="heading-5 color-light">
             {formatDate(comment.date ? comment.date : post.date)}
@@ -164,7 +193,8 @@ const mapDispatchToProps = dispatch => ({
   toggleShowComments: (postId, commentId) =>
     dispatch(toggleShowComments(postId, commentId)),
   voteComment: (postId, commentId, parentCommentId, authToken) =>
-    dispatch(voteComment(postId, commentId, parentCommentId, authToken))
+    dispatch(voteComment(postId, commentId, parentCommentId, authToken)),
+  showModal: (props, component) => dispatch(showModal(props, component))
 });
 
 const mapStateToProps = createStructuredSelector({

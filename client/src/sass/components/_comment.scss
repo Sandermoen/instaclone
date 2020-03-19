@@ -25,6 +25,11 @@
 
   &__content {
     width: 100%;
+    position: relative;
+
+    &:hover .comment__menu-dots {
+      opacity: 0.9;
+    }
   }
 
   &__stats {
@@ -35,5 +40,15 @@
   &__like {
     cursor: pointer;
     margin-top: 1rem;
+  }
+
+  &__menu-dots {
+    position: absolute;
+    height: 100%;
+    top: 0;
+    right: 0;
+    opacity: 0;
+    padding: 0 5px;
+    background-color: $color-white;
   }
 }
