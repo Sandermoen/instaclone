@@ -150,6 +150,33 @@ export const addComment = (postId, comment) => (dispatch, getState) => {
   }
 };
 
+export const deleteComment = (
+  postId,
+  commentId,
+  nestedCommentId,
+  authToken
+) => async dispatch => {
+  dispatch({
+    type: postsTypes.DELETE_COMMENT,
+    payload: { postId, commentId, nestedCommentId }
+  });
+  try {
+    await axios.delete(
+      `/post/${postId}/${nestedCommentId ? nestedCommentId : commentId}`,
+      {
+        headers: {
+          authorization: authToken
+        },
+        data: {
+          nested: !!nestedCommentId
+        }
+      }
+    );
+  } catch (err) {
+    console.warn(err);
+  }
+};
+
 export const setReplyComment = (
   commentId,
   username,

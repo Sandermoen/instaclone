@@ -9,7 +9,8 @@ import {
   setReplyComment,
   fetchCommentReplies,
   toggleShowComments,
-  voteComment
+  voteComment,
+  deleteComment
 } from '../../redux/posts/postsActions';
 
 import { showModal } from '../../redux/modal/modalActions';
@@ -31,7 +32,8 @@ const Comment = ({
   token,
   voteComment,
   currentUser,
-  showModal
+  showModal,
+  deleteComment
 }) => {
   useEffect(() => {
     if (comment.toggleComments === true) {
@@ -61,7 +63,7 @@ const Comment = ({
         <p className="heading-4">
           <b>{username}</b> {comment.message}
         </p>
-        {!caption && (
+        {!caption && comment.username === currentUser.username ? (
           <div
             className="comment__menu-dots"
             style={{ marginRight: '0' }}
@@ -70,8 +72,17 @@ const Comment = ({
               showModal(
                 {
                   options: [
-                    { warning: true, text: 'Delete' },
-                    { warning: true, text: 'Report' }
+                    {
+                      warning: true,
+                      text: 'Delete',
+                      onClick: () =>
+                        deleteComment(
+                          post._id,
+                          nested ? comment.postId : comment._id,
+                          nested ? comment._id : null,
+                          token
+                        )
+                    }
                   ]
                 },
                 'OptionsDialog'
@@ -84,7 +95,7 @@ const Comment = ({
               style={{ height: '3rem' }}
             />
           </div>
-        )}
+        ) : null}
         <div className="comment__stats">
           <p className="heading-5 color-light">
             {formatDate(comment.date ? comment.date : post.date)}
@@ -194,7 +205,9 @@ const mapDispatchToProps = dispatch => ({
     dispatch(toggleShowComments(postId, commentId)),
   voteComment: (postId, commentId, parentCommentId, authToken) =>
     dispatch(voteComment(postId, commentId, parentCommentId, authToken)),
-  showModal: (props, component) => dispatch(showModal(props, component))
+  showModal: (props, component) => dispatch(showModal(props, component)),
+  deleteComment: (postId, commentId, nestedCommentId, authToken) =>
+    dispatch(deleteComment(postId, commentId, nestedCommentId, authToken))
 });
 
 const mapStateToProps = createStructuredSelector({

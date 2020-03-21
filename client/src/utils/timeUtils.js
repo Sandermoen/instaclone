@@ -7,5 +7,5 @@ export const formatDate = endDate => {
   if (duration[0] === '0') {
     return 'Just now';
   }
-  return duration.join('');
+  return duration.join(' ');
 };

@@ -11,7 +11,8 @@ const {
   addComment,
   addReply,
   getComments,
-  toggleBookmark
+  toggleBookmark,
+  deleteComment
 } = require('../controllers/postController');
 
 const postLimiter = rateLimit({
@@ -33,6 +34,8 @@ postRouter.post('/:postId/vote', requireAuth, votePost);
 postRouter.post('/:postId/comment', requireAuth, addComment);
 postRouter.post('/:postId/:commentId/reply', requireAuth, addReply);
 postRouter.post('/:postId/bookmark', requireAuth, toggleBookmark);
+
+postRouter.delete('/:postId/:commentId', requireAuth, deleteComment);
 
 postRouter.get('/:postId', getPost);
 postRouter.get('/:commentId/comments', getComments);

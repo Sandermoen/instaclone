@@ -1,6 +1,7 @@
 const aws = require('aws-sdk');
 const User = require('../models/User');
 const fs = require('fs');
+const ObjectId = require('mongoose').Types.ObjectId;
 
 const {
   addPost,
@@ -282,5 +283,107 @@ module.exports.toggleBookmark = async (req, res, next) => {
     return res.send({ success: true });
   } catch (err) {
     next(err);
+  }
+};
+
+module.exports.deleteComment = async (req, res, next) => {
+  const { postId, commentId } = req.params;
+  const { nested } = req.body;
+  const user = res.locals.user;
+  let commentsCount = 1;
+
+  try {
+    const commentDocument = await User.findOne(
+      {
+        _id: user._id,
+        'comments._id': commentId
+      },
+      'comments.$'
+    );
+    if (!commentDocument) {
+      return res
+        .status(404)
+        .send({ error: 'Could not find a comment with that id.' });
+    }
+    const comment = commentDocument.comments[0];
+
+    // If it is a parent comment find all comments that need to be removed
+    if (!nested) {
+      let comments = await User.aggregate([
+        {
+          $match: {
+            $or: [
+              { 'comments._id': ObjectId(commentId) },
+              { 'comments.postId': commentId }
+            ]
+          }
+        },
+        {
+          $project: {
+            comments: {
+              $filter: {
+                input: '$comments',
+                as: 'comment',
+                cond: {
+                  $or: [
+                    { $eq: ['$$comment.postId', commentId] },
+                    { $eq: ['$$comment._id', commentId] }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        { $unwind: '$comments' },
+        {
+          $group: {
+            _id: '$comments._id',
+            comments: { $push: '$comments' }
+          }
+        }
+      ]);
+      commentsCount += comments.length;
+    } else {
+      const parentCommentUpdate = await User.updateOne(
+        {
+          'comments._id': comment.postId
+        },
+        { $inc: { 'comments.$.commentsCount': -1 } }
+      );
+      if (!parentCommentUpdate.nModified) {
+        return res
+          .status(500)
+          .send({ error: 'Error while updating parent comment count.' });
+      }
+    }
+
+    // Decrementing the post's comment count
+    const postCommentsCountUpdate = await User.updateOne(
+      {
+        'posts._id': postId
+      },
+      { $inc: { 'posts.$.commentsCount': -commentsCount } }
+    );
+
+    // Removing all comments with the postId or _id of commentId
+    const commentsUpdate = await User.updateMany(
+      {},
+      {
+        $pull: {
+          comments: { $or: [{ _id: commentId }, { postId: commentId }] }
+        }
+      }
+    );
+
+    if (!postCommentsCountUpdate.nModified || !commentsUpdate.nModified) {
+      return res.status(500).send({
+        error: 'Could not update post.',
+        postCommentsCountUpdate,
+        commentsUpdate
+      });
+    }
+    return res.status(204).send();
+  } catch (err) {
+    return next(err);
   }
 };

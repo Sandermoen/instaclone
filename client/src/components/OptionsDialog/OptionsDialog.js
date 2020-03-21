@@ -18,7 +18,16 @@ const OptionsDialog = ({ hide, options }) => {
           'options-dialog__button--warning': option.warning
         });
         return (
-          <button className={buttonClassNames} key={idx}>
+          <button
+            onClick={() => {
+              if (option.hasOwnProperty('onClick')) {
+                option.onClick();
+                hide();
+              }
+            }}
+            className={buttonClassNames}
+            key={idx}
+          >
             {option.text}
           </button>
         );

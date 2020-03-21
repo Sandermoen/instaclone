@@ -106,6 +106,32 @@ const postsReducer = (state = INITIAL_STATE, action) => {
       };
     }
 
+    case postsTypes.DELETE_COMMENT: {
+      const { postId, commentId, nestedCommentId } = action.payload;
+      const post = JSON.parse(JSON.stringify(state.data[postId]));
+      let commentsCount = 1;
+      const commentIndex = post.comments.findIndex(
+        comment => comment._id === commentId
+      );
+      const parentComment = post.comments[commentIndex];
+
+      if (nestedCommentId) {
+        const nestedCommentIndex = parentComment.replies.findIndex(
+          comment => comment._id === nestedCommentId
+        );
+        parentComment.replies.splice(nestedCommentIndex, 1);
+        parentComment.commentsCount -= 1;
+      } else {
+        commentsCount += parentComment.replies
+          ? parentComment.replies.length
+          : 0;
+        post.comments.splice(commentIndex, 1);
+      }
+
+      post.commentsCount -= commentsCount;
+      return { ...state, data: { ...state.data, [postId]: post } };
+    }
+
     case postsTypes.ADD_COMMENT_REPLY: {
       const { postId, commentId, comment } = action.payload;
       const post = JSON.parse(JSON.stringify(state.data[postId]));

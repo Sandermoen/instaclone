@@ -56,12 +56,10 @@ userSchema.pre('save', function(next) {
       bcrypt.hash(this.password, salt, (err, hash) => {
         if (err) return next(err);
         this.password = hash;
-        next();
       });
     });
-  } else {
-    next();
   }
+  next();
 });
 
 userSchema.statics.findByCredentials = async function(

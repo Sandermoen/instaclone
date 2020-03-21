@@ -108,17 +108,9 @@ const findComments = async parentId => {
  */
 const postComment = async (comment, userId, postId) => {
   try {
-    const commentUpdate = await User.findOneAndUpdate(
-      { _id: userId },
-      {
-        $push: {
-          comments: comment
-        }
-      },
-      { new: true, useFindAndModify: false }
-    );
-
-    if (!commentUpdate) throw new Error('Could not post comment.');
+    const document = await User.findOne({ _id: userId });
+    document.comments.push(comment);
+    const updatedDocument = await document.save();
 
     // Update post comment count
     const postCommentCountUpdate = await User.updateOne(
@@ -129,8 +121,9 @@ const postComment = async (comment, userId, postId) => {
     if (!postCommentCountUpdate.nModified) {
       throw new Error('Could not update post comments count.');
     }
-    return commentUpdate;
+    return updatedDocument;
   } catch (err) {
+    console.log(err);
     throw new Error(err);
   }
 };
