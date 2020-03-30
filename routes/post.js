@@ -5,14 +5,9 @@ const rateLimit = require('express-rate-limit');
 
 const { requireAuth } = require('../controllers/authController');
 const {
-  uploadFile,
-  votePost,
+  createPost,
   getPost,
-  addComment,
-  addReply,
-  getComments,
-  toggleBookmark,
-  deleteComment
+  votePost
 } = require('../controllers/postController');
 
 const postLimiter = rateLimit({
@@ -28,15 +23,15 @@ postRouter.post(
     dest: 'temp/',
     limits: { fieldSize: 8 * 1024 * 1024, fileSize: 500000 }
   }).single('image'),
-  uploadFile
+  createPost
 );
 postRouter.post('/:postId/vote', requireAuth, votePost);
-postRouter.post('/:postId/comment', requireAuth, addComment);
-postRouter.post('/:postId/:commentId/reply', requireAuth, addReply);
-postRouter.post('/:postId/bookmark', requireAuth, toggleBookmark);
+// postRouter.post('/:postId/comment', requireAuth, addComment);
+// postRouter.post('/:postId/:commentId/reply', requireAuth, addReply);
+// postRouter.post('/:postId/bookmark', requireAuth, toggleBookmark);
 
-postRouter.delete('/:postId/:commentId', requireAuth, deleteComment);
+// postRouter.delete('/:postId/:commentId', requireAuth, deleteComment);
 
 postRouter.get('/:postId', getPost);
-postRouter.get('/:commentId/comments', getComments);
+// postRouter.get('/:commentId/comments', getComments);
 module.exports = postRouter;

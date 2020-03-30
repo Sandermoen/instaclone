@@ -26,7 +26,7 @@ const Modal = memo(({ component, hideModal, ...additionalProps }) => {
       el.removeEventListener('click', hide, false);
       modalRoot.removeChild(el);
     };
-  }, [el, modalRoot, hideModal]);
+  }, [el, modalRoot, hideModal, component]);
 
   return ReactDOM.createPortal(
     <Child hide={() => hideModal(component)} {...additionalProps} />,

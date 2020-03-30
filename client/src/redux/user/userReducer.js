@@ -29,6 +29,22 @@ const userReducer = (state = INITIAL_STATE, action) => {
         token: null
       };
     }
+    case authTypes.BOOKMARK_POST: {
+      const { operation, postId } = action.payload;
+      let bookmarks = JSON.parse(JSON.stringify(state.currentUser.bookmarks));
+      if (operation === 'add') {
+        bookmarks.push({ post: postId });
+      } else {
+        bookmarks = bookmarks.filter(bookmark => bookmark.post !== postId);
+      }
+      return {
+        ...state,
+        currentUser: {
+          ...state.currentUser,
+          bookmarks
+        }
+      };
+    }
     default:
       return state;
   }

@@ -1,11 +1,15 @@
 const jwt = require('jwt-simple');
 const User = require('../models/User');
+const bcrypt = require('bcrypt');
 
 module.exports.verifyJwt = token => {
   return new Promise(async (resolve, reject) => {
     try {
       const id = jwt.decode(token, process.env.JWT_SECRET).id;
-      const user = await User.findByTokenId(id);
+      const user = await User.findOne(
+        { _id: id },
+        'email username avatar bookmarks'
+      );
       if (user) {
         return resolve(user);
       }
@@ -17,7 +21,7 @@ module.exports.verifyJwt = token => {
 
 module.exports.requireAuth = async (req, res, next) => {
   const { authorization } = req.headers;
-  if (!authorization) return res.status(401).send({ error: 'Not authorized' });
+  if (!authorization) return res.status(401).send({ error: 'Not authorized.' });
   try {
     const user = await this.verifyJwt(authorization);
     // Allow other middlewares to access the authenticated user details.
@@ -35,11 +39,7 @@ module.exports.loginAuthentication = async (req, res, next) => {
     try {
       const user = await this.verifyJwt(authorization);
       return res.send({
-        user: {
-          email: user.email,
-          username: user.username,
-          avatar: user.avatar
-        },
+        user,
         token: authorization
       });
     } catch (err) {
@@ -54,22 +54,38 @@ module.exports.loginAuthentication = async (req, res, next) => {
   }
 
   try {
-    const user = await User.findByCredentials(usernameOrEmail, password);
+    const user = await User.findOne({
+      $or: [{ username: usernameOrEmail }, { email: usernameOrEmail }]
+    });
     if (!user) {
       return res.status(401).send({
         error: 'The credentials you provided are incorrect, please try again.'
       });
     }
-    res.send({
-      user: {
-        email: user.email,
-        username: user.username,
-        avatar: user.avatar
-      },
-      token: jwt.encode({ id: user._id }, process.env.JWT_SECRET)
+
+    bcrypt.compare(password, user.password, (err, result) => {
+      if (err) {
+        return next(err);
+      }
+      if (!result) {
+        return res.status(401).send({
+          error: 'The credentials you provided are incorrect, please try again.'
+        });
+      }
+
+      res.send({
+        user: {
+          _id: user._id,
+          email: user.email,
+          username: user.username,
+          avatar: user.avatar
+        },
+        token: jwt.encode({ id: user._id }, process.env.JWT_SECRET)
+      });
     });
   } catch (err) {
-    res.status(400).send({ error: err.message });
+    console.log(err);
+    next(err);
   }
 };
 
@@ -92,6 +108,6 @@ module.exports.register = async (req, res, next) => {
       token: jwt.encode({ id: user._id }, process.env.JWT_SECRET)
     });
   } catch (err) {
-    res.status(400).send({ error: err.message });
+    next(err);
   }
 };

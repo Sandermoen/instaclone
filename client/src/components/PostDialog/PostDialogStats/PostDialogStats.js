@@ -1,7 +1,10 @@
-import React, { useReducer, useRef } from 'react';
+import React, { useRef } from 'react';
 import { connect } from 'react-redux';
 
-import { votePost, toggleBookmark } from '../../../redux/posts/postsActions';
+import { bookmarkPost } from '../../../redux/user/userActions';
+
+import { formatDate } from '../../../utils/timeUtils';
+import { votePost } from '../../../services/postService';
 
 import Icon from '../../Icon/Icon';
 import PulsatingIcon from '../../Icon/PulsatingIcon/PulsatingIcon';
@@ -10,47 +13,35 @@ const PostDialogStats = ({
   currentUser,
   post,
   token,
-  currentPostId,
-  votePost,
-  toggleBookmark
+  postId,
+  dispatch,
+  profileDispatch,
+  bookmarkPost
 }) => {
   const ref = useRef();
 
-  const INITIAL_STATE = {
-    likesCount: post.likesCount,
-    liked: post.likes.includes(currentUser.username)
-  };
-
-  const likesReducer = (state, action) => {
-    switch (action.type) {
-      case 'LIKE_POST': {
-        return { likesCount: state.likesCount++, liked: true };
-      }
-      case 'UNLIKE_POST': {
-        return { likesCount: state.likesCount--, liked: false };
-      }
-      default: {
-        throw new Error('Invalid action type issued to likesReducer');
-      }
-    }
-  };
-
-  const [state, dispatch] = useReducer(likesReducer, INITIAL_STATE);
-
   const handleClick = async () => {
-    // We want this to happen instantly since it's non-crucial data
-    // We can assume that the server will respond with 200 and be fine
-    state.liked
-      ? dispatch({ type: 'UNLIKE_POST' })
-      : dispatch({ type: 'LIKE_POST' });
-    votePost(currentPostId, token);
+    // Dispatch the action immediately to avoid a delay between the user's click and something happening
+    dispatch({
+      type: 'VOTE_POST',
+      payload: { currentUser, postId, dispatch: profileDispatch }
+    });
+    try {
+      await votePost(post._id, token);
+    } catch (err) {
+      console.warn(err);
+    }
   };
 
   return (
     <div ref={ref} className="post-dialog__stats">
       <div className="post-dialog__actions">
         <PulsatingIcon
-          toggle={state.liked}
+          toggle={
+            !!post.postVotes[0].votes.find(
+              vote => vote.author === currentUser._id
+            )
+          }
           elementRef={ref}
           constantProps={{ onClick: () => handleClick() }}
           toggledProps={[
@@ -72,12 +63,16 @@ const PostDialogStats = ({
         <Icon className="icon--button" icon="paper-plane-outline" />
         <Icon
           className="icon--button"
-          icon={post.bookmarked ? 'bookmark' : 'bookmark-outline'}
-          onClick={() => toggleBookmark(currentPostId, token)}
+          onClick={() => bookmarkPost(post._id, token)}
+          icon={
+            !!currentUser.bookmarks.find(bookmark => bookmark.post === post._id)
+              ? 'bookmark'
+              : 'bookmark-outline'
+          }
         />
       </div>
       <p className="heading-4">
-        {state.likesCount === 0 ? (
+        {post.postVotes[0].votes.length === 0 ? (
           <span>
             Be the first to{' '}
             <b
@@ -93,20 +88,19 @@ const PostDialogStats = ({
         ) : (
           <span>
             <b>
-              {state.likesCount} {state.likesCount === 1 ? 'like' : 'likes'}
+              {post.postVotes[0].votes.length}{' '}
+              {post.postVotes[0].votes.length === 1 ? 'like' : 'likes'}
             </b>
           </span>
         )}
       </p>
-      <p className="heading-5 color-light uppercase">february 28</p>
+      <p className="heading-5 color-light uppercase">{formatDate(post.date)}</p>
     </div>
   );
 };
 
 const mapDispatchToProps = dispatch => ({
-  votePost: (postId, authToken) => dispatch(votePost(postId, authToken)),
-  toggleBookmark: (postId, authToken) =>
-    dispatch(toggleBookmark(postId, authToken))
+  bookmarkPost: (postId, authToken) => dispatch(bookmarkPost(postId, authToken))
 });
 
 export default connect(null, mapDispatchToProps)(PostDialogStats);

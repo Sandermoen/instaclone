@@ -1,10 +1,9 @@
 import postsTypes from './postsTypes';
 
-const INITIAL_STATE = {
+export const INITIAL_STATE = {
   fetching: false,
   error: false,
-  data: {},
-  replyComment: undefined
+  data: {}
 };
 
 const postsReducer = (state = INITIAL_STATE, action) => {

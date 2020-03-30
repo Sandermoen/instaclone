@@ -2,12 +2,9 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcrypt');
 
-const commentSchema = require('./Comment');
-const postSchema = require('./Post');
-
 const Schema = mongoose.Schema;
 
-const userSchema = new Schema({
+const UserSchema = new Schema({
   email: {
     type: String,
     required: true,
@@ -36,18 +33,21 @@ const userSchema = new Schema({
     type: String,
     maxlength: 130
   },
-  followers: Array,
-  following: Array,
-  posts: [postSchema],
-  comments: [commentSchema],
-  bookmarks: Array,
+  bookmarks: [
+    {
+      post: {
+        type: Schema.ObjectId,
+        ref: 'Post'
+      }
+    }
+  ],
   private: {
     type: Boolean,
     default: false
   }
 });
 
-userSchema.pre('save', function(next) {
+UserSchema.pre('save', function(next) {
   const saltRounds = 10;
   // Check if the password has been modified
   if (this.modifiedPaths().includes('password')) {
@@ -56,57 +56,13 @@ userSchema.pre('save', function(next) {
       bcrypt.hash(this.password, salt, (err, hash) => {
         if (err) return next(err);
         this.password = hash;
+        next();
       });
     });
+  } else {
+    next();
   }
-  next();
 });
 
-userSchema.statics.findByCredentials = async function(
-  usernameOrEmail,
-  password
-) {
-  const user = await User.findOne({
-    $or: [{ email: usernameOrEmail }, { username: usernameOrEmail }]
-  });
-
-  if (!user) {
-    throw new Error('Invalid login credentials');
-  }
-
-  const matchingPasswords = await bcrypt.compare(password, user.password);
-  if (!matchingPasswords) {
-    throw new Error('Invalid login credentials');
-  }
-
-  return user;
-};
-
-userSchema.statics.findByUsername = async function(username) {
-  const user = await User.findOne({ username });
-
-  if (!user) {
-    throw new Error('User does not exist');
-  }
-  return user;
-};
-
-userSchema.statics.findByTokenId = async function(id) {
-  try {
-    const user = await User.findOne({
-      _id: id
-    });
-
-    if (!user) {
-      throw new Error('Invalid login credentials');
-    }
-
-    return user;
-  } catch (err) {
-    throw new Error(err);
-  }
-};
-
-const User = mongoose.model('User', userSchema);
-
+const User = mongoose.model('User', UserSchema);
 module.exports = User;

@@ -27,18 +27,32 @@ export const signInFailure = err => ({
 export const signInStart = (
   usernameOrEmail,
   password,
-  token
+  authToken
 ) => async dispatch => {
   const request =
     usernameOrEmail && password
       ? { data: { usernameOrEmail, password } }
-      : { headers: { authorization: token } };
+      : { headers: { authorization: authToken } };
   try {
     dispatch({ type: userTypes.SIGN_IN_START });
     const response = await axios('/auth/login', { method: 'POST', ...request });
     dispatch(signInSuccess(response.data));
   } catch (err) {
-    if (token) dispatch(signOut);
+    if (authToken) dispatch(signOut);
     dispatch(signInFailure(err.response.data));
+  }
+};
+
+export const bookmarkPost = (postId, authToken) => async dispatch => {
+  try {
+    const response = await axios.post(`/user/${postId}/bookmark`, null, {
+      headers: { authorization: authToken }
+    });
+    dispatch({
+      type: userTypes.BOOKMARK_POST,
+      payload: { ...response.data, postId }
+    });
+  } catch (err) {
+    console.warn(err);
   }
 };

@@ -1,103 +1,107 @@
-import React, { useState, Fragment, useEffect, useRef } from 'react';
-import { createStructuredSelector } from 'reselect';
-import { connect } from 'react-redux';
-import axios from 'axios';
+import React, { useReducer, Fragment, useEffect, useRef } from 'react';
 
 import {
-  addComment,
-  clearReplyComment,
-  toggleShowComments
-} from '../../../redux/posts/postsActions';
+  createComment,
+  createCommentReply
+} from '../../../services/commentService';
 
-import { selectReplyComment } from '../../../redux/posts/postsSelectors';
+import {
+  INITIAL_STATE,
+  postDialogCommentFormReducer
+} from './postDialogCommentFormReducer';
 
 import Loader from '../../Loader/Loader';
 
 const PostDialogCommentForm = ({
-  currentPostId,
+  currentUser,
   token,
-  addComment,
-  clearReplyComment,
-  replyComment,
-  toggleShowComments
+  postId,
+  commentsRef,
+  dialogDispatch,
+  profileDispatch,
+  replying
 }) => {
-  const [comment, setComment] = useState({ fetching: false, data: '' });
-  const commentInput = useRef();
+  const [state, dispatch] = useReducer(
+    postDialogCommentFormReducer,
+    INITIAL_STATE
+  );
+
+  const commentInputRef = useRef();
 
   useEffect(() => {
-    if (replyComment) {
-      setComment(previous => ({
-        ...previous,
-        data: `@${replyComment.username} `
-      }));
-      commentInput.current.focus();
+    if (replying) {
+      commentInputRef.current.value = `@${replying.commentUser} `;
+      commentInputRef.current.focus();
     }
-  }, [replyComment]);
+  }, [replying]);
 
-  const postComment = async event => {
+  const handleSubmit = async event => {
     event.preventDefault();
-    if (!comment.data) return console.warn('Cannot post an empty comment.');
-    setComment(previous => ({ ...previous, fetching: true }));
-    try {
-      let response = undefined;
-      if (replyComment) {
-        response = await axios.post(
-          `/post/${currentPostId}/${replyComment.commentId}/reply`,
-          { comment: comment.data, nested: replyComment.nested },
-          {
-            headers: { authorization: token }
-          }
-        );
-      } else {
-        response = await axios.post(
-          `/post/${
-            replyComment ? replyComment.commentId : currentPostId
-          }/comment`,
-          { comment: comment.data },
-          {
-            headers: {
-              authorization: token
-            }
-          }
-        );
-      }
-      addComment(currentPostId, response.data.comment);
-      if (
-        replyComment &&
-        !replyComment.toggleComments &&
-        !replyComment.nested
-      ) {
-        toggleShowComments(currentPostId, replyComment.commentId);
-      }
-      clearReplyComment();
-      setComment({ fetching: false, data: '' });
+    if (state.comment.length === 0) {
+      return dispatch({
+        type: 'POST_COMMENT_FAILURE',
+        payload: 'You cannot post an empty comment.'
+      });
+    }
 
-      if (!replyComment) {
+    try {
+      dispatch({ type: 'POST_COMMENT_START' });
+      if (!replying) {
+        // The user is not replying to a comment
+        const comment = await createComment(state.comment, postId, token);
+        dispatch({
+          type: 'POST_COMMENT_SUCCESS',
+          payload: { comment, dispatch: dialogDispatch, postId }
+        });
         // Scroll to bottom to see posted comment
-        const comments = document.querySelector('.comments');
-        comments.scrollTop = comments.scrollHeight;
+        commentsRef.current.scrollTop = commentsRef.current.scrollHeight;
+      } else {
+        // The user is replying to a comment
+        const comment = await createCommentReply(
+          state.comment,
+          replying.commentId,
+          token
+        );
+        dispatch({
+          type: 'POST_COMMENT_REPLY_SUCCESS',
+          payload: {
+            comment,
+            dispatch: dialogDispatch,
+            parentCommentId: replying.commentId
+          }
+        });
+        dialogDispatch({ type: 'SET_REPLYING' });
       }
+      // Increment the comment count on the overlay of the image on the profile page
+      profileDispatch({
+        type: 'INCREMENT_POST_COMMENTS_COUNT',
+        payload: postId
+      });
     } catch (err) {
-      console.warn(err);
+      dispatch({ type: 'POST_COMMENT_FAILURE', payload: err });
     }
   };
 
   return (
     <form
-      onSubmit={event => postComment(event)}
+      onSubmit={event => handleSubmit(event)}
       className="post-dialog__add-comment"
     >
       <Fragment>
-        {comment.fetching && <Loader />}
+        {state.posting && <Loader />}
         <input
           className="add-comment__input"
           type="text"
           placeholder="Add a comment..."
-          onChange={event =>
-            setComment({ fetching: false, data: event.target.value })
-          }
-          value={comment.data}
-          ref={commentInput}
+          onChange={event => {
+            // Removed the `@username` from the input so the user is no longer looking to reply
+            if (replying && !event.target.value) {
+              dialogDispatch({ type: 'SET_REPLYING' });
+            }
+            dispatch({ type: 'SET_COMMENT', payload: event.target.value });
+          }}
+          value={state.comment}
+          ref={commentInputRef}
         />
         <button
           type="submit"
@@ -110,18 +114,4 @@ const PostDialogCommentForm = ({
   );
 };
 
-const mapDispatchToProps = dispatch => ({
-  addComment: (postId, comment) => dispatch(addComment(postId, comment)),
-  clearReplyComment: () => dispatch(clearReplyComment()),
-  toggleShowComments: (postId, commentId) =>
-    dispatch(toggleShowComments(postId, commentId))
-});
-
-const mapStateToProps = createStructuredSelector({
-  replyComment: selectReplyComment
-});
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(PostDialogCommentForm);
+export default PostDialogCommentForm;

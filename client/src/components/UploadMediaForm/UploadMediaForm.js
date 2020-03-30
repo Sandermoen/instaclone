@@ -1,10 +1,11 @@
 import React, { useState, useEffect, Fragment } from 'react';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
-import axios from 'axios';
 import { useHistory } from 'react-router-dom';
 
 import { selectToken, selectCurrentUser } from '../../redux/user/userSelectors';
+
+import { createPost } from '../../services/postService';
 
 import Loader from '../Loader/Loader';
 import Avatar from '../Avatar/Avatar';
@@ -46,12 +47,7 @@ const UploadMediaForm = ({ token, file, currentUser, hide }) => {
     formData.set('caption', caption);
     try {
       setFormEvents(previous => ({ ...previous, isLoading: true }));
-      await axios.post('/post', formData, {
-        headers: {
-          authorization: token,
-          'Content-Type': 'multipart/form-data'
-        }
-      });
+      createPost(formData, token);
       setFormEvents(previous => ({ ...previous, isLoading: false }));
       hide();
       history.push('/');

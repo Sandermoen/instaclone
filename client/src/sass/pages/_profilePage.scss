@@ -65,7 +65,7 @@
 .profile-images {
   display: grid;
   grid-column: center-start / center-end;
-  grid-template-columns: repeat(auto-fit, minmax(10rem, 25rem));
+  grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(auto-fit, 25rem);
   grid-auto-rows: 25rem;
   grid-column-gap: 2.5rem;
