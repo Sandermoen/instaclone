@@ -1,4 +1,4 @@
-const aws = require('aws-sdk');
+const cloudinary = require('cloudinary').v2;
 const Post = require('../models/Post');
 const PostVote = require('../models/PostVote');
 const Comment = require('../models/Comment');
@@ -16,42 +16,40 @@ module.exports.createPost = async (req, res, next) => {
       .send({ error: 'Please provide the req.file to upload.' });
   }
 
-  aws.config.setPromisesDependency();
-  aws.config.update({
-    accessKeyId: process.env.AWS_ACCESS_KEY,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    region: process.env.AWS_REGION
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
   });
 
-  // S3 bucket config
-  const params = {
-    ACL: 'public-read',
-    Bucket: process.env.AWS_S3_BUCKET_NAME,
-    Body: fs.createReadStream(req.file.path),
-    Key: `images/${req.file.originalname}`
-  };
-  const s3 = new aws.S3();
-  s3.upload(params, async (err, data) => {
-    if (err) next(err);
-    if (data) {
-      fs.unlinkSync(req.file.path);
-      const resourceLocation = data.Location;
-      try {
-        const post = new Post({
-          image: resourceLocation,
-          caption,
-          author: user._id
-        });
-
-        const postVote = new PostVote({ post: post._id });
-        await post.save();
-        await postVote.save();
-        return res.status(201).send(resourceLocation);
-      } catch (err) {
-        return res.status(401).send({ error: err });
+  cloudinary.uploader.upload(
+    req.file.path,
+    {
+      eager: [{ width: 250, height: 250, crop: 'fit' }]
+    },
+    async (err, result) => {
+      if (err) next(err);
+      if (result) {
+        try {
+          fs.unlinkSync(req.file.path);
+          const post = new Post({
+            image: result.secure_url,
+            thumbnail: result.eager[0].secure_url,
+            caption,
+            author: user._id
+          });
+          const postVote = new PostVote({
+            post: post._id
+          });
+          await post.save();
+          await postVote.save();
+          return res.status(201).send(result);
+        } catch (err) {
+          next(err);
+        }
       }
     }
-  });
+  );
 };
 
 module.exports.getPost = async (req, res, next) => {

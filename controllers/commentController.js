@@ -249,6 +249,14 @@ module.exports.getCommentReplies = async (req, res, next) => {
         $unwind: '$author'
       },
       {
+        $unset: [
+          'author.private',
+          'author.password',
+          'author.bookmarks',
+          'author.email'
+        ]
+      },
+      {
         $addFields: {
           commentReplyVotes: '$commentReplyVotes.votes'
         }

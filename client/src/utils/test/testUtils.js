@@ -1,4 +1,4 @@
-import { assertPropTypes } from 'check-prop-types';
+import checkPropTypes from 'check-prop-types';
 import { createStore, applyMiddleware } from 'redux';
 
 import rootReducer from '../../redux/rootReducer';
@@ -40,7 +40,7 @@ export const findByTestAttribute = (wrapper, attributeName) => {
  */
 /* eslint react/forbid-foreign-prop-types: 0 */
 export const checkProps = (Component, expectedProps) => {
-  const result = assertPropTypes(
+  const result = checkPropTypes(
     Component.propTypes,
     expectedProps,
     'prop',

@@ -48,6 +48,7 @@ module.exports.retrieveUser = async (req, res, next) => {
       {
         $unwind: '$postvotes'
       },
+      { $addFields: { image: '$thumbnail' } },
       {
         $project: {
           user: true,
@@ -57,6 +58,7 @@ module.exports.retrieveUser = async (req, res, next) => {
             $sum: [{ $size: '$comments' }, { $size: '$commentReplies' }]
           },
           image: true,
+          thumbnail: true,
           caption: true,
           author: true,
           postVotes: { $size: '$postvotes.votes' }

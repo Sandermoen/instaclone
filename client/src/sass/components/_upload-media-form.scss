@@ -1,6 +1,8 @@
 .upload-media-form {
   height: 200px;
   width: 50rem;
+  grid-column: center-start / center-end;
+  justify-self: center;
   background-color: $color-grey-3;
   box-shadow: 0 1rem 2rem $color-black;
   transform: translateY(-15rem);

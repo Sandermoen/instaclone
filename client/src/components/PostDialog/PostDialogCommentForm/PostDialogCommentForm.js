@@ -1,4 +1,5 @@
 import React, { useReducer, Fragment, useEffect, useRef } from 'react';
+import PropTypes from 'prop-types';
 
 import {
   createComment,
@@ -13,7 +14,6 @@ import {
 import Loader from '../../Loader/Loader';
 
 const PostDialogCommentForm = ({
-  currentUser,
   token,
   postId,
   commentsRef,
@@ -86,6 +86,7 @@ const PostDialogCommentForm = ({
     <form
       onSubmit={event => handleSubmit(event)}
       className="post-dialog__add-comment"
+      data-test="component-post-dialog-add-comment"
     >
       <Fragment>
         {state.posting && <Loader />}
@@ -102,6 +103,7 @@ const PostDialogCommentForm = ({
           }}
           value={state.comment}
           ref={commentInputRef}
+          data-test="component-add-comment-input"
         />
         <button
           type="submit"
@@ -112,6 +114,15 @@ const PostDialogCommentForm = ({
       </Fragment>
     </form>
   );
+};
+
+PostDialogCommentForm.propTypes = {
+  token: PropTypes.string.isRequired,
+  postId: PropTypes.string.isRequired,
+  commentsRef: PropTypes.object.isRequired,
+  dialogDispatch: PropTypes.func.isRequired,
+  profileDispatch: PropTypes.func.isRequired,
+  replying: PropTypes.oneOfType([PropTypes.bool, PropTypes.object]).isRequired
 };
 
 export default PostDialogCommentForm;

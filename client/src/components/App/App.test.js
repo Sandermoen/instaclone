@@ -10,7 +10,7 @@ import { findByTestAttribute } from '../../utils/test/testUtils';
  * @returns {ShallowWrapper}
  */
 export const setup = () => {
-  const wrapper = shallow(<UnconnectedApp />);
+  const wrapper = shallow(<UnconnectedApp modal={{ modals: [] }} />);
   return wrapper;
 };
 

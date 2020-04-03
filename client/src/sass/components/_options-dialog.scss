@@ -5,6 +5,8 @@
   text-align: center;
   display: flex;
   flex-direction: column;
+  justify-self: center;
+  grid-column: center-start / center-end;
   overflow: hidden;
 
   & > :not(:last-child) {

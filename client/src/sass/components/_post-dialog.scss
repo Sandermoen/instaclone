@@ -1,6 +1,7 @@
 .post-dialog {
+  grid-column: center-start / center-end;
   display: grid;
-  margin: 0 5rem;
+  justify-self: center;
   grid-template-rows: 55rem;
   grid-template-columns: 35vw 30rem;
 

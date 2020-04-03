@@ -1,4 +1,5 @@
 import React, { useRef } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import { bookmarkPost } from '../../../redux/user/userActions';
@@ -13,7 +14,6 @@ const PostDialogStats = ({
   currentUser,
   post,
   token,
-  postId,
   dispatch,
   profileDispatch,
   bookmarkPost
@@ -24,7 +24,7 @@ const PostDialogStats = ({
     // Dispatch the action immediately to avoid a delay between the user's click and something happening
     dispatch({
       type: 'VOTE_POST',
-      payload: { currentUser, postId, dispatch: profileDispatch }
+      payload: { currentUser, postId: post._id, dispatch: profileDispatch }
     });
     try {
       await votePost(post._id, token);
@@ -34,7 +34,11 @@ const PostDialogStats = ({
   };
 
   return (
-    <div ref={ref} className="post-dialog__stats">
+    <div
+      ref={ref}
+      className="post-dialog__stats"
+      data-test="component-post-dialog-stats"
+    >
       <div className="post-dialog__actions">
         <PulsatingIcon
           toggle={
@@ -81,6 +85,7 @@ const PostDialogStats = ({
                 event.nativeEvent.stopImmediatePropagation();
                 handleClick();
               }}
+              data-test="component-like-button"
             >
               like this
             </b>
@@ -97,6 +102,15 @@ const PostDialogStats = ({
       <p className="heading-5 color-light uppercase">{formatDate(post.date)}</p>
     </div>
   );
+};
+
+PostDialogStats.propTypes = {
+  currentUser: PropTypes.object.isRequired,
+  post: PropTypes.object.isRequired,
+  token: PropTypes.string.isRequired,
+  dispatch: PropTypes.func.isRequired,
+  profileDispatch: PropTypes.func.isRequired,
+  bookmarkPost: PropTypes.func.isRequired
 };
 
 const mapDispatchToProps = dispatch => ({

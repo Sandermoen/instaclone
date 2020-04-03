@@ -1,4 +1,5 @@
 import React, { useEffect, useReducer, Fragment, useRef } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 
@@ -26,7 +27,6 @@ const PostDialog = ({
   const [state, dispatch] = useReducer(postDialogReducer, INITIAL_STATE);
 
   useEffect(() => {
-    console.log(state.data);
     try {
       (async function() {
         const response = await getPost(postId);
@@ -38,7 +38,7 @@ const PostDialog = ({
   }, [postId]);
 
   return (
-    <div className="post-dialog">
+    <div className="post-dialog" data-test="component-post-dialog">
       {state.fetching ? (
         <Loader />
       ) : (
@@ -46,7 +46,10 @@ const PostDialog = ({
           <div className="post-dialog__image">
             <img src={state.data.image} alt="Post" />
           </div>
-          <div className="post-dialog__content">
+          <div
+            data-test="component-post-dialog-content"
+            className="post-dialog__content"
+          >
             <header className="post-dialog__header">
               <Avatar
                 className="avatar--small"
@@ -92,14 +95,12 @@ const PostDialog = ({
               currentUser={currentUser}
               token={token}
               post={state.data}
-              postId={postId}
               dispatch={dispatch}
               profileDispatch={profileDispatch}
             />
             <PostDialogCommentForm
               postId={postId}
               token={token}
-              currentUser={currentUser}
               commentsRef={commentsRef}
               dialogDispatch={dispatch}
               profileDispatch={profileDispatch}
@@ -110,6 +111,14 @@ const PostDialog = ({
       )}
     </div>
   );
+};
+
+PostDialog.propTypes = {
+  postId: PropTypes.string.isRequired,
+  username: PropTypes.string.isRequired,
+  token: PropTypes.string.isRequired,
+  currentUser: PropTypes.object.isRequired,
+  profileDispatch: PropTypes.func.isRequired
 };
 
 const mapStateToProps = createStructuredSelector({
