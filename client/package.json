@@ -15,6 +15,7 @@
     "classnames": "^2.2.6",
     "date-fns": "^2.11.0",
     "linkifyjs": "^2.1.9",
+    "lodash": "^4.17.15",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
     "react-redux": "^7.1.3",

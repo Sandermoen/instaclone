@@ -7,9 +7,18 @@ import axios from 'axios';
  * @param {string} postId Id of the post to fetch
  * @returns {object} The post requested
  */
-export const getPost = async postId => {
+export const getPost = async (postId) => {
   try {
     const response = await axios.get(`/post/${postId}`);
+    return response.data;
+  } catch (err) {
+    throw new Error(err);
+  }
+};
+
+export const getPosts = async (username, offset = 0) => {
+  try {
+    const response = await axios.get(`/user/${username}/posts/${offset}`);
     return response.data;
   } catch (err) {
     throw new Error(err);
@@ -25,7 +34,7 @@ export const getPost = async postId => {
 export const votePost = async (postId, authToken) => {
   try {
     await axios.post(`/post/${postId}/vote`, null, {
-      headers: { authorization: authToken }
+      headers: { authorization: authToken },
     });
   } catch (err) {
     throw new Error(err);
@@ -43,8 +52,8 @@ export const createPost = async (formData, authToken) => {
     await axios.post('/post', formData, {
       headers: {
         authorization: authToken,
-        'Content-Type': 'multipart/form-data'
-      }
+        'Content-Type': 'multipart/form-data',
+      },
     });
   } catch (err) {
     throw new Error(err);

@@ -19,13 +19,13 @@ module.exports.createPost = async (req, res, next) => {
   cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET
+    api_secret: process.env.CLOUDINARY_API_SECRET,
   });
 
   cloudinary.uploader.upload(
     req.file.path,
     {
-      eager: [{ width: 250, height: 250, crop: 'fit' }]
+      eager: [{ width: 250, height: 250, crop: 'fit' }],
     },
     async (err, result) => {
       if (err) next(err);
@@ -36,10 +36,10 @@ module.exports.createPost = async (req, res, next) => {
             image: result.secure_url,
             thumbnail: result.eager[0].secure_url,
             caption,
-            author: user._id
+            author: user._id,
           });
           const postVote = new PostVote({
-            post: post._id
+            post: post._id,
           });
           await post.save();
           await postVote.save();
@@ -52,10 +52,10 @@ module.exports.createPost = async (req, res, next) => {
   );
 };
 
-module.exports.getPost = async (req, res, next) => {
+module.exports.retrievePost = async (req, res, next) => {
   const { postId } = req.params;
   try {
-    // Get the post and the post's votes
+    // Retrieve the post and the post's votes
     const post = await Post.aggregate([
       { $match: { _id: ObjectId(postId) } },
       {
@@ -63,16 +63,16 @@ module.exports.getPost = async (req, res, next) => {
           from: 'postvotes',
           localField: '_id',
           foreignField: 'post',
-          as: 'postVotes'
-        }
+          as: 'postVotes',
+        },
       },
       {
         $lookup: {
           from: 'users',
           localField: 'author',
           foreignField: '_id',
-          as: 'author'
-        }
+          as: 'author',
+        },
       },
       { $unwind: '$author' },
       {
@@ -80,16 +80,16 @@ module.exports.getPost = async (req, res, next) => {
           'author.password',
           'author.email',
           'author.private',
-          'author.bio'
-        ]
-      }
+          'author.bio',
+        ],
+      },
     ]);
     if (post.length === 0) {
       return res
         .status(404)
         .send({ error: 'Could not find a post with that id.' });
     }
-    // Get the comments associated with the post aswell as the comment's replies and votes
+    // Retrieve the comments associated with the post aswell as the comment's replies and votes
     const comments = await Comment.aggregate([
       { $match: { post: ObjectId(postId) } },
       { $limit: 10 },
@@ -98,16 +98,16 @@ module.exports.getPost = async (req, res, next) => {
           from: 'commentreplies',
           localField: '_id',
           foreignField: 'parentComment',
-          as: 'commentReplies'
-        }
+          as: 'commentReplies',
+        },
       },
       {
         $lookup: {
           from: 'commentvotes',
           localField: '_id',
           foreignField: 'comment',
-          as: 'commentVotes'
-        }
+          as: 'commentVotes',
+        },
       },
       { $unwind: '$commentVotes' },
       {
@@ -115,24 +115,24 @@ module.exports.getPost = async (req, res, next) => {
           from: 'users',
           localField: 'author',
           foreignField: '_id',
-          as: 'author'
-        }
+          as: 'author',
+        },
       },
       { $unwind: '$author' },
       {
         $addFields: {
           commentReplies: { $size: '$commentReplies' },
-          commentVotes: '$commentVotes.votes'
-        }
+          commentVotes: '$commentVotes.votes',
+        },
       },
       {
         $unset: [
           'author.password',
           'author.email',
           'author.private',
-          'author.bio'
-        ]
-      }
+          'author.bio',
+        ],
+      },
     ]);
 
     return res.send({ ...post[0], comments });
@@ -150,7 +150,7 @@ module.exports.votePost = async (req, res, next) => {
     const postLikeUpdate = await PostVote.updateOne(
       { post: postId, 'votes.author': { $ne: user._id } },
       {
-        $push: { votes: { author: user._id } }
+        $push: { votes: { author: user._id } },
       }
     );
     if (!postLikeUpdate.nModified) {

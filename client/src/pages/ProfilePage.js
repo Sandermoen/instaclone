@@ -1,4 +1,4 @@
-import React, { useReducer, useEffect, Fragment } from 'react';
+import React, { useReducer, useEffect, useState, Fragment } from 'react';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import { useParams } from 'react-router-dom';
@@ -9,6 +9,9 @@ import { INITIAL_STATE, profileReducer } from './ProfilePageReducer';
 import { showModal } from '../redux/modal/modalActions';
 
 import { getUserProfile } from '../services/profileService';
+import { getPosts } from '../services/postService';
+
+import useScrollPositionThrottled from '../hooks/useScrollPositionThrottled';
 
 import Avatar from '../components/Avatar/Avatar';
 import Button from '../components/Button/Button';
@@ -16,15 +19,34 @@ import ProfileCategory from '../components/ProfileCategory/ProfileCategory';
 import Icon from '../components/Icon/Icon';
 import ProfileImage from '../components/ProfileImage/ProfileImage';
 import Loader from '../components/Loader/Loader';
+import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
 
 const ProfilePage = ({ currentUser, showModal }) => {
   const { username } = useParams();
-
   const [state, dispatch] = useReducer(profileReducer, INITIAL_STATE);
+
+  useScrollPositionThrottled(async () => {
+    if (
+      window.innerHeight + document.documentElement.scrollTop ===
+        document.documentElement.offsetHeight &&
+      state.data.posts.length < state.data.postCount &&
+      !state.fetchingAdditionalPosts
+    ) {
+      console.log(state.data.posts.length, state.data.postCount);
+      try {
+        dispatch({ type: 'FETCH_ADDITIONAL_POSTS_START' });
+        const posts = await getPosts(username, state.data.posts.length);
+        dispatch({ type: 'FETCH_ADDITIONAL_POSTS_SUCCESS' });
+        dispatch({ type: 'ADD_POSTS', payload: posts });
+      } catch (err) {
+        dispatch({ type: 'FETCH_ADDITIONAL_POSTS_FAILURE', payload: err });
+      }
+    }
+  });
 
   useEffect(() => {
     try {
-      (async function() {
+      (async function () {
         dispatch({ type: 'FETCH_PROFILE_START' });
         const profile = await getUserProfile(username);
         dispatch({ type: 'FETCH_PROFILE_SUCCESS', payload: profile });
@@ -34,13 +56,13 @@ const ProfilePage = ({ currentUser, showModal }) => {
     }
   }, [username]);
 
-  const handleClick = postId => {
+  const handleClick = (postId) => {
     showModal(
       {
         postId,
         avatar: state.data.avatar,
         username,
-        profileDispatch: dispatch
+        profileDispatch: dispatch,
       },
       'PostDialog'
     );
@@ -73,7 +95,8 @@ const ProfilePage = ({ currentUser, showModal }) => {
         followers,
         following,
         user: { avatar, username, bio },
-        posts
+        posts,
+        postCount,
       } = state.data;
       return (
         <Fragment>
@@ -86,7 +109,7 @@ const ProfilePage = ({ currentUser, showModal }) => {
               </div>
               <div className="profile-stats">
                 <p className="heading-3">
-                  <b>{posts.length}</b> posts
+                  <b>{postCount}</b> posts
                 </p>
                 <p className="heading-3">
                   <b>{followers}</b>{' '}
@@ -116,6 +139,19 @@ const ProfilePage = ({ currentUser, showModal }) => {
                 />
               );
             })}
+            {state.fetchingAdditionalPosts && (
+              <Fragment>
+                <div>
+                  <SkeletonLoader animated />
+                </div>
+                <div>
+                  <SkeletonLoader animated />
+                </div>
+                <div>
+                  <SkeletonLoader animated />
+                </div>
+              </Fragment>
+            )}
           </div>
         </Fragment>
       );
@@ -126,11 +162,11 @@ const ProfilePage = ({ currentUser, showModal }) => {
 };
 
 const mapStateToProps = createStructuredSelector({
-  currentUser: selectCurrentUser
+  currentUser: selectCurrentUser,
 });
 
-const mapDispatchToProps = dispatch => ({
-  showModal: (props, component) => dispatch(showModal(props, component))
+const mapDispatchToProps = (dispatch) => ({
+  showModal: (props, component) => dispatch(showModal(props, component)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProfilePage);

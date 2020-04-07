@@ -11,6 +11,7 @@ const apiRouter = require('./routes');
 const app = express();
 const PORT = process.env.PORT || 9000;
 
+app.use(helmet());
 app.use(helmet.hidePoweredBy());
 app.use(cors());
 app.use(bodyParser.json());
@@ -24,12 +25,12 @@ app.use((err, req, res, next) => {
   res.status(err.statusCode).send({ error: err.message });
 });
 
-(async function() {
+(async function () {
   try {
     await mongoose.connect(process.env.MONGO_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      useCreateIndex: true
+      useCreateIndex: true,
     });
     console.log('Connected to database');
   } catch (err) {

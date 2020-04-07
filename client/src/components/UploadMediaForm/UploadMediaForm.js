@@ -47,7 +47,7 @@ const UploadMediaForm = ({ token, file, currentUser, hide }) => {
     formData.set('caption', caption);
     try {
       setFormEvents(previous => ({ ...previous, isLoading: true }));
-      createPost(formData, token);
+      await createPost(formData, token);
       setFormEvents(previous => ({ ...previous, isLoading: false }));
       hide();
       history.push('/');

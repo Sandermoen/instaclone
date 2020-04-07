@@ -12,3 +12,10 @@
     transform: scale(1);
   }
 }
+
+@keyframes shimmer {
+  90%,
+  100% {
+    transform: translateX(100%);
+  }
+}

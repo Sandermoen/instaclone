@@ -10,7 +10,7 @@ import { showModal } from '../../redux/modal/modalActions';
 import {
   voteComment,
   getCommentReplies,
-  deleteComment
+  deleteComment,
 } from '../../services/commentService';
 
 import Avatar from '../Avatar/Avatar';
@@ -25,7 +25,7 @@ const Comment = ({
   currentUser,
   dialogDispatch,
   profileDispatch,
-  showModal
+  showModal,
 }) => {
   const commentRef = useRef();
   const [commentPostTime, setCommentPostTime] = useState(() =>
@@ -36,7 +36,7 @@ const Comment = ({
 
   const commentReplies =
     post.commentReplies
-      .filter(commentReply => commentReply.parentComment === comment._id)
+      .filter((commentReply) => commentReply.parentComment === comment._id)
       .sort((a, b) => {
         return new Date(a) - new Date(b);
       }) || [];
@@ -59,7 +59,7 @@ const Comment = ({
     try {
       dialogDispatch({
         type: 'VOTE_COMMENT',
-        payload: { commentId: comment._id, currentUser }
+        payload: { commentId: comment._id, currentUser },
       });
       await voteComment(comment._id, token);
     } catch (err) {
@@ -69,7 +69,7 @@ const Comment = ({
 
   const handleGetCommentReplies = async () => {
     if (commentReplies.length === comment.commentReplies) {
-      setToggleCommentReplies(previous => !previous);
+      setToggleCommentReplies((previous) => !previous);
     } else {
       try {
         const replies = await getCommentReplies(
@@ -78,7 +78,7 @@ const Comment = ({
         );
         dialogDispatch({
           type: 'ADD_COMMENT_REPLY',
-          payload: { comment: replies, parentCommentId: comment._id }
+          payload: { comment: replies, parentCommentId: comment._id },
         });
         !toggleCommentReplies && setToggleCommentReplies(true);
       } catch (err) {
@@ -93,9 +93,11 @@ const Comment = ({
       profileDispatch({
         type: 'DECREMENT_POST_COMMENTS_COUNT',
         payload: {
-          decrementCount: commentReplies ? 1 + commentReplies.length : 1,
-          postId: post._id
-        }
+          decrementCount: comment.commentReplies
+            ? 1 + comment.commentReplies
+            : 1,
+          postId: post._id,
+        },
       });
       await deleteComment(comment._id, token);
     } catch (err) {
@@ -131,9 +133,9 @@ const Comment = ({
                       {
                         warning: true,
                         text: 'Delete',
-                        onClick: () => handleDeleteComment()
-                      }
-                    ]
+                        onClick: () => handleDeleteComment(),
+                      },
+                    ],
                   },
                   'OptionsDialog'
                 )
@@ -165,8 +167,8 @@ const Comment = ({
                       type: 'SET_REPLYING',
                       payload: {
                         username: comment.author.username,
-                        commentId: comment._id
-                      }
+                        commentId: comment._id,
+                      },
                     })
                   }
                   className="heading-5 heading--button color-light"
@@ -182,7 +184,7 @@ const Comment = ({
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                marginTop: '1rem'
+                marginTop: '1rem',
               }}
               className="heading-5 heading--button color-light"
             >
@@ -197,15 +199,15 @@ const Comment = ({
             <PulsatingIcon
               toggle={
                 !!comment.commentVotes.find(
-                  vote => vote.author === currentUser._id
+                  (vote) => vote.author === currentUser._id
                 )
               }
               constantProps={{
-                onClick: () => handleVote()
+                onClick: () => handleVote(),
               }}
               toggledProps={[
                 { icon: 'heart', className: 'icon--tiny color-red' },
-                { icon: 'heart-outline', className: 'icon--tiny' }
+                { icon: 'heart-outline', className: 'icon--tiny' },
               ]}
               elementRef={commentRef}
             />
@@ -232,8 +234,8 @@ const Comment = ({
   );
 };
 
-const mapDispatchToProps = dispatch => ({
-  showModal: (props, component) => dispatch(showModal(props, component))
+const mapDispatchToProps = (dispatch) => ({
+  showModal: (props, component) => dispatch(showModal(props, component)),
 });
 
 Comment.propTypes = {
@@ -243,13 +245,13 @@ Comment.propTypes = {
     username: PropTypes.isRequired,
     commentVotes: PropTypes.array,
     _id: PropTypes.string,
-    date: PropTypes.string
+    date: PropTypes.string,
   }).isRequired,
   caption: PropTypes.bool,
   post: PropTypes.object.isRequired,
   token: PropTypes.string.isRequired,
   currentUser: PropTypes.object.isRequired,
-  showModal: PropTypes.func.isRequired
+  showModal: PropTypes.func.isRequired,
 };
 
 export default connect(null, mapDispatchToProps)(Comment);

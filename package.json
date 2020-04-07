@@ -20,7 +20,6 @@
   },
   "homepage": "https://github.com/Sandermoen/instaclone#readme",
   "dependencies": {
-    "aws-sdk": "^2.623.0",
     "bcrypt": "^3.0.8",
     "body-parser": "^1.19.0",
     "cloudinary": "^1.21.0",

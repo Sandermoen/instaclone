@@ -2,8 +2,8 @@
   grid-column: center-start / center-end;
   display: grid;
   justify-self: center;
-  grid-template-rows: 55rem;
-  grid-template-columns: 35vw 30rem;
+  grid-template-rows: 6rem 55rem;
+  grid-template-columns: minmax(25vw, 35vw) 35rem;
 
   &__image {
     width: 100%;
@@ -19,9 +19,10 @@
   }
 
   &__content {
+    grid-row: 2 / -1;
     background-color: $color-white;
     display: grid;
-    grid-template-rows: min-content 1fr repeat(2, min-content);
+    grid-template-rows: 1fr repeat(2, min-content);
   }
 
   &__header {
@@ -29,6 +30,7 @@
     align-items: center;
     justify-content: flex-start;
     padding: 1rem;
+    background-color: $color-white;
 
     *:not(:last-child) {
       margin-right: 1.5rem;
@@ -61,7 +63,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1.5rem;
+    padding: 2rem;
     position: relative;
 
     input {

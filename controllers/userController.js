@@ -18,62 +18,78 @@ module.exports.retrieveUser = async (req, res, next) => {
     }
 
     const posts = await Post.aggregate([
-      { $match: { author: ObjectId(user._id) } },
-      { $limit: 12 },
-      { $sort: { date: -1 } },
       {
-        $lookup: {
-          from: 'postvotes',
-          localField: '_id',
-          foreignField: 'post',
-          as: 'postvotes'
-        }
+        $facet: {
+          data: [
+            { $match: { author: ObjectId(user._id) } },
+            { $sort: { date: -1 } },
+            { $limit: 12 },
+            {
+              $lookup: {
+                from: 'postvotes',
+                localField: '_id',
+                foreignField: 'post',
+                as: 'postvotes',
+              },
+            },
+            {
+              $lookup: {
+                from: 'comments',
+                localField: '_id',
+                foreignField: 'post',
+                as: 'comments',
+              },
+            },
+            {
+              $lookup: {
+                from: 'commentreplies',
+                localField: 'comments._id',
+                foreignField: 'parentComment',
+                as: 'commentReplies',
+              },
+            },
+            {
+              $unwind: '$postvotes',
+            },
+            {
+              $addFields: { image: '$thumbnail' },
+            },
+            {
+              $project: {
+                user: true,
+                followers: true,
+                following: true,
+                comments: {
+                  $sum: [{ $size: '$comments' }, { $size: '$commentReplies' }],
+                },
+                image: true,
+                thumbnail: true,
+                caption: true,
+                author: true,
+                postVotes: { $size: '$postvotes.votes' },
+              },
+            },
+          ],
+          postCount: [{ $count: 'postCount' }],
+        },
       },
-      {
-        $lookup: {
-          from: 'comments',
-          localField: '_id',
-          foreignField: 'post',
-          as: 'comments'
-        }
-      },
-      {
-        $lookup: {
-          from: 'commentreplies',
-          localField: 'comments._id',
-          foreignField: 'parentComment',
-          as: 'commentReplies'
-        }
-      },
-      {
-        $unwind: '$postvotes'
-      },
-      { $addFields: { image: '$thumbnail' } },
+      { $unwind: '$postCount' },
       {
         $project: {
-          user: true,
-          followers: true,
-          following: true,
-          comments: {
-            $sum: [{ $size: '$comments' }, { $size: '$commentReplies' }]
-          },
-          image: true,
-          thumbnail: true,
-          caption: true,
-          author: true,
-          postVotes: { $size: '$postvotes.votes' }
-        }
-      }
+          data: true,
+          postCount: '$postCount.postCount',
+        },
+      },
     ]);
 
     const followers = await Followers.findOne({
-      user: ObjectId(user._id)
+      user: ObjectId(user._id),
     }).countDocuments();
 
     const following = await Following.findOne({
-      user: ObjectId(user._id)
+      user: ObjectId(user._id),
     }).countDocuments();
-    return res.send({ user, followers, following, posts });
+    return res.send({ user, followers, following, posts: posts[0] });
   } catch (err) {
     next(err);
   }
@@ -81,47 +97,49 @@ module.exports.retrieveUser = async (req, res, next) => {
 
 module.exports.retrievePosts = async (req, res, next) => {
   // Retrieve a user's posts with the post's comments & likes
-  const { username } = req.params;
+  const { username, offset = 0 } = req.params;
   try {
     const posts = await Post.aggregate([
-      { $limit: 12 },
       { $sort: { date: -1 } },
+      { $skip: Number(offset) },
+      { $limit: 12 },
       {
         $lookup: {
           from: 'users',
           localField: 'author',
           foreignField: '_id',
-          as: 'user'
-        }
+          as: 'user',
+        },
       },
       { $match: { 'user.username': username } },
       {
         $lookup: {
           from: 'comments',
-          localField: 'author',
-          foreignField: 'author',
-          as: 'comments'
-        }
+          localField: '_id',
+          foreignField: 'post',
+          as: 'comments',
+        },
       },
       {
         $lookup: {
           from: 'postvotes',
-          localField: 'author',
+          localField: '_id',
           foreignField: 'post',
-          as: 'postvotes'
-        }
+          as: 'postVotes',
+        },
       },
+      { $unwind: '$postVotes' },
       {
         $project: {
           image: true,
           caption: true,
-          date: 1,
+          date: true,
           'user.username': true,
           'user.avatar': true,
-          comments: { $size: '$comments.votes' },
-          postvotes: { $size: '$postvotes.votes' }
-        }
-      }
+          comments: { $size: '$comments' },
+          postVotes: { $size: '$postVotes.votes' },
+        },
+      },
     ]);
     if (posts.length === 0) {
       return res.status(404).send({ error: 'Could not find any posts.' });
@@ -147,7 +165,7 @@ module.exports.bookmarkPost = async (req, res, next) => {
     const userBookmarkUpdate = await User.updateOne(
       {
         _id: user._id,
-        'bookmarks.post': { $ne: postId }
+        'bookmarks.post': { $ne: postId },
       },
       { $push: { bookmarks: { post: postId } } }
     );

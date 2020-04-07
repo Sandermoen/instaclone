@@ -1,10 +1,12 @@
-import React, { useEffect, useState, memo, Fragment } from 'react';
+import React, { useState, memo, Fragment } from 'react';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import { Link, NavLink } from 'react-router-dom';
 import classNames from 'classnames';
 
 import { selectCurrentUser } from '../../redux/user/userSelectors';
+
+import useScrollPositionThrottled from '../../hooks/useScrollPositionThrottled';
 
 import { ReactComponent as LogoCamera } from '../../assets/svg/logo-camera.svg';
 import SearchBox from '../SearchBox/SearchBox';
@@ -13,19 +15,17 @@ import Button from '../Button/Button';
 import Icon from '../Icon/Icon';
 
 const Header = memo(({ currentUser }) => {
-  const [scrollOffset, setScrollOffset] = useState(0);
-  useEffect(() => {
-    // Shrink header height and remove logo on scroll
-    window.onscroll = () => setScrollOffset(window.pageYOffset);
-
-    return () => {
-      window.removeEventListener('scroll', setScrollOffset, false);
-    };
-  }, [setScrollOffset]);
+  const [shouldMinimizeHeader, setShouldMinimizeHeader] = useState(false);
+  // Shrink header height and remove logo on scroll
+  useScrollPositionThrottled(
+    ({ previousScrollPosition, currentScrollPosition }) => {
+      setShouldMinimizeHeader(currentScrollPosition > 100);
+    }
+  );
 
   const headerClassNames = classNames({
     header: true,
-    'header--small': scrollOffset > 60
+    'header--small': shouldMinimizeHeader,
   });
 
   return (
@@ -87,7 +87,7 @@ const Header = memo(({ currentUser }) => {
 Header.whyDidYouRender = true;
 
 const mapStateToProps = createStructuredSelector({
-  currentUser: selectCurrentUser
+  currentUser: selectCurrentUser,
 });
 
 export default connect(mapStateToProps)(Header);

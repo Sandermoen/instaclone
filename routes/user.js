@@ -4,12 +4,12 @@ const userRouter = express.Router();
 const {
   retrieveUser,
   retrievePosts,
-  bookmarkPost
+  bookmarkPost,
 } = require('../controllers/userController');
 const { requireAuth } = require('../controllers/authController');
 
 userRouter.get('/:username', retrieveUser);
-userRouter.get('/:username/posts', retrievePosts);
+userRouter.get('/:username/posts/:offset', retrievePosts);
 
 userRouter.post('/:postId/bookmark', requireAuth, bookmarkPost);
 
