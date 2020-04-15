@@ -25,7 +25,7 @@ module.exports.createPost = async (req, res, next) => {
   cloudinary.uploader.upload(
     req.file.path,
     {
-      eager: [{ width: 250, height: 250, crop: 'fit' }],
+      eager: [{ width: 300, height: 300, crop: 'fit' }],
     },
     async (err, result) => {
       if (err) next(err);

@@ -1,12 +1,13 @@
 import React, { useState, useRef, useEffect, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { formatDateDistance } from '../../../utils/timeUtils';
+import { Link } from 'react-router-dom';
 
 import Icon from '../../Icon/Icon';
 
 import {
   voteCommentReply,
-  deleteCommentReply
+  deleteCommentReply,
 } from '../../../services/commentService';
 
 import Avatar from '../../Avatar/Avatar';
@@ -20,7 +21,8 @@ const CommentReply = ({
   currentUser,
   dialogDispatch,
   profileDispatch,
-  showModal
+  showModal,
+  hideModal,
 }) => {
   const commentReplyRef = useRef();
   const [commentPostTime, setCommentPostTime] = useState(() =>
@@ -38,7 +40,7 @@ const CommentReply = ({
     try {
       dialogDispatch({
         type: 'VOTE_COMMENT_REPLY',
-        payload: { commentReplyId: comment._id, currentUser }
+        payload: { commentReplyId: comment._id, currentUser },
       });
       await voteCommentReply(comment._id, token);
     } catch (err) {
@@ -52,12 +54,12 @@ const CommentReply = ({
         type: 'REMOVE_COMMENT_REPLY',
         payload: {
           commentReplyId: comment._id,
-          parentCommentId: parentComment._id
-        }
+          parentCommentId: parentComment._id,
+        },
       });
       profileDispatch({
         type: 'DECREMENT_POST_COMMENTS_COUNT',
-        payload: { decrementCount: 1, postId: post._id }
+        payload: { decrementCount: 1, postId: post._id },
       });
       await deleteCommentReply(comment._id, token);
     } catch (err) {
@@ -71,10 +73,25 @@ const CommentReply = ({
       className="comment"
       ref={commentReplyRef}
     >
-      <Avatar imageSrc={comment.author.avatar} className="avatar--small" />
+      <Link
+        onClick={() => hideModal('PostDialog')}
+        to={`/${comment.author.username}`}
+      >
+        <Avatar
+          size="4rem"
+          imageSrc={comment.author.avatar}
+          className="avatar--small"
+        />
+      </Link>
       <div className="comment__content">
         <p className="heading-4">
-          <b>{comment.author.username}</b> {comment.message}
+          <Link
+            onClick={() => hideModal('PostDialog')}
+            style={{ textDecoration: 'none', color: 'currentColor' }}
+            to={`/${comment.author.username}`}
+          >
+            <b>{comment.author.username}</b> {comment.message}
+          </Link>
         </p>
         {comment.author.username === currentUser.username ? (
           <div
@@ -85,9 +102,9 @@ const CommentReply = ({
                     {
                       warning: true,
                       text: 'Delete',
-                      onClick: () => handleCommentReplyDelete()
-                    }
-                  ]
+                      onClick: () => handleCommentReplyDelete(),
+                    },
+                  ],
                 },
                 'OptionsDialog'
               )
@@ -118,8 +135,8 @@ const CommentReply = ({
                   type: 'SET_REPLYING',
                   payload: {
                     username: comment.author.username,
-                    commentId: parentComment._id
-                  }
+                    commentId: parentComment._id,
+                  },
                 })
               }
               className="heading-5 heading--button color-light"
@@ -133,15 +150,15 @@ const CommentReply = ({
         <PulsatingIcon
           toggle={
             !!comment.commentReplyVotes.find(
-              vote => vote.author === currentUser._id
+              (vote) => vote.author === currentUser._id
             )
           }
           constantProps={{
-            onClick: () => handleCommentReplyVote()
+            onClick: () => handleCommentReplyVote(),
           }}
           toggledProps={[
             { icon: 'heart', className: 'icon--tiny color-red' },
-            { icon: 'heart-outline', className: 'icon--tiny' }
+            { icon: 'heart-outline', className: 'icon--tiny' },
           ]}
           elementRef={commentReplyRef}
         />

@@ -6,6 +6,7 @@ const ObjectId = require('mongoose').Types.ObjectId;
 
 module.exports.retrieveUser = async (req, res, next) => {
   const { username } = req.params;
+  const requestingUser = res.locals.user;
   try {
     const user = await User.findOne(
       { username },
@@ -70,7 +71,10 @@ module.exports.retrieveUser = async (req, res, next) => {
               },
             },
           ],
-          postCount: [{ $count: 'postCount' }],
+          postCount: [
+            { $match: { author: ObjectId(user._id) } },
+            { $count: 'postCount' },
+          ],
         },
       },
       { $unwind: '$postCount' },
@@ -82,14 +86,26 @@ module.exports.retrieveUser = async (req, res, next) => {
       },
     ]);
 
-    const followers = await Followers.findOne({
+    const followersDocument = await Followers.findOne({
       user: ObjectId(user._id),
-    }).countDocuments();
+    });
 
-    const following = await Following.findOne({
+    const followingDocument = await Following.findOne({
       user: ObjectId(user._id),
-    }).countDocuments();
-    return res.send({ user, followers, following, posts: posts[0] });
+    });
+
+    return res.send({
+      user,
+      followers: followersDocument.followers.length,
+      following: followingDocument.following.length,
+      // Check if the requesting user follows the retrieved user
+      isFollowing: requestingUser
+        ? !!followersDocument.followers.find(
+            (follower) => String(follower.user) === String(requestingUser._id)
+          )
+        : false,
+      posts: posts[0],
+    });
   } catch (err) {
     next(err);
   }
@@ -185,6 +201,163 @@ module.exports.bookmarkPost = async (req, res, next) => {
       return res.send({ success: true, operation: 'remove' });
     }
     return res.send({ success: true, operation: 'add' });
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports.followUser = async (req, res, next) => {
+  const { userId } = req.params;
+  const user = res.locals.user;
+
+  try {
+    const userToFollow = await User.findById(userId);
+    if (!userToFollow) {
+      return res
+        .status(400)
+        .send({ error: 'Could not find a user with that id.' });
+    }
+
+    const followerUpdate = await Followers.updateOne(
+      { user: userId, 'followers.user': { $ne: user._id } },
+      { $push: { followers: { user: user._id } } }
+    );
+
+    const followingUpdate = await Following.updateOne(
+      { user: user._id, 'following.user': { $ne: userId } },
+      { $push: { following: { user: userId } } }
+    );
+
+    if (!followerUpdate.nModified || !followingUpdate.nModified) {
+      if (!followerUpdate.ok || !followingUpdate.ok) {
+        return res
+          .status(500)
+          .send({ error: 'Could not follow user please try again later.' });
+      }
+      // Nothing was modified in the above query meaning that the user is already following
+      // Unfollow instead
+      const followerUnfollowUpdate = await Followers.updateOne(
+        {
+          user: userId,
+        },
+        { $pull: { followers: { user: user._id } } }
+      );
+
+      const followingUnfollowUpdate = await Following.updateOne(
+        { user: user._id },
+        { $pull: { following: { user: userId } } }
+      );
+      if (!followerUnfollowUpdate.ok || !followingUnfollowUpdate.ok) {
+        return res
+          .status(500)
+          .send({ error: 'Could not follow user please try again later.' });
+      }
+      return res.send({ success: true, operation: 'unfollow' });
+    }
+    return res.send({ success: true, operation: 'follow' });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ *
+ * @param {object} user The user object passed on from other middlewares
+ * @param {string} userId Id of the user to be used in the query
+ * @param {number} offset The offset for how many documents to skip
+ * @param {boolean} followers Whether to query who is following the user or who the user follows default is the latter
+ * @returns {array} Array of users
+ */
+const retrieveRelatedUsers = async (user, userId, offset, followers) => {
+  const pipeline = [
+    {
+      $match: { user: ObjectId(userId) },
+    },
+    {
+      $lookup: {
+        from: 'users',
+        let: followers
+          ? { userId: '$followers.user' }
+          : { userId: '$following.user' },
+        pipeline: [
+          {
+            $match: {
+              // Using the $in operator instead of the $eq
+              // operator because we can't coerce the types
+              $expr: { $in: ['$_id', '$$userId'] },
+            },
+          },
+          {
+            $skip: Number(offset),
+          },
+          {
+            $limit: 10,
+          },
+        ],
+        as: 'users',
+      },
+    },
+    {
+      $lookup: {
+        from: 'followers',
+        localField: 'users._id',
+        foreignField: 'user',
+        as: 'userFollowers',
+      },
+    },
+    {
+      $project: {
+        'users._id': true,
+        'users.username': true,
+        'users.avatar': true,
+        userFollowers: true,
+      },
+    },
+  ];
+
+  const aggregation = followers
+    ? await Followers.aggregate(pipeline)
+    : await Following.aggregate(pipeline);
+
+  // Make a set to store the IDs of the followed users
+  const followedUsers = new Set();
+  // Loop through every follower and add the id to the set if the user's id is in the array
+  aggregation[0].userFollowers.forEach((followingUser) => {
+    if (
+      !!followingUser.followers.find(
+        (follower) => String(follower.user) === String(user._id)
+      )
+    ) {
+      followedUsers.add(String(followingUser.user));
+    }
+  });
+  // Add the isFollowing key to the following object with a value
+  // depending on the outcome of the loop above
+  aggregation[0].users.forEach((followingUser) => {
+    followingUser.isFollowing = followedUsers.has(String(followingUser._id));
+  });
+
+  return aggregation[0].users;
+};
+
+module.exports.retrieveFollowing = async (req, res, next) => {
+  const { userId, offset = 0 } = req.params;
+  const user = res.locals.user;
+  try {
+    const users = await retrieveRelatedUsers(user, userId, offset);
+    return res.send(users);
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports.retrieveFollowers = async (req, res, next) => {
+  const { userId, offset = 0 } = req.params;
+  const user = res.locals.user;
+
+  try {
+    const users = await retrieveRelatedUsers(user, userId, offset, true);
+    return res.send(users);
   } catch (err) {
     next(err);
   }

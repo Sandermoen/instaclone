@@ -17,7 +17,7 @@ module.exports.createComment = async (req, res, next) => {
   }
   if (!postId) {
     return res.status(400).send({
-      error: 'Please provide the id of the post you would like to comment on.'
+      error: 'Please provide the id of the post you would like to comment on.',
     });
   }
 
@@ -34,7 +34,7 @@ module.exports.createComment = async (req, res, next) => {
     res.status(201).send({
       ...comment.toObject(),
       author: { username: user.username, avatar: user.avatar },
-      commentVotes: []
+      commentVotes: [],
     });
   } catch (err) {
     next(err);
@@ -47,17 +47,18 @@ module.exports.deleteComment = async (req, res, next) => {
   try {
     const comment = await Comment.findOne({
       _id: commentId,
-      author: user._id
+      author: user._id,
     });
     if (!comment) {
       return res.status(404).send({
-        error: 'Could not find a comment with that id associated with the user.'
+        error:
+          'Could not find a comment with that id associated with the user.',
       });
     }
 
     // This uses pre hooks to delete everything associated with this comment i.e replies
     const commentDelete = await Comment.deleteOne({
-      _id: commentId
+      _id: commentId,
     });
     if (!commentDelete.deletedCount) {
       return res.status(500).send({ error: 'Could not delete the comment.' });
@@ -77,7 +78,7 @@ module.exports.voteComment = async (req, res, next) => {
     const commentLikeUpdate = await CommentVote.updateOne(
       {
         comment: commentId,
-        'votes.author': { $ne: user._id }
+        'votes.author': { $ne: user._id },
       },
       { $push: { votes: { author: user._id } } }
     );
@@ -117,7 +118,7 @@ module.exports.createCommentReply = async (req, res, next) => {
   }
   if (!parentCommentId) {
     return res.status(400).send({
-      error: 'Please provide the id of the comment you would like to reply to.'
+      error: 'Please provide the id of the comment you would like to reply to.',
     });
   }
 
@@ -131,14 +132,14 @@ module.exports.createCommentReply = async (req, res, next) => {
     const commentReply = await new CommentReply({
       parentComment: parentCommentId,
       message,
-      author: user._id
+      author: user._id,
     });
 
     await commentReply.save();
     return res.status(201).send({
       ...commentReply.toObject(),
       author: { username: user.username, avatar: user.avatar },
-      commentReplyVotes: []
+      commentReplyVotes: [],
     });
   } catch (err) {
     next(err);
@@ -152,17 +153,17 @@ module.exports.deleteCommentReply = async (req, res, next) => {
   try {
     const commentReply = await CommentReply.findOne({
       _id: commentReplyId,
-      author: user._id
+      author: user._id,
     });
     if (!commentReply) {
       return res.status(404).send({
         error:
-          'Could not find a comment reply with that id associated with the user.'
+          'Could not find a comment reply with that id associated with the user.',
       });
     }
 
     const commentReplyDeletion = await CommentReply.deleteOne({
-      _id: commentReplyId
+      _id: commentReplyId,
     });
     if (!commentReplyDeletion.deletedCount) {
       console.log(commentReplyDeletion);
@@ -182,7 +183,7 @@ module.exports.voteCommentReply = async (req, res, next) => {
     const commentReplyLikeUpdate = await CommentReplyVote.updateOne(
       {
         comment: commentReplyId,
-        'votes.author': { $ne: user._id }
+        'votes.author': { $ne: user._id },
       },
       { $push: { votes: { author: user._id } } }
     );
@@ -199,7 +200,6 @@ module.exports.voteCommentReply = async (req, res, next) => {
         { $pull: { votes: { author: user._id } } }
       );
       if (!commentReplyDislikeUpdate.nModified) {
-        console.log('heuyy');
         return res
           .status(500)
           .send({ error: 'Could not vote on the comment reply.' });
@@ -233,8 +233,8 @@ module.exports.getCommentReplies = async (req, res, next) => {
           from: 'commentreplyvotes',
           localField: '_id',
           foreignField: 'comment',
-          as: 'commentReplyVotes'
-        }
+          as: 'commentReplyVotes',
+        },
       },
       { $unwind: '$commentReplyVotes' },
       {
@@ -242,30 +242,30 @@ module.exports.getCommentReplies = async (req, res, next) => {
           from: 'users',
           localField: 'author',
           foreignField: '_id',
-          as: 'author'
-        }
+          as: 'author',
+        },
       },
       {
-        $unwind: '$author'
+        $unwind: '$author',
       },
       {
         $unset: [
           'author.private',
           'author.password',
           'author.bookmarks',
-          'author.email'
-        ]
+          'author.email',
+        ],
       },
       {
         $addFields: {
-          commentReplyVotes: '$commentReplyVotes.votes'
-        }
-      }
+          commentReplyVotes: '$commentReplyVotes.votes',
+        },
+      },
     ]);
 
     if (commentReplies.length === 0) {
       return res.status(404).send({
-        error: 'Could not find any replies for the specified comment.'
+        error: 'Could not find any replies for the specified comment.',
       });
     }
     return res.send(commentReplies);

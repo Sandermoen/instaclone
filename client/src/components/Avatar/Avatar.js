@@ -5,15 +5,18 @@ import classNames from 'classnames';
 const Avatar = ({
   imageSrc = require('../../assets/img/default-avatar.png'),
   size,
-  className
+  className,
 }) => {
   const avatarClasses = classNames({
     avatar: true,
-    [className]: className
+    [className]: className,
   });
 
   return (
-    <div className={avatarClasses}>
+    <div
+      style={size && { width: size, height: size }}
+      className={avatarClasses}
+    >
       <img
         style={size && { width: size, height: size }}
         src={imageSrc}
@@ -26,7 +29,7 @@ const Avatar = ({
 Avatar.propTypes = {
   imageSrc: PropTypes.string,
   size: PropTypes.string,
-  className: PropTypes.string
+  className: PropTypes.string,
 };
 
 export default Avatar;

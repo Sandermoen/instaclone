@@ -10,44 +10,44 @@ const UserSchema = new Schema({
     required: true,
     unique: true,
     lowercase: true,
-    validate: value => {
+    validate: (value) => {
       if (!validator.isEmail(value)) {
         throw new Error('Invalid email address.');
       }
-    }
+    },
   },
   username: {
     type: String,
     required: true,
     lowercase: true,
     unique: true,
-    minlength: 3
+    minlength: 3,
   },
   password: {
     type: String,
     required: true,
-    minlength: 8
+    minlength: 8,
   },
   avatar: String,
   bio: {
     type: String,
-    maxlength: 130
+    maxlength: 130,
   },
   bookmarks: [
     {
       post: {
         type: Schema.ObjectId,
-        ref: 'Post'
-      }
-    }
+        ref: 'Post',
+      },
+    },
   ],
   private: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 });
 
-UserSchema.pre('save', function(next) {
+UserSchema.pre('save', function (next) {
   const saltRounds = 10;
   // Check if the password has been modified
   if (this.modifiedPaths().includes('password')) {
@@ -55,12 +55,24 @@ UserSchema.pre('save', function(next) {
       if (err) return next(err);
       bcrypt.hash(this.password, salt, (err, hash) => {
         if (err) return next(err);
+        console.log(this);
         this.password = hash;
         next();
       });
     });
   } else {
     next();
+  }
+});
+
+UserSchema.pre('save', async function (next) {
+  if (this.isNew) {
+    try {
+      await mongoose.model('Followers').create({ user: this._id });
+      await mongoose.model('Following').create({ user: this._id });
+    } catch (err) {
+      return next(err);
+    }
   }
 });
 

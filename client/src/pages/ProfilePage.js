@@ -1,14 +1,14 @@
-import React, { useReducer, useEffect, useState, Fragment } from 'react';
+import React, { useReducer, useEffect, Fragment } from 'react';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import { useParams } from 'react-router-dom';
 
-import { selectCurrentUser } from '../redux/user/userSelectors';
+import { selectCurrentUser, selectToken } from '../redux/user/userSelectors';
 
 import { INITIAL_STATE, profileReducer } from './ProfilePageReducer';
 import { showModal } from '../redux/modal/modalActions';
 
-import { getUserProfile } from '../services/profileService';
+import { getUserProfile, followUser } from '../services/profileService';
 import { getPosts } from '../services/postService';
 
 import useScrollPositionThrottled from '../hooks/useScrollPositionThrottled';
@@ -20,10 +20,28 @@ import Icon from '../components/Icon/Icon';
 import ProfileImage from '../components/ProfileImage/ProfileImage';
 import Loader from '../components/Loader/Loader';
 import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
+import UsersList from '../components/UsersList/UsersList';
+import UnfollowPrompt from '../components/UnfollowPrompt/UnfollowPrompt';
 
-const ProfilePage = ({ currentUser, showModal }) => {
+const ProfilePage = ({ currentUser, token, showModal }) => {
   const { username } = useParams();
   const [state, dispatch] = useReducer(profileReducer, INITIAL_STATE);
+
+  const follow = async () => {
+    try {
+      dispatch({ type: 'FOLLOW_USER_START' });
+      const response = await followUser(state.data.user._id, token);
+      dispatch({
+        type: 'FOLLOW_USER_SUCCESS',
+        payload: response.operation,
+      });
+    } catch (err) {
+      dispatch({
+        type: 'FOLLOW_USER_FAILURE',
+        payload: err,
+      });
+    }
+  };
 
   useScrollPositionThrottled(async () => {
     if (
@@ -32,7 +50,6 @@ const ProfilePage = ({ currentUser, showModal }) => {
       state.data.posts.length < state.data.postCount &&
       !state.fetchingAdditionalPosts
     ) {
-      console.log(state.data.posts.length, state.data.postCount);
       try {
         dispatch({ type: 'FETCH_ADDITIONAL_POSTS_START' });
         const posts = await getPosts(username, state.data.posts.length);
@@ -42,13 +59,14 @@ const ProfilePage = ({ currentUser, showModal }) => {
         dispatch({ type: 'FETCH_ADDITIONAL_POSTS_FAILURE', payload: err });
       }
     }
-  });
+  }, null);
 
   useEffect(() => {
+    document.title = `@${username} • Instaclone photos`;
     try {
       (async function () {
         dispatch({ type: 'FETCH_PROFILE_START' });
-        const profile = await getUserProfile(username);
+        const profile = await getUserProfile(username, token);
         dispatch({ type: 'FETCH_PROFILE_SUCCESS', payload: profile });
       })();
     } catch (err) {
@@ -70,18 +88,54 @@ const ProfilePage = ({ currentUser, showModal }) => {
 
   const renderButton = () => {
     if (currentUser) {
-      return currentUser.username === username ? (
-        <Fragment>
-          <Button inverted>Edit Profile</Button>
-          <div className="icon">
-            <Icon icon="aperture-outline" />
-          </div>
-        </Fragment>
-      ) : (
-        <Button>Follow</Button>
-      );
+      if (currentUser.username === username) {
+        return (
+          <Fragment>
+            <Button inverted>Edit Profile</Button>
+            <div className="icon">
+              <Icon icon="aperture-outline" />
+            </div>
+          </Fragment>
+        );
+      } else if (state.data.isFollowing) {
+        return (
+          <Button
+            loading={state.following}
+            onClick={() =>
+              showModal(
+                {
+                  options: [
+                    {
+                      warning: true,
+                      text: 'Unfollow',
+                      onClick: () => follow(),
+                    },
+                  ],
+                  children: (
+                    <UnfollowPrompt
+                      avatar={state.data.user.avatar}
+                      username={state.data.user.username}
+                    />
+                  ),
+                },
+                'OptionsDialog'
+              )
+            }
+            inverted
+          >
+            Following
+          </Button>
+        );
+      }
     }
-    return <Button>Follow</Button>;
+    return (
+      <Button
+        loading={state.following}
+        onClick={() => follow(state.data.user._id, token)}
+      >
+        Follow
+      </Button>
+    );
   };
 
   const renderProfile = () => {
@@ -111,18 +165,61 @@ const ProfilePage = ({ currentUser, showModal }) => {
                 <p className="heading-3">
                   <b>{postCount}</b> posts
                 </p>
-                <p className="heading-3">
+                <p
+                  onClick={() =>
+                    showModal(
+                      {
+                        options: [],
+                        title: 'Followers',
+                        cancelButton: false,
+                        children: (
+                          <UsersList
+                            userId={state.data.user._id}
+                            token={token}
+                            followersCount={followers}
+                            followers
+                          />
+                        ),
+                      },
+                      'OptionsDialog'
+                    )
+                  }
+                  style={{ cursor: 'pointer' }}
+                  className="heading-3"
+                >
                   <b>{followers}</b>{' '}
                   {followers > 1 || followers === 0 ? 'followers' : 'follower'}
                 </p>
-                <p className="heading-3">
+                <p
+                  onClick={() =>
+                    showModal(
+                      {
+                        options: [],
+                        title: 'Following',
+                        cancelButton: false,
+                        children: (
+                          <UsersList
+                            userId={state.data.user._id}
+                            token={token}
+                            followingCount={following}
+                            following
+                          />
+                        ),
+                      },
+                      'OptionsDialog'
+                    )
+                  }
+                  style={{ cursor: 'pointer' }}
+                  className="heading-3"
+                >
                   <b>{following}</b> following
                 </p>
               </div>
               <div>
                 <p className="heading-3">
-                  <b>{bio}</b>
+                  <b>John Marston</b>
                 </p>
+                <p className="heading-3">{bio}</p>
               </div>
             </div>
           </header>
@@ -163,6 +260,7 @@ const ProfilePage = ({ currentUser, showModal }) => {
 
 const mapStateToProps = createStructuredSelector({
   currentUser: selectCurrentUser,
+  token: selectToken,
 });
 
 const mapDispatchToProps = (dispatch) => ({

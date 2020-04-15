@@ -1,5 +1,6 @@
 export const INITIAL_STATE = {
   fetching: false,
+  following: false,
   fetchingAdditionalPosts: false,
   error: false,
   data: null,
@@ -20,8 +21,8 @@ export const profileReducer = (state, action) => {
         error: false,
         data: {
           ...action.payload,
-          posts: action.payload.posts.data,
-          postCount: action.payload.posts.postCount,
+          posts: action.payload.posts ? action.payload.posts.data : [],
+          postCount: action.payload.posts ? action.payload.posts.postCount : 0,
         },
       };
     }
@@ -87,6 +88,34 @@ export const profileReducer = (state, action) => {
         data: {
           ...state.data,
           posts: [...state.data.posts, ...posts],
+        },
+      };
+    }
+    case 'FOLLOW_USER_START': {
+      return { ...state, following: true };
+    }
+    case 'FOLLOW_USER_FAILURE': {
+      return { ...state, following: false, error: action.payload };
+    }
+    case 'FOLLOW_USER_SUCCESS': {
+      if (action.payload === 'follow') {
+        return {
+          ...state,
+          following: false,
+          data: {
+            ...state.data,
+            isFollowing: true,
+            followers: state.data.followers + 1,
+          },
+        };
+      }
+      return {
+        ...state,
+        following: false,
+        data: {
+          ...state.data,
+          isFollowing: false,
+          followers: state.data.followers - 1,
         },
       };
     }

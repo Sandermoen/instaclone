@@ -1,4 +1,5 @@
 .options-dialog {
+  max-height: 40rem;
   width: 40rem;
   background-color: $color-white;
   border-radius: 10px;
@@ -8,10 +9,7 @@
   justify-self: center;
   grid-column: center-start / center-end;
   overflow: hidden;
-
-  & > :not(:last-child) {
-    border-bottom: 1px solid $color-grey-2;
-  }
+  backface-visibility: hidden;
 
   &__button {
     padding: 1.5rem;
@@ -30,5 +28,33 @@
       font-weight: 700;
       color: $color-red;
     }
+  }
+
+  &__title {
+    @extend .options-dialog__button;
+    cursor: initial;
+    &:active {
+      background-color: $color-white;
+    }
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: min-content;
+    justify-items: center;
+    align-items: center;
+
+    & > :first-child {
+      grid-column: 2 / 3;
+    }
+
+    & > :last-child {
+      margin-left: auto;
+      margin-right: 1rem;
+    }
+  }
+
+  &__button,
+  &__title {
+    border-bottom: 1px solid $color-grey-2;
   }
 }

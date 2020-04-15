@@ -2,10 +2,11 @@ import React, { Fragment, useRef, useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { formatDateDistance } from '../../utils/timeUtils';
+import { Link } from 'react-router-dom';
 
 import Icon from '../Icon/Icon';
 
-import { showModal } from '../../redux/modal/modalActions';
+import { showModal, hideModal } from '../../redux/modal/modalActions';
 
 import {
   voteComment,
@@ -26,6 +27,7 @@ const Comment = ({
   dialogDispatch,
   profileDispatch,
   showModal,
+  hideModal,
 }) => {
   const commentRef = useRef();
   const [commentPostTime, setCommentPostTime] = useState(() =>
@@ -49,11 +51,6 @@ const Comment = ({
     }, 60000);
     return () => clearInterval(commentPostTimeInterval);
   }, [setCommentPostTime, caption, comment, post]);
-
-  // useEffect(() => {
-  //   // Show the comment replies when the comment state changes f.ex if a user replies to this comment
-  //   !toggleCommentReplies && setToggleCommentReplies(true);
-  // }, [commentReplies]);
 
   const handleVote = async () => {
     try {
@@ -119,10 +116,25 @@ const Comment = ({
   return (
     <Fragment>
       <div className="comment" ref={commentRef}>
-        <Avatar imageSrc={author.avatar} className="avatar--small" />
+        <Link
+          onClick={() => hideModal('PostDialog')}
+          to={`/${author.username}`}
+        >
+          <Avatar
+            size="4rem"
+            imageSrc={author.avatar}
+            className="avatar--small"
+          />
+        </Link>
         <div className="comment__content">
           <p className="heading-4">
-            <b>{author.username}</b> {comment.message}
+            <Link
+              onClick={() => hideModal('PostDialog')}
+              style={{ textDecoration: 'none', color: 'currentColor' }}
+              to={`/${author.username}`}
+            >
+              <b>{author.username}</b> {comment.message}
+            </Link>
           </p>
           {!caption && author.username === currentUser.username ? (
             <div
@@ -226,6 +238,7 @@ const Comment = ({
               dialogDispatch={dialogDispatch}
               profileDispatch={profileDispatch}
               showModal={showModal}
+              hideModal={hideModal}
               key={idx}
             />
           ))
@@ -235,6 +248,7 @@ const Comment = ({
 };
 
 const mapDispatchToProps = (dispatch) => ({
+  hideModal: (component) => dispatch(hideModal(component)),
   showModal: (props, component) => dispatch(showModal(props, component)),
 });
 

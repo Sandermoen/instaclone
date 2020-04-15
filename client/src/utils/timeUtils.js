@@ -1,6 +1,6 @@
 import { formatDistanceStrict, format } from 'date-fns';
 
-export const formatDateDistance = endDate => {
+export const formatDateDistance = (endDate) => {
   const format = formatDistanceStrict(new Date(), new Date(endDate));
   const duration = format.split(' ');
   duration[1] = duration[1].substring(0, 1);
@@ -10,8 +10,8 @@ export const formatDateDistance = endDate => {
   return duration.join(' ');
 };
 
-export const formatDate = date => {
+export const formatDate = (date) => {
   date = new Date(date);
-  const formattedDate = format(date, 'MMMM M');
+  const formattedDate = format(date, 'MMMM d');
   return formattedDate;
 };

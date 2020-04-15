@@ -2,7 +2,7 @@ const jwt = require('jwt-simple');
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
 
-module.exports.verifyJwt = token => {
+module.exports.verifyJwt = (token) => {
   return new Promise(async (resolve, reject) => {
     try {
       const id = jwt.decode(token, process.env.JWT_SECRET).id;
@@ -32,6 +32,20 @@ module.exports.requireAuth = async (req, res, next) => {
   }
 };
 
+module.exports.optionalAuth = async (req, res, next) => {
+  const { authorization } = req.headers;
+  if (authorization) {
+    try {
+      const user = await this.verifyJwt(authorization);
+      // Allow other middlewares to access the authenticated user details.
+      res.locals.user = user;
+    } catch (err) {
+      return res.status(401).send({ error: err });
+    }
+  }
+  return next();
+};
+
 module.exports.loginAuthentication = async (req, res, next) => {
   const { authorization } = req.headers;
   const { usernameOrEmail, password } = req.body;
@@ -40,7 +54,7 @@ module.exports.loginAuthentication = async (req, res, next) => {
       const user = await this.verifyJwt(authorization);
       return res.send({
         user,
-        token: authorization
+        token: authorization,
       });
     } catch (err) {
       return res.status(401).send({ error: err });
@@ -55,11 +69,11 @@ module.exports.loginAuthentication = async (req, res, next) => {
 
   try {
     const user = await User.findOne({
-      $or: [{ username: usernameOrEmail }, { email: usernameOrEmail }]
+      $or: [{ username: usernameOrEmail }, { email: usernameOrEmail }],
     });
     if (!user) {
       return res.status(401).send({
-        error: 'The credentials you provided are incorrect, please try again.'
+        error: 'The credentials you provided are incorrect, please try again.',
       });
     }
 
@@ -69,7 +83,8 @@ module.exports.loginAuthentication = async (req, res, next) => {
       }
       if (!result) {
         return res.status(401).send({
-          error: 'The credentials you provided are incorrect, please try again.'
+          error:
+            'The credentials you provided are incorrect, please try again.',
         });
       }
 
@@ -78,9 +93,9 @@ module.exports.loginAuthentication = async (req, res, next) => {
           _id: user._id,
           email: user.email,
           username: user.username,
-          avatar: user.avatar
+          avatar: user.avatar,
         },
-        token: jwt.encode({ id: user._id }, process.env.JWT_SECRET)
+        token: jwt.encode({ id: user._id }, process.env.JWT_SECRET),
       });
     });
   } catch (err) {
@@ -93,7 +108,7 @@ module.exports.register = async (req, res, next) => {
   const { username, email, password } = req.body;
   if (!username || !email || !password) {
     return res.status(400).send({
-      error: 'Please provide all the required information before registering.'
+      error: 'Please provide all the required information before registering.',
     });
   }
 
@@ -103,9 +118,9 @@ module.exports.register = async (req, res, next) => {
     res.status(201).send({
       user: {
         email: user.email,
-        username: user.username
+        username: user.username,
       },
-      token: jwt.encode({ id: user._id }, process.env.JWT_SECRET)
+      token: jwt.encode({ id: user._id }, process.env.JWT_SECRET),
     });
   } catch (err) {
     next(err);

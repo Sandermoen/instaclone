@@ -5,11 +5,12 @@
   grid-column-gap: 10rem;
   justify-items: start;
 
-  padding-bottom: 4rem;
+  padding: 0px 10rem 4rem 10rem;
   border-bottom: 1px solid $color-grey-2;
 
   &__info {
     display: grid;
+    grid-template-rows: min-content;
     justify-items: start;
   }
 }
@@ -30,7 +31,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 0;
 
   & > * {
     &:not(:last-child) {
@@ -66,8 +66,8 @@
   display: grid;
   grid-column: center-start / center-end;
   grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(auto-fit, 25rem);
-  grid-auto-rows: 25rem;
+  grid-template-rows: repeat(auto-fit, 30rem);
+  grid-auto-rows: 30rem;
   grid-column-gap: 2.5rem;
   grid-row-gap: 2.5rem;
 }

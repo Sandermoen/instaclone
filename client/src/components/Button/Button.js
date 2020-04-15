@@ -2,13 +2,21 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-const Button = ({ children, onClick, inverted, style }) => {
+import Loader from '../Loader/Loader';
+
+const Button = ({ children, onClick, inverted, style, disabled, loading }) => {
   const buttonClasses = classNames({
     button: true,
-    'button--inverted': inverted
+    'button--inverted': inverted,
+    'button--disabled': disabled,
   });
   return (
-    <button style={style} className={buttonClasses} onClick={onClick}>
+    <button
+      style={style}
+      className={buttonClasses}
+      onClick={loading ? () => {} : onClick}
+    >
+      {loading && <Loader />}
       {children}
     </button>
   );
@@ -17,10 +25,10 @@ const Button = ({ children, onClick, inverted, style }) => {
 Button.propTypes = {
   children: PropTypes.oneOfType([
     PropTypes.arrayOf(PropTypes.node),
-    PropTypes.node
+    PropTypes.node,
   ]),
   onClick: PropTypes.func,
-  inverted: PropTypes.bool
+  inverted: PropTypes.bool,
 };
 
 export default Button;

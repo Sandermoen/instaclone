@@ -39,11 +39,11 @@ Modal.whyDidYouRender = true;
 
 Modal.propTypes = {
   component: PropTypes.string.isRequired,
-  props: PropTypes.object
+  props: PropTypes.object,
 };
 
-const mapDispatchToProps = dispatch => ({
-  hideModal: component => dispatch(hideModal(component))
+const mapDispatchToProps = (dispatch) => ({
+  hideModal: (component) => dispatch(hideModal(component)),
 });
 
 export default connect(null, mapDispatchToProps)(Modal);
