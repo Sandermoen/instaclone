@@ -261,7 +261,9 @@ module.exports.followUser = async (req, res, next) => {
 };
 
 /**
- *
+ * Retrieves either who a specific user follows or who is following the user.
+ * Also retrieves whether the requesting user is following the returned users
+ * @function retrieveRelatedUsers
  * @param {object} user The user object passed on from other middlewares
  * @param {string} userId Id of the user to be used in the query
  * @param {number} offset The offset for how many documents to skip
