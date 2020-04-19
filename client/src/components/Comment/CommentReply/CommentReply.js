@@ -2,6 +2,11 @@ import React, { useState, useRef, useEffect, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { formatDateDistance } from '../../../utils/timeUtils';
 import { Link } from 'react-router-dom';
+import Linkify from 'linkifyjs/react';
+import * as linkify from 'linkifyjs';
+import mention from 'linkifyjs/plugins/mention';
+
+import { linkifyOptions } from '../../../utils/linkifyUtils';
 
 import Icon from '../../Icon/Icon';
 
@@ -12,6 +17,8 @@ import {
 
 import Avatar from '../../Avatar/Avatar';
 import PulsatingIcon from '../../Icon/PulsatingIcon/PulsatingIcon';
+
+mention(linkify);
 
 const CommentReply = ({
   comment,
@@ -87,11 +94,16 @@ const CommentReply = ({
         <p className="heading-4">
           <Link
             onClick={() => hideModal('PostDialog')}
-            style={{ textDecoration: 'none', color: 'currentColor' }}
+            style={{
+              textDecoration: 'none',
+              color: 'currentColor',
+              marginRight: '5px',
+            }}
             to={`/${comment.author.username}`}
           >
-            <b>{comment.author.username}</b> {comment.message}
+            <b>{comment.author.username}</b>
           </Link>
+          <Linkify options={linkifyOptions}>{comment.message}</Linkify>
         </p>
         {comment.author.username === currentUser.username ? (
           <div

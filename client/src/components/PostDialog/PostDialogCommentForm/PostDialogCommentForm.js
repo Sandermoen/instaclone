@@ -1,17 +1,26 @@
-import React, { useReducer, Fragment, useEffect, useRef } from 'react';
+import React, {
+  useReducer,
+  Fragment,
+  useEffect,
+  useRef,
+  useCallback,
+} from 'react';
 import PropTypes from 'prop-types';
 
 import {
   createComment,
-  createCommentReply
+  createCommentReply,
 } from '../../../services/commentService';
 
 import {
   INITIAL_STATE,
-  postDialogCommentFormReducer
+  postDialogCommentFormReducer,
 } from './postDialogCommentFormReducer';
 
+import useSearchUsersDebounced from '../../../hooks/useSearchUsersDebounced';
+
 import Loader from '../../Loader/Loader';
+import SearchSuggestion from '../../SearchSuggestion/SearchSuggestion';
 
 const PostDialogCommentForm = ({
   token,
@@ -19,11 +28,23 @@ const PostDialogCommentForm = ({
   commentsRef,
   dialogDispatch,
   profileDispatch,
-  replying
+  replying,
 }) => {
   const [state, dispatch] = useReducer(
     postDialogCommentFormReducer,
     INITIAL_STATE
+  );
+
+  let {
+    handleSearchDebounced,
+    result,
+    setResult,
+    fetching,
+    setFetching,
+  } = useSearchUsersDebounced();
+  const handleSearchDebouncedMemoized = useCallback(
+    (username, offset = 0) => handleSearchDebounced(username, offset),
+    []
   );
 
   const commentInputRef = useRef();
@@ -35,23 +56,24 @@ const PostDialogCommentForm = ({
     }
   }, [replying]);
 
-  const handleSubmit = async event => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     if (state.comment.length === 0) {
       return dispatch({
         type: 'POST_COMMENT_FAILURE',
-        payload: 'You cannot post an empty comment.'
+        payload: 'You cannot post an empty comment.',
       });
     }
 
     try {
+      setResult(null);
       dispatch({ type: 'POST_COMMENT_START' });
       if (!replying) {
         // The user is not replying to a comment
         const comment = await createComment(state.comment, postId, token);
         dispatch({
           type: 'POST_COMMENT_SUCCESS',
-          payload: { comment, dispatch: dialogDispatch, postId }
+          payload: { comment, dispatch: dialogDispatch, postId },
         });
         // Scroll to bottom to see posted comment
         commentsRef.current.scrollTop = commentsRef.current.scrollHeight;
@@ -67,15 +89,15 @@ const PostDialogCommentForm = ({
           payload: {
             comment,
             dispatch: dialogDispatch,
-            parentCommentId: replying.commentId
-          }
+            parentCommentId: replying.commentId,
+          },
         });
         dialogDispatch({ type: 'SET_REPLYING' });
       }
       // Increment the comment count on the overlay of the image on the profile page
       profileDispatch({
         type: 'INCREMENT_POST_COMMENTS_COUNT',
-        payload: postId
+        payload: postId,
       });
     } catch (err) {
       dispatch({ type: 'POST_COMMENT_FAILURE', payload: err });
@@ -84,7 +106,7 @@ const PostDialogCommentForm = ({
 
   return (
     <form
-      onSubmit={event => handleSubmit(event)}
+      onSubmit={(event) => handleSubmit(event)}
       className="post-dialog__add-comment"
       data-test="component-post-dialog-add-comment"
     >
@@ -94,12 +116,25 @@ const PostDialogCommentForm = ({
           className="add-comment__input"
           type="text"
           placeholder="Add a comment..."
-          onChange={event => {
+          onChange={(event) => {
             // Removed the `@username` from the input so the user is no longer looking to reply
             if (replying && !event.target.value) {
               dialogDispatch({ type: 'SET_REPLYING' });
             }
             dispatch({ type: 'SET_COMMENT', payload: event.target.value });
+            // Checking for an @ mention
+            let mention = event.target.value.match(
+              new RegExp(/@[a-zA-Z0-9]+$/)
+            );
+            if (mention) {
+              mention = mention[0].substring(1);
+              setFetching(true);
+              // Setting the result to an empty array to show skeleton
+              setResult([]);
+              handleSearchDebouncedMemoized(mention);
+            } else {
+              setResult(null);
+            }
           }}
           value={state.comment}
           ref={commentInputRef}
@@ -112,6 +147,22 @@ const PostDialogCommentForm = ({
           Post
         </button>
       </Fragment>
+      {result && (
+        <SearchSuggestion
+          fetching={fetching}
+          result={result}
+          onClick={(user) => {
+            let comment = commentInputRef.current.value;
+            // Replace the last word with the @mention
+            dispatch({
+              type: 'SET_COMMENT',
+              payload: comment.replace(/@\b(\w+)$/, `@${user.username} `),
+            });
+            commentInputRef.current.focus();
+            setResult(null);
+          }}
+        />
+      )}
     </form>
   );
 };
@@ -122,7 +173,7 @@ PostDialogCommentForm.propTypes = {
   commentsRef: PropTypes.object.isRequired,
   dialogDispatch: PropTypes.func.isRequired,
   profileDispatch: PropTypes.func.isRequired,
-  replying: PropTypes.oneOfType([PropTypes.bool, PropTypes.object]).isRequired
+  replying: PropTypes.oneOfType([PropTypes.bool, PropTypes.object]).isRequired,
 };
 
 export default PostDialogCommentForm;

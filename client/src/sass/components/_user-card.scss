@@ -9,7 +9,7 @@
     line-height: 15px;
   }
 
-  & > *:last-child {
+  & > :nth-child(3) {
     margin-left: auto;
   }
 }

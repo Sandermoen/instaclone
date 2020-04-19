@@ -364,3 +364,62 @@ module.exports.retrieveFollowers = async (req, res, next) => {
     next(err);
   }
 };
+
+module.exports.searchUsers = async (req, res, next) => {
+  const { username, offset = 0 } = req.params;
+  if (!username) {
+    return res
+      .status(400)
+      .send({ error: 'Please provide a user to search for.' });
+  }
+
+  try {
+    const users = await User.aggregate([
+      {
+        $match: {
+          username: { $regex: new RegExp(username), $options: 'i' },
+        },
+      },
+      {
+        $lookup: {
+          from: 'followers',
+          localField: '_id',
+          foreignField: 'user',
+          as: 'followers',
+        },
+      },
+      {
+        $unwind: '$followers',
+      },
+      {
+        $addFields: {
+          followersCount: { $size: '$followers.followers' },
+        },
+      },
+      {
+        $sort: { followersCount: -1 },
+      },
+      {
+        $skip: Number(offset),
+      },
+      {
+        $limit: 10,
+      },
+      {
+        $project: {
+          _id: true,
+          username: true,
+          avatar: true,
+        },
+      },
+    ]);
+    if (users.length === 0) {
+      return res
+        .status(404)
+        .send({ error: 'Could not find any users matching the criteria.' });
+    }
+    return res.send(users);
+  } catch (err) {
+    next(err);
+  }
+};

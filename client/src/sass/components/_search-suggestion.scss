@@ -1,0 +1,10 @@
+.search-suggestion {
+  background-color: $color-white;
+  position: absolute;
+  left: 0;
+  bottom: 101%;
+  max-height: 20rem;
+  width: 25rem;
+  overflow-y: auto;
+  box-shadow: 0 0 1rem -5px $color-grey-1;
+}

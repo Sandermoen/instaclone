@@ -22,79 +22,103 @@ const UserCard = ({
   hideModal,
   showModal,
   currentUser,
+  followButton,
+  onClick,
 }) => {
   const [isFollowing, setIsFollowing] = useState(following);
   const [loading, setLoading] = useState(false);
-  const follow = async () => {
-    try {
-      setLoading(true);
-      await followUser(userId, token);
-      if (!isFollowing) {
-        setIsFollowing(true);
+  let renderFollowButton = undefined;
+
+  if (followButton) {
+    const follow = async () => {
+      try {
+        setLoading(true);
+        await followUser(userId, token);
+        if (!isFollowing) {
+          setIsFollowing(true);
+        }
+        setLoading(false);
+      } catch (err) {
+        setLoading(false);
+        console.warn(err);
       }
-      setLoading(false);
-    } catch (err) {
-      setLoading(false);
-      console.warn(err);
-    }
-  };
+    };
 
-  const renderFollowButton = () => {
-    if (username === currentUser.username) {
-      return <Button disabled>Follow</Button>;
-    }
+    renderFollowButton = () => {
+      if (username === currentUser.username) {
+        return <Button disabled>Follow</Button>;
+      }
 
-    if (isFollowing) {
+      if (isFollowing) {
+        return (
+          <Button
+            loading={loading}
+            onClick={() =>
+              showModal(
+                {
+                  options: [
+                    {
+                      warning: true,
+                      text: 'Unfollow',
+                      onClick: () => follow(),
+                    },
+                  ],
+                  children: (
+                    <UnfollowPrompt avatar={avatar} username={username} />
+                  ),
+                },
+                'OptionsDialog'
+              )
+            }
+            inverted
+          >
+            Following
+          </Button>
+        );
+      }
       return (
-        <Button
-          loading={loading}
-          onClick={() =>
-            showModal(
-              {
-                options: [
-                  {
-                    warning: true,
-                    text: 'Unfollow',
-                    onClick: () => follow(),
-                  },
-                ],
-                children: (
-                  <UnfollowPrompt avatar={avatar} username={username} />
-                ),
-              },
-              'OptionsDialog'
-            )
-          }
-          inverted
-        >
-          Following
+        <Button loading={loading} onClick={() => follow()}>
+          Follow
         </Button>
       );
-    }
-
-    return (
-      <Button loading={loading} onClick={() => follow()}>
-        Follow
-      </Button>
-    );
-  };
+    };
+  }
 
   return (
     <div className="user-card">
-      <Link onClick={() => hideModal('OptionsDialog')} to={`/${username}`}>
-        <Avatar className="avatar--small" imageSrc={avatar} />
-      </Link>
-      <div className="user-card__details">
-        <Link
-          onClick={() => hideModal('OptionsDialog')}
-          style={{ textDecoration: 'none' }}
-          to={`/${username}`}
-        >
-          <p className="heading-4 font-bold">{username}</p>
+      {onClick ? (
+        <Avatar
+          onClick={() => onClick()}
+          className="avatar--small"
+          imageSrc={avatar}
+          style={{ cursor: 'pointer' }}
+        />
+      ) : (
+        <Link onClick={() => hideModal('OptionsDialog')} to={`/${username}`}>
+          <Avatar className="avatar--small" imageSrc={avatar} />
         </Link>
+      )}
+      <div className="user-card__details">
+        {onClick ? (
+          <p
+            onClick={() => onClick()}
+            style={{ cursor: 'pointer' }}
+            className="heading-4 font-bold"
+          >
+            {username}
+          </p>
+        ) : (
+          <Link
+            onClick={() => hideModal('OptionsDialog')}
+            style={{ textDecoration: 'none' }}
+            to={`/${username}`}
+          >
+            <p className="heading-4 font-bold">{username}</p>
+          </Link>
+        )}
         {name && <p className="heading-4 color-grey">{name}</p>}
       </div>
-      {renderFollowButton()}
+      {followButton && renderFollowButton()}
     </div>
   );
 };
