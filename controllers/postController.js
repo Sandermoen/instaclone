@@ -1,10 +1,10 @@
 const cloudinary = require('cloudinary').v2;
 const Post = require('../models/Post');
 const PostVote = require('../models/PostVote');
-const Comment = require('../models/Comment');
-const CommentVote = require('../models/CommentVote');
 const fs = require('fs');
 const ObjectId = require('mongoose').Types.ObjectId;
+
+const { retrieveComments } = require('./utils');
 
 module.exports.createPost = async (req, res, next) => {
   const user = res.locals.user;
@@ -90,52 +90,9 @@ module.exports.retrievePost = async (req, res, next) => {
         .send({ error: 'Could not find a post with that id.' });
     }
     // Retrieve the comments associated with the post aswell as the comment's replies and votes
-    const comments = await Comment.aggregate([
-      { $match: { post: ObjectId(postId) } },
-      { $limit: 10 },
-      {
-        $lookup: {
-          from: 'commentreplies',
-          localField: '_id',
-          foreignField: 'parentComment',
-          as: 'commentReplies',
-        },
-      },
-      {
-        $lookup: {
-          from: 'commentvotes',
-          localField: '_id',
-          foreignField: 'comment',
-          as: 'commentVotes',
-        },
-      },
-      { $unwind: '$commentVotes' },
-      {
-        $lookup: {
-          from: 'users',
-          localField: 'author',
-          foreignField: '_id',
-          as: 'author',
-        },
-      },
-      { $unwind: '$author' },
-      {
-        $addFields: {
-          commentReplies: { $size: '$commentReplies' },
-          commentVotes: '$commentVotes.votes',
-        },
-      },
-      {
-        $unset: [
-          'author.password',
-          'author.email',
-          'author.private',
-          'author.bio',
-        ],
-      },
-    ]);
+    const comments = await retrieveComments(postId, 0);
 
-    return res.send({ ...post[0], comments });
+    return res.send({ ...post[0], commentData: comments });
   } catch (err) {
     next(err);
   }

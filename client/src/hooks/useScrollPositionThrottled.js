@@ -10,17 +10,29 @@ import throttle from 'lodash/throttle';
 const useScrollPositionThrottled = (callback, element) => {
   const [, setScrollPosition] = useState(0);
   let previousScrollPosition = 0;
+  const currentElement = element
+    ? element
+    : document.documentElement || document.body;
 
+  /**
+   * Handles determining positional values when scrolling
+   * @function handleScroll
+   * @returns {object} Object with information about the current and previous scroll position
+   */
   const handleScroll = () => {
-    const { scrollTop: currentScrollPosition } = element
-      ? element
-      : document.documentElement || document.body;
+    const { scrollTop: currentScrollPosition } = currentElement;
 
     setScrollPosition((previousPosition) => {
       previousScrollPosition = previousPosition;
       return currentScrollPosition;
     });
-    callback({ previousScrollPosition, currentScrollPosition });
+    callback({
+      previousScrollPosition,
+      currentScrollPosition,
+      atBottom:
+        currentElement.scrollTop + currentElement.offsetHeight ===
+        currentElement.scrollHeight,
+    });
   };
 
   // Throttle the function to improve performance

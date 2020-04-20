@@ -10,8 +10,8 @@ export const INITIAL_STATE = {
     date: null,
     postVotes: [],
     comments: [],
-    commentReplies: []
-  }
+    commentReplies: [],
+  },
 };
 
 export const postDialogReducer = (state, action) => {
@@ -20,47 +20,54 @@ export const postDialogReducer = (state, action) => {
       return { ...state, fetching: false, error: action.payload };
     }
     case 'FETCH_POST_SUCCESS': {
+      const { comments = [], commentCount = 0 } =
+        action.payload.commentData || {};
       return {
         ...state,
         fetching: false,
         error: false,
-        data: { ...action.payload, commentReplies: [] }
+        data: {
+          ...action.payload,
+          commentReplies: [],
+          comments,
+          commentCount,
+        },
       };
     }
     case 'VOTE_POST': {
       const { currentUser, postId, dispatch } = action.payload;
       let postVotes = JSON.parse(JSON.stringify(state.data.postVotes[0]));
       const liked = !!postVotes.votes.find(
-        vote => vote.author === currentUser._id
+        (vote) => vote.author === currentUser._id
       );
       if (!liked) {
         postVotes.votes.push({ author: currentUser._id });
       } else {
         postVotes.votes = postVotes.votes.filter(
-          vote => vote.author !== currentUser._id
+          (vote) => vote.author !== currentUser._id
         );
       }
       dispatch({
         type: 'SET_POST_VOTES_COUNT',
-        payload: { postId, votes: postVotes.votes.length }
+        payload: { postId, votes: postVotes.votes.length },
       });
 
       return {
         ...state,
         data: {
           ...state.data,
-          postVotes: [postVotes]
-        }
+          postVotes: [postVotes],
+        },
       };
     }
     case 'VOTE_COMMENT': {
       const { commentId, currentUser } = action.payload;
       const comments = JSON.parse(JSON.stringify(state.data.comments));
       const commentIndex = comments.findIndex(
-        comment => comment._id === commentId
+        (comment) => comment._id === commentId
       );
       const liked = !!comments[commentIndex].commentVotes.find(
-        vote => vote.author === currentUser._id
+        (vote) => vote.author === currentUser._id
       );
 
       if (!liked) {
@@ -68,26 +75,27 @@ export const postDialogReducer = (state, action) => {
       } else {
         comments[commentIndex].commentVotes = comments[
           commentIndex
-        ].commentVotes.filter(vote => vote.author !== currentUser._id);
+        ].commentVotes.filter((vote) => vote.author !== currentUser._id);
       }
 
       return {
         ...state,
         data: {
           ...state.data,
-          comments
-        }
+          comments,
+        },
       };
     }
     case 'ADD_COMMENT': {
-      const comment = action.payload;
-
+      let comment = action.payload;
+      if (!Array.isArray(comment)) comment = [comment];
+      console.log(comment);
       return {
         ...state,
         data: {
           ...state.data,
-          comments: [...state.data.comments, comment]
-        }
+          comments: [...state.data.comments, ...comment],
+        },
       };
     }
     case 'REMOVE_COMMENT': {
@@ -98,16 +106,17 @@ export const postDialogReducer = (state, action) => {
         data: {
           ...state.data,
           comments: state.data.comments.filter(
-            comment => comment._id !== commentId
-          )
-        }
+            (comment) => comment._id !== commentId
+          ),
+          commentCount: state.data.commentCount - 1,
+        },
       };
     }
     case 'ADD_COMMENT_REPLY': {
       let { comment: newComment, parentCommentId } = action.payload;
       const comments = JSON.parse(JSON.stringify(state.data.comments));
       const parentCommentIndex = comments.findIndex(
-        comment => comment._id === parentCommentId
+        (comment) => comment._id === parentCommentId
       );
       if (!Array.isArray(newComment)) {
         const parentComment = comments[parentCommentIndex];
@@ -123,15 +132,15 @@ export const postDialogReducer = (state, action) => {
         data: {
           ...state.data,
           comments,
-          commentReplies: [...state.data.commentReplies, ...newComment]
-        }
+          commentReplies: [...state.data.commentReplies, ...newComment],
+        },
       };
     }
     case 'REMOVE_COMMENT_REPLY': {
       const { commentReplyId, parentCommentId } = action.payload;
       const comments = JSON.parse(JSON.stringify(state.data.comments));
       const commentIndex = comments.findIndex(
-        comment => comment._id === parentCommentId
+        (comment) => comment._id === parentCommentId
       );
       comments[commentIndex].commentReplies -= 1;
 
@@ -141,9 +150,9 @@ export const postDialogReducer = (state, action) => {
           ...state.data,
           comments,
           commentReplies: state.data.commentReplies.filter(
-            commentReply => commentReply._id !== commentReplyId
-          )
-        }
+            (commentReply) => commentReply._id !== commentReplyId
+          ),
+        },
       };
     }
     case 'VOTE_COMMENT_REPLY': {
@@ -152,27 +161,27 @@ export const postDialogReducer = (state, action) => {
         JSON.stringify(state.data.commentReplies)
       );
       const commentReplyIndex = state.data.commentReplies.findIndex(
-        commentReply => commentReply._id === commentReplyId
+        (commentReply) => commentReply._id === commentReplyId
       );
       const liked = !!commentReplies[commentReplyIndex].commentReplyVotes.find(
-        vote => vote.author === currentUser._id
+        (vote) => vote.author === currentUser._id
       );
       if (!liked) {
         commentReplies[commentReplyIndex].commentReplyVotes.push({
-          author: currentUser._id
+          author: currentUser._id,
         });
       } else {
         commentReplies[commentReplyIndex].commentReplyVotes = commentReplies[
           commentReplyIndex
-        ].commentReplyVotes.filter(vote => vote.author !== currentUser._id);
+        ].commentReplyVotes.filter((vote) => vote.author !== currentUser._id);
       }
 
       return {
         ...state,
         data: {
           ...state.data,
-          commentReplies
-        }
+          commentReplies,
+        },
       };
     }
     case 'SET_REPLYING': {

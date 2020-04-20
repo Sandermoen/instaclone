@@ -6,10 +6,10 @@ import { createStructuredSelector } from 'reselect';
 import { selectToken, selectCurrentUser } from '../../redux/user/userSelectors';
 
 import { getPost } from '../../services/postService';
+import { getComments } from '../../services/commentService';
 
 import Avatar from '../Avatar/Avatar';
 import Icon from '../Icon/Icon';
-import Loader from '../Loader/Loader';
 import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 import Comment from '../Comment/Comment';
 import PostDialogCommentForm from './PostDialogCommentForm/PostDialogCommentForm';
@@ -37,6 +37,16 @@ const PostDialog = ({
       dispatch({ type: 'FETCH_POST_FAILURE', payload: err });
     }
   }, [postId]);
+
+  const fetchAdditionalComments = async () => {
+    try {
+      const commentData = await getComments(postId, state.data.comments.length);
+      console.log(commentData);
+      dispatch({ type: 'ADD_COMMENT', payload: commentData.comments });
+    } catch (err) {
+      console.warn(err);
+    }
+  };
 
   return (
     <div className="post-dialog" data-test="component-post-dialog">
@@ -110,6 +120,18 @@ const PostDialog = ({
                   profileDispatch={profileDispatch}
                 />
               ))}
+            {state.data.comments.length < state.data.commentCount && (
+              <div style={{ padding: '2rem' }}>
+                <Icon
+                  style={{
+                    margin: '0 auto',
+                    cursor: 'pointer',
+                  }}
+                  icon="add-circle-outline"
+                  onClick={() => fetchAdditionalComments()}
+                />
+              </div>
+            )}
           </div>
           {state.fetching ? (
             <div

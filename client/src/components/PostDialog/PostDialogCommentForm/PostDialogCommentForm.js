@@ -4,6 +4,7 @@ import React, {
   useEffect,
   useRef,
   useCallback,
+  useState,
 } from 'react';
 import PropTypes from 'prop-types';
 
@@ -34,6 +35,7 @@ const PostDialogCommentForm = ({
     postDialogCommentFormReducer,
     INITIAL_STATE
   );
+  const [mention, setMention] = useState(null);
 
   let {
     handleSearchDebounced,
@@ -123,15 +125,16 @@ const PostDialogCommentForm = ({
             }
             dispatch({ type: 'SET_COMMENT', payload: event.target.value });
             // Checking for an @ mention
-            let mention = event.target.value.match(
-              new RegExp(/@[a-zA-Z0-9]+$/)
-            );
-            if (mention) {
-              mention = mention[0].substring(1);
-              setFetching(true);
-              // Setting the result to an empty array to show skeleton
-              setResult([]);
-              handleSearchDebouncedMemoized(mention);
+            let string = event.target.value.match(new RegExp(/@[a-zA-Z0-9]+$/));
+            if (string) {
+              setMention(() => {
+                setFetching(true);
+                const mention = string[0].substring(1);
+                // Setting the result to an empty array to show skeleton
+                setResult([]);
+                handleSearchDebouncedMemoized(mention);
+                return mention;
+              });
             } else {
               setResult(null);
             }
@@ -151,6 +154,7 @@ const PostDialogCommentForm = ({
         <SearchSuggestion
           fetching={fetching}
           result={result}
+          username={mention}
           onClick={(user) => {
             let comment = commentInputRef.current.value;
             // Replace the last word with the @mention

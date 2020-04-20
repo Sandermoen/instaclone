@@ -6,12 +6,12 @@ import { animated } from 'react-spring';
 const Icon = ({ onClick, className, icon, style }) => {
   const iconClassNames = classNames({
     icon: true,
-    [className]: className
+    [className]: className,
   });
 
   return (
     <animated.div style={style} onClick={onClick} className={iconClassNames}>
-      <ion-icon name={icon}></ion-icon>
+      <ion-icon size="large" name={icon}></ion-icon>
     </animated.div>
   );
 };
@@ -19,7 +19,7 @@ const Icon = ({ onClick, className, icon, style }) => {
 Icon.propTypes = {
   onClick: PropTypes.func,
   className: PropTypes.string,
-  icon: PropTypes.string.isRequired
+  icon: PropTypes.string.isRequired,
 };
 
 export default Icon;

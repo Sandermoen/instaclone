@@ -44,10 +44,9 @@ const UsersList = ({
     })();
   }, [userId, token]);
 
-  useScrollPositionThrottled(async () => {
+  useScrollPositionThrottled(async ({ atBottom }) => {
     if (
-      componentRef.current.scrollTop + componentRef.current.offsetHeight ===
-        componentRef.current.scrollHeight && following
+      atBottom && following
         ? state.data.length < followingCount
         : state.data.length < followersCount &&
           !state.fetching &&

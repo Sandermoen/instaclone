@@ -15,8 +15,8 @@ export const createComment = async (message, postId, authToken) => {
       { message },
       {
         headers: {
-          authorization: authToken
-        }
+          authorization: authToken,
+        },
       }
     );
     return response.data;
@@ -35,8 +35,8 @@ export const deleteComment = async (commentId, authToken) => {
   try {
     await axios.delete(`/comment/${commentId}`, {
       headers: {
-        authorization: authToken
-      }
+        authorization: authToken,
+      },
     });
   } catch (err) {
     throw new Error(err);
@@ -52,7 +52,7 @@ export const deleteComment = async (commentId, authToken) => {
 export const voteComment = async (commentId, authToken) => {
   try {
     await axios.post(`/comment/${commentId}/vote`, null, {
-      headers: { authorization: authToken }
+      headers: { authorization: authToken },
     });
   } catch (err) {
     throw new Error(err);
@@ -78,8 +78,8 @@ export const createCommentReply = async (
       { message },
       {
         headers: {
-          authorization: authToken
-        }
+          authorization: authToken,
+        },
       }
     );
     return response.data;
@@ -98,8 +98,8 @@ export const deleteCommentReply = async (commentReplyId, authToken) => {
   try {
     await axios.delete(`/comment/${commentReplyId}/reply`, {
       headers: {
-        authorization: authToken
-      }
+        authorization: authToken,
+      },
     });
   } catch (err) {
     throw new Error(err);
@@ -115,7 +115,7 @@ export const deleteCommentReply = async (commentReplyId, authToken) => {
 export const voteCommentReply = async (commentReplyId, authToken) => {
   try {
     await axios.post(`/comment/${commentReplyId}/replyVote`, null, {
-      headers: { authorization: authToken }
+      headers: { authorization: authToken },
     });
   } catch (err) {
     throw new Error(err);
@@ -134,6 +134,22 @@ export const getCommentReplies = async (parentCommentId, offset = 0) => {
     const response = await axios.get(
       `/comment/${parentCommentId}/${offset}/replies`
     );
+    return response.data;
+  } catch (err) {
+    throw new Error(err);
+  }
+};
+
+/**
+ * Retrieves comments from a post with the given offset
+ * @function getComments
+ * @param {string} postId The id of a post to retrieve comments from
+ * @param {*} offset The amount of comments to skip
+ * @returns {object} Object of comment details
+ */
+export const getComments = async (postId, offset) => {
+  try {
+    const response = await axios.get(`/comment/${postId}/${offset}`);
     return response.data;
   } catch (err) {
     throw new Error(err);

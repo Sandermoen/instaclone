@@ -5,6 +5,8 @@ const CommentReplyVote = require('../models/CommentReplyVote');
 const Post = require('../models/Post');
 const ObjectId = require('mongoose').Types.ObjectId;
 
+const { retrieveComments } = require('./utils');
+
 module.exports.createComment = async (req, res, next) => {
   const { postId } = req.params;
   const { message } = req.body;
@@ -212,7 +214,7 @@ module.exports.voteCommentReply = async (req, res, next) => {
   }
 };
 
-module.exports.getCommentReplies = async (req, res, next) => {
+module.exports.retrieveCommentReplies = async (req, res, next) => {
   const { parentCommentId, offset = 0 } = req.params;
 
   try {
@@ -269,6 +271,16 @@ module.exports.getCommentReplies = async (req, res, next) => {
       });
     }
     return res.send(commentReplies);
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports.retrieveComments = async (req, res, next) => {
+  const { postId, offset } = req.params;
+  try {
+    const comments = await retrieveComments(postId, offset);
+    return res.send(comments);
   } catch (err) {
     next(err);
   }
