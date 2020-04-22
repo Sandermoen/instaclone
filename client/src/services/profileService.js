@@ -8,7 +8,7 @@ import axios from 'axios';
 export const getUserProfile = async (username, authToken) => {
   try {
     const response = await axios.get(
-      `/user/${username}`,
+      `/api/user/${username}`,
       authToken && { headers: { authorization: authToken } }
     );
     return response.data;
@@ -26,7 +26,7 @@ export const getUserProfile = async (username, authToken) => {
  */
 export const followUser = async (userId, authToken) => {
   try {
-    const response = await axios.post(`/user/${userId}/follow`, null, {
+    const response = await axios.post(`/api/user/${userId}/follow`, null, {
       headers: { authorization: authToken },
     });
     return response.data;
@@ -44,9 +44,12 @@ export const followUser = async (userId, authToken) => {
  */
 export const retrieveUserFollowing = async (userId, offset, authToken) => {
   try {
-    const response = await axios.get(`/user/${userId}/${offset}/following`, {
-      headers: { authorization: authToken },
-    });
+    const response = await axios.get(
+      `/api/user/${userId}/${offset}/following`,
+      {
+        headers: { authorization: authToken },
+      }
+    );
     return response.data;
   } catch (err) {
     throw new Error(err);
@@ -62,9 +65,12 @@ export const retrieveUserFollowing = async (userId, offset, authToken) => {
  */
 export const retrieveUserFollowers = async (userId, offset, authToken) => {
   try {
-    const response = await axios.get(`/user/${userId}/${offset}/followers`, {
-      headers: { authorization: authToken },
-    });
+    const response = await axios.get(
+      `/api/user/${userId}/${offset}/followers`,
+      {
+        headers: { authorization: authToken },
+      }
+    );
     return response.data;
   } catch (err) {
     throw new Error(err);

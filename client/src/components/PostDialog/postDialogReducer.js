@@ -2,6 +2,7 @@ export const INITIAL_STATE = {
   fetching: true,
   error: false,
   replying: false,
+  localStateComments: new Set(),
   data: {
     _id: null,
     image: '',
@@ -88,10 +89,14 @@ export const postDialogReducer = (state, action) => {
     }
     case 'ADD_COMMENT': {
       let comment = action.payload;
-      if (!Array.isArray(comment)) comment = [comment];
-      console.log(comment);
+      let localStateComments = new Set(state.localStateComments);
+      if (!Array.isArray(comment)) {
+        localStateComments.add(comment._id);
+        comment = [comment];
+      }
       return {
         ...state,
+        localStateComments,
         data: {
           ...state.data,
           comments: [...state.data.comments, ...comment],
@@ -100,11 +105,14 @@ export const postDialogReducer = (state, action) => {
     }
     case 'REMOVE_COMMENT': {
       const commentId = action.payload;
+      const localStateComments = new Set(state.localStateComments);
+      localStateComments.has(commentId) && localStateComments.delete(commentId);
 
       return {
         ...state,
         data: {
           ...state.data,
+          localStateComments,
           comments: state.data.comments.filter(
             (comment) => comment._id !== commentId
           ),

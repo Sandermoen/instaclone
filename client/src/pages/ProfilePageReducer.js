@@ -91,6 +91,16 @@ export const profileReducer = (state, action) => {
         },
       };
     }
+    case 'DELETE_POST': {
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          postCount: state.data.postCount - 1,
+          posts: state.data.posts.filter((post) => post._id !== action.payload),
+        },
+      };
+    }
     case 'FOLLOW_USER_START': {
       return { ...state, following: true };
     }

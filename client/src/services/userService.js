@@ -9,7 +9,7 @@ import axios from 'axios';
  */
 export const searchUsers = async (username, offset = 0) => {
   try {
-    const response = await axios.get(`/user/${username}/${offset}/search`);
+    const response = await axios.get(`/api/user/${username}/${offset}/search`);
     return response.data;
   } catch (err) {
     console.warn(err);

@@ -9,7 +9,7 @@ import axios from 'axios';
  */
 export const getPost = async (postId) => {
   try {
-    const response = await axios.get(`/post/${postId}`);
+    const response = await axios.get(`/api/post/${postId}`);
     return response.data;
   } catch (err) {
     throw new Error(err);
@@ -18,7 +18,7 @@ export const getPost = async (postId) => {
 
 export const getPosts = async (username, offset = 0) => {
   try {
-    const response = await axios.get(`/user/${username}/posts/${offset}`);
+    const response = await axios.get(`/api/user/${username}/posts/${offset}`);
     return response.data;
   } catch (err) {
     throw new Error(err);
@@ -33,7 +33,7 @@ export const getPosts = async (username, offset = 0) => {
  */
 export const votePost = async (postId, authToken) => {
   try {
-    await axios.post(`/post/${postId}/vote`, null, {
+    await axios.post(`/api/post/${postId}/vote`, null, {
       headers: { authorization: authToken },
     });
   } catch (err) {
@@ -49,10 +49,28 @@ export const votePost = async (postId, authToken) => {
  */
 export const createPost = async (formData, authToken) => {
   try {
-    await axios.post('/post', formData, {
+    await axios.post('/api/post', formData, {
       headers: {
         authorization: authToken,
         'Content-Type': 'multipart/form-data',
+      },
+    });
+  } catch (err) {
+    throw new Error(err);
+  }
+};
+
+/**
+ * Deletes a post
+ * @function deletePost
+ * @param {string} postId The id of the post to delete
+ * @param {string} authToken A user's auth token
+ */
+export const deletePost = async (postId, authToken) => {
+  try {
+    await axios.delete(`/api/post/${postId}`, {
+      headers: {
+        authorization: authToken,
       },
     });
   } catch (err) {

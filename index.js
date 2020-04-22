@@ -4,6 +4,8 @@ const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
+const compression = require('compression');
+const path = require('path');
 require('dotenv').config();
 
 const apiRouter = require('./routes');
@@ -24,6 +26,15 @@ app.use((err, req, res, next) => {
   if (!err.statusCode) err.statusCode = 500;
   res.status(err.statusCode).send({ error: err.message });
 });
+
+if (process.env.NODE_ENV === 'production') {
+  app.use(compression());
+  app.use(express.static(path.join(__dirname, 'client/build')));
+
+  app.get('*', function (req, res) {
+    res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
+  });
+}
 
 (async function () {
   try {

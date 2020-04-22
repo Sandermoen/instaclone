@@ -20,10 +20,8 @@ const Modal = memo(({ component, hideModal, ...additionalProps }) => {
     };
     el.addEventListener('click', hide, false);
     modalRoot.appendChild(el);
-    document.querySelector('body').setAttribute('style', 'overflow: hidden;');
 
     return () => {
-      document.querySelector('body').setAttribute('style', '');
       el.removeEventListener('click', hide, false);
       modalRoot.removeChild(el);
     };

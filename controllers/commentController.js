@@ -277,9 +277,9 @@ module.exports.retrieveCommentReplies = async (req, res, next) => {
 };
 
 module.exports.retrieveComments = async (req, res, next) => {
-  const { postId, offset } = req.params;
+  const { postId, offset, exclude } = req.params;
   try {
-    const comments = await retrieveComments(postId, offset);
+    const comments = await retrieveComments(postId, offset, exclude);
     return res.send(comments);
   } catch (err) {
     next(err);

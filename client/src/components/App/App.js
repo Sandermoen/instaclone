@@ -15,12 +15,22 @@ export function UnconnectedApp({ signInStart, modal }) {
       signInStart(null, null, token);
     }
   }, [signInStart, token]);
+
+  const renderModals = () => {
+    if (modal.modals.length > 0) {
+      // Disable scrolling on the body while a modal is active
+      document.querySelector('body').setAttribute('style', 'overflow: hidden;');
+      return modal.modals.map((modal, idx) => (
+        <Modal key={idx} component={modal.component} {...modal.props} />
+      ));
+    } else {
+      document.querySelector('body').setAttribute('style', '');
+    }
+  };
+
   return (
     <div className="app" data-test="component-app">
-      {modal.modals.length > 0 &&
-        modal.modals.map((modal, idx) => (
-          <Modal key={idx} component={modal.component} {...modal.props} />
-        ))}
+      {renderModals()}
       <Switch>
         {!token && (
           <Route path="/login">
@@ -33,12 +43,12 @@ export function UnconnectedApp({ signInStart, modal }) {
   );
 }
 
-const mapStateToProps = state => ({
-  modal: state.modal
+const mapStateToProps = (state) => ({
+  modal: state.modal,
 });
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
   signInStart: (usernameOrEmail, password, token) =>
-    dispatch(signInStart(usernameOrEmail, password, token))
+    dispatch(signInStart(usernameOrEmail, password, token)),
 });
 export default connect(mapStateToProps, mapDispatchToProps)(UnconnectedApp);

@@ -8,16 +8,23 @@ const ObjectId = require('mongoose').Types.ObjectId;
  * @param {number} offset The amount of comments to skip
  * @returns {array} Array of comments
  */
-module.exports.retrieveComments = async (postId, offset) => {
+module.exports.retrieveComments = async (postId, offset, exclude = 0) => {
   try {
     const commentsAggregation = await Comment.aggregate([
       {
         $facet: {
           comments: [
             { $match: { post: ObjectId(postId) } },
+            // Sort the newest comments to the top
+            { $sort: { date: -1 } },
+            // Skip the comments we do not want
+            // This is desireable in the even that a comment has been created
+            // and stored locally, we'd not want duplicate comments
+            { $skip: Number(exclude) },
+            // Re-sort the comments to an ascending order
+            { $sort: { date: 1 } },
             { $skip: Number(offset) },
             { $limit: 10 },
-            { $sort: { date: 1 } },
             {
               $lookup: {
                 from: 'commentreplies',

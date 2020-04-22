@@ -14,25 +14,24 @@ const LoginForm = ({ signInStart, error }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleSubmit = event => {
+  const handleSubmit = (event) => {
     event.preventDefault();
     signInStart(email, password);
-    console.log('submitted');
   };
 
   return (
     <Fragment>
-      <form onSubmit={event => handleSubmit(event)} className="login-form">
+      <form onSubmit={(event) => handleSubmit(event)} className="login-form">
         <FormInput
           placeholder="Username or email address"
           type="email"
-          onChange={e => setEmail(e.target.value)}
+          onChange={(e) => setEmail(e.target.value)}
           required
         />
         <FormInput
           placeholder="Password"
           type="password"
-          onChange={e => setPassword(e.target.value)}
+          onChange={(e) => setPassword(e.target.value)}
           required
         />
         <Button>Login</Button>
@@ -47,15 +46,15 @@ const LoginForm = ({ signInStart, error }) => {
 };
 
 LoginForm.propTypes = {
-  signInStart: PropTypes.func.isRequired
+  signInStart: PropTypes.func.isRequired,
 };
 
-const mapDispatchToProps = dispatch => ({
-  signInStart: (email, password) => dispatch(signInStart(email, password))
+const mapDispatchToProps = (dispatch) => ({
+  signInStart: (email, password) => dispatch(signInStart(email, password)),
 });
 
 const mapStateToProps = createStructuredSelector({
-  error: selectError
+  error: selectError,
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(LoginForm);

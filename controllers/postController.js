@@ -52,6 +52,30 @@ module.exports.createPost = async (req, res, next) => {
   );
 };
 
+module.exports.deletePost = async (req, res, next) => {
+  const { postId } = req.params;
+  const user = res.locals.user;
+
+  try {
+    const post = await Post.findOne({ _id: postId, author: user._id });
+    if (!post) {
+      return res.status(404).send({
+        error: 'Could not find a post with that id associated with the user.',
+      });
+    }
+    // This uses pre hooks to delete everything associated with this post i.e comments
+    const postDelete = await Post.deleteOne({
+      _id: postId,
+    });
+    if (!postDelete.deletedCount) {
+      return res.status(500).send({ error: 'Could not delete the post.' });
+    }
+    res.status(204).send();
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports.retrievePost = async (req, res, next) => {
   const { postId } = req.params;
   try {

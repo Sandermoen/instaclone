@@ -6,7 +6,7 @@
     "node": "12.14.1",
     "npm": "6.13.7"
   },
-  "proxy": "http://localhost:9000/api",
+  "proxy": "http://localhost:9000",
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.4.0",

@@ -23,6 +23,7 @@
     "bcrypt": "^3.0.8",
     "body-parser": "^1.19.0",
     "cloudinary": "^1.21.0",
+    "compression": "^1.7.4",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-rate-limit": "^5.1.1",

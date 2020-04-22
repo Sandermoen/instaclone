@@ -4,35 +4,36 @@ import axios from 'axios';
 const signOut = () => {
   localStorage.removeItem('token');
   return {
-    type: userTypes.SIGN_OUT
+    type: userTypes.SIGN_OUT,
   };
 };
 
-export const signInSuccess = user => {
+export const signInSuccess = (user) => {
   localStorage.setItem('token', user.token);
   return {
     type: userTypes.SIGN_IN_SUCCESS,
-    payload: user
+    payload: user,
   };
 };
 
-export const signInFailure = err => ({
+export const signInFailure = (err) => ({
   type: userTypes.SIGN_IN_FAILURE,
-  payload: err
+  payload: err,
 });
 
-export const signInStart = (
-  usernameOrEmail,
-  password,
-  authToken
-) => async dispatch => {
+export const signInStart = (usernameOrEmail, password, authToken) => async (
+  dispatch
+) => {
   const request =
     usernameOrEmail && password
       ? { data: { usernameOrEmail, password } }
       : { headers: { authorization: authToken } };
   try {
     dispatch({ type: userTypes.SIGN_IN_START });
-    const response = await axios('/auth/login', { method: 'POST', ...request });
+    const response = await axios('/api/auth/login', {
+      method: 'POST',
+      ...request,
+    });
     dispatch(signInSuccess(response.data));
   } catch (err) {
     if (authToken) dispatch(signOut);
@@ -40,14 +41,14 @@ export const signInStart = (
   }
 };
 
-export const bookmarkPost = (postId, authToken) => async dispatch => {
+export const bookmarkPost = (postId, authToken) => async (dispatch) => {
   try {
-    const response = await axios.post(`/user/${postId}/bookmark`, null, {
-      headers: { authorization: authToken }
+    const response = await axios.post(`/api/user/${postId}/bookmark`, null, {
+      headers: { authorization: authToken },
     });
     dispatch({
       type: userTypes.BOOKMARK_POST,
-      payload: { ...response.data, postId }
+      payload: { ...response.data, postId },
     });
   } catch (err) {
     console.warn(err);

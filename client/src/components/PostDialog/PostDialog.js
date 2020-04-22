@@ -1,11 +1,19 @@
-import React, { useEffect, useReducer, Fragment, useRef } from 'react';
+import React, {
+  useEffect,
+  useReducer,
+  Fragment,
+  useRef,
+  useState,
+} from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 
 import { selectToken, selectCurrentUser } from '../../redux/user/userSelectors';
 
-import { getPost } from '../../services/postService';
+import { showModal, hideModal } from '../../redux/modal/modalActions';
+
+import { getPost, deletePost } from '../../services/postService';
 import { getComments } from '../../services/commentService';
 
 import Avatar from '../Avatar/Avatar';
@@ -23,6 +31,8 @@ const PostDialog = ({
   token,
   currentUser,
   profileDispatch,
+  showModal,
+  hideModal,
 }) => {
   const commentsRef = useRef();
   const [state, dispatch] = useReducer(postDialogReducer, INITIAL_STATE);
@@ -40,9 +50,25 @@ const PostDialog = ({
 
   const fetchAdditionalComments = async () => {
     try {
-      const commentData = await getComments(postId, state.data.comments.length);
-      console.log(commentData);
+      const commentData = await getComments(
+        postId,
+        state.data.comments.length,
+        state.localStateComments.size
+      );
       dispatch({ type: 'ADD_COMMENT', payload: commentData.comments });
+    } catch (err) {
+      console.warn(err);
+    }
+  };
+
+  const handleDeletePost = async () => {
+    try {
+      await deletePost(postId, token);
+      profileDispatch({
+        type: 'DELETE_POST',
+        payload: postId,
+      });
+      hideModal('PostDialog');
     } catch (err) {
       console.warn(err);
     }
@@ -82,10 +108,34 @@ const PostDialog = ({
             </p>
           )}
           {!state.fetching && (
-            <div style={{ cursor: 'pointer' }} className="post-dialog__more">
-              <div className="icon icon--small">
-                <Icon icon="ellipsis-horizontal" />
-              </div>
+            <div
+              onClick={() =>
+                showModal(
+                  {
+                    options:
+                      currentUser.username === username
+                        ? [
+                            {
+                              text: 'Go to post',
+                            },
+                            {
+                              text: 'Copy link',
+                            },
+                            {
+                              text: 'Delete post',
+                              warning: true,
+                              onClick: () => handleDeletePost(),
+                            },
+                          ]
+                        : [{ text: 'Go to post' }, { text: 'Copy link' }],
+                  },
+                  'OptionsDialog'
+                )
+              }
+              style={{ cursor: 'pointer' }}
+              className="post-dialog__more"
+            >
+              <Icon className="icon--small" icon="ellipsis-horizontal" />
             </div>
           )}
         </header>
@@ -120,15 +170,17 @@ const PostDialog = ({
                   profileDispatch={profileDispatch}
                 />
               ))}
-            {state.data.comments.length < state.data.commentCount && (
-              <div style={{ padding: '2rem' }}>
+            {state.data.comments.length - state.localStateComments.size <
+              state.data.commentCount - state.localStateComments.size && (
+              <div
+                style={{ padding: '2rem', cursor: 'pointer' }}
+                onClick={() => fetchAdditionalComments()}
+              >
                 <Icon
                   style={{
                     margin: '0 auto',
-                    cursor: 'pointer',
                   }}
                   icon="add-circle-outline"
-                  onClick={() => fetchAdditionalComments()}
                 />
               </div>
             )}
@@ -187,6 +239,11 @@ const mapStateToProps = createStructuredSelector({
   currentUser: selectCurrentUser,
 });
 
+const mapDispatchToProps = (dispatch) => ({
+  showModal: (props, component) => dispatch(showModal(props, component)),
+  hideModal: (component) => dispatch(hideModal(component)),
+});
+
 PostDialog.whyDidYouRender = true;
 
-export default connect(mapStateToProps)(PostDialog);
+export default connect(mapStateToProps, mapDispatchToProps)(PostDialog);

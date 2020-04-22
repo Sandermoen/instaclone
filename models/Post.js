@@ -7,11 +7,22 @@ const PostSchema = new Schema({
   caption: String,
   date: {
     type: Date,
-    default: Date.now
+    default: Date.now,
   },
   author: {
     type: Schema.ObjectId,
-    ref: 'User'
+    ref: 'User',
+  },
+});
+
+PostSchema.pre('deleteOne', async function (next) {
+  const postId = this.getQuery()['_id'];
+  try {
+    await mongoose.model('PostVote').deleteOne({ post: postId });
+    await mongoose.model('Comment').deleteMany({ post: postId });
+    next();
+  } catch (err) {
+    next(err);
   }
 });
 
