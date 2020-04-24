@@ -1,17 +1,14 @@
-import React, {
-  useEffect,
-  useReducer,
-  Fragment,
-  useRef,
-  useState,
-} from 'react';
+import React, { useEffect, useReducer, Fragment, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
+import classNames from 'classnames';
+import { Link, useHistory } from 'react-router-dom';
 
 import { selectToken, selectCurrentUser } from '../../redux/user/userSelectors';
 
 import { showModal, hideModal } from '../../redux/modal/modalActions';
+import { showAlert } from '../../redux/alert/alertActions';
 
 import { getPost, deletePost } from '../../services/postService';
 import { getComments } from '../../services/commentService';
@@ -27,17 +24,25 @@ import { INITIAL_STATE, postDialogReducer } from './postDialogReducer';
 
 const PostDialog = ({
   postId,
-  username,
   token,
   currentUser,
   profileDispatch,
   showModal,
   hideModal,
+  showAlert,
+  style,
+  className,
 }) => {
   const commentsRef = useRef();
   const [state, dispatch] = useReducer(postDialogReducer, INITIAL_STATE);
+  const history = useHistory();
 
   useEffect(() => {
+    window.history.pushState(
+      { prevUrl: window.location.href },
+      null,
+      `/post/${postId}`
+    );
     try {
       (async function () {
         const response = await getPost(postId);
@@ -46,6 +51,12 @@ const PostDialog = ({
     } catch (err) {
       dispatch({ type: 'FETCH_POST_FAILURE', payload: err });
     }
+    return () =>
+      window.history.pushState(
+        'profile',
+        'Profile',
+        window.history.state.prevUrl
+      );
   }, [postId]);
 
   const fetchAdditionalComments = async () => {
@@ -57,7 +68,9 @@ const PostDialog = ({
       );
       dispatch({ type: 'ADD_COMMENT', payload: commentData.comments });
     } catch (err) {
-      console.warn(err);
+      showAlert('Unable to fetch additional comments.', () =>
+        fetchAdditionalComments()
+      );
     }
   };
 
@@ -70,12 +83,21 @@ const PostDialog = ({
       });
       hideModal('PostDialog');
     } catch (err) {
-      console.warn(err);
+      showAlert('Unable to delete post.', () => handleDeletePost());
     }
   };
 
+  const postDialogClassNames = classNames({
+    'post-dialog': true,
+    [className]: className,
+  });
+
   return (
-    <div className="post-dialog" data-test="component-post-dialog">
+    <div
+      className={postDialogClassNames}
+      data-test="component-post-dialog"
+      style={style}
+    >
       <Fragment>
         <div className="post-dialog__image">
           {state.fetching ? (
@@ -90,10 +112,12 @@ const PostDialog = ({
               style={{ height: '4rem', width: '4rem', borderRadius: '100px' }}
             />
           ) : (
-            <Avatar
-              className="avatar--small"
-              imageSrc={state.data.author.avatar}
-            />
+            <Link to={`/${state.data.author.username}`}>
+              <Avatar
+                className="avatar--small"
+                imageSrc={state.data.author.avatar}
+              />
+            </Link>
           )}
           {state.fetching ? (
             <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -103,35 +127,56 @@ const PostDialog = ({
               />
             </div>
           ) : (
-            <p className="heading-4 heading-4--bold">
-              <b>{username}</b>
-            </p>
+            <Link
+              style={{ textDecoration: 'none' }}
+              to={`/${state.data.author.username}`}
+            >
+              <p className="heading-4 heading-4--bold">
+                <b>{state.data.author.username}</b>
+              </p>
+            </Link>
           )}
           {!state.fetching && (
             <div
-              onClick={() =>
+              onClick={() => {
+                const options = [
+                  {
+                    text: 'Go to post',
+                    onClick: () => {
+                      hideModal('PostDialog');
+                      history.push(`/post/${postId}`);
+                    },
+                  },
+                  {
+                    text: 'Copy link',
+                    onClick: () => {
+                      navigator.clipboard
+                        .writeText(document.URL)
+                        .then(() => showAlert('Link copied to clipboard.'))
+                        .catch(() =>
+                          showAlert('Could not copy link to clipboard.')
+                        );
+                    },
+                  },
+                ];
                 showModal(
                   {
                     options:
-                      currentUser.username === username
+                      currentUser &&
+                      currentUser.username === state.data.author.username
                         ? [
-                            {
-                              text: 'Go to post',
-                            },
-                            {
-                              text: 'Copy link',
-                            },
+                            ...options,
                             {
                               text: 'Delete post',
                               warning: true,
                               onClick: () => handleDeletePost(),
                             },
                           ]
-                        : [{ text: 'Go to post' }, { text: 'Copy link' }],
+                        : options,
                   },
                   'OptionsDialog'
-                )
-              }
+                );
+              }}
               style={{ cursor: 'pointer' }}
               className="post-dialog__more"
             >
@@ -150,12 +195,12 @@ const PostDialog = ({
                 comment={{
                   message: state.data.caption,
                   avatar: state.data.author.avatar,
-                  username,
+                  username: state.data.author.username,
                 }}
-                caption
                 currentUser={currentUser}
                 token={token}
                 post={state.data}
+                caption
               />
             ) : null}
             {!state.fetching &&
@@ -228,10 +273,9 @@ const PostDialog = ({
 
 PostDialog.propTypes = {
   postId: PropTypes.string.isRequired,
-  username: PropTypes.string.isRequired,
-  token: PropTypes.string.isRequired,
-  currentUser: PropTypes.object.isRequired,
-  profileDispatch: PropTypes.func.isRequired,
+  token: PropTypes.string,
+  currentUser: PropTypes.object,
+  profileDispatch: PropTypes.func,
 };
 
 const mapStateToProps = createStructuredSelector({
@@ -242,6 +286,7 @@ const mapStateToProps = createStructuredSelector({
 const mapDispatchToProps = (dispatch) => ({
   showModal: (props, component) => dispatch(showModal(props, component)),
   hideModal: (component) => dispatch(hideModal(component)),
+  showAlert: (text, onClick) => dispatch(showAlert(text, onClick)),
 });
 
 PostDialog.whyDidYouRender = true;

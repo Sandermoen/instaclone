@@ -5,6 +5,7 @@ import ProtectedRoute from '../ProtectedRoute/ProtectedRoute';
 import Header from '../Header/Header';
 import HomePage from '../../pages/HomePage';
 import ProfilePage from '../../pages/ProfilePage';
+import PostPage from '../../pages/PostPage';
 
 /**
  * Renders routes that require a header at the top
@@ -18,7 +19,8 @@ const HeaderRoutes = () => (
       <ProtectedRoute exact path="/">
         <HomePage />
       </ProtectedRoute>
-      <Route path="/:username" component={ProfilePage} />
+      <Route exact path="/:username" component={ProfilePage} />
+      <Route path="/post/:postId" component={PostPage} />
     </Switch>
   </Fragment>
 );

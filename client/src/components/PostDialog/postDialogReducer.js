@@ -48,10 +48,11 @@ export const postDialogReducer = (state, action) => {
           (vote) => vote.author !== currentUser._id
         );
       }
-      dispatch({
-        type: 'SET_POST_VOTES_COUNT',
-        payload: { postId, votes: postVotes.votes.length },
-      });
+      dispatch &&
+        dispatch({
+          type: 'SET_POST_VOTES_COUNT',
+          payload: { postId, votes: postVotes.votes.length },
+        });
 
       return {
         ...state,

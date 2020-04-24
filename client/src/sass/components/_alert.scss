@@ -1,0 +1,12 @@
+.alert {
+  background-color: $color-black;
+  height: 4rem;
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+  z-index: 9999999999999999;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+}

@@ -11,6 +11,7 @@ import { usersListReducer, INITIAL_STATE } from './usersListReducer';
 
 import UserCard from '../UserCard/UserCard';
 import UsersListSkeleton from './UsersListSkeleton/UsersListSkeleton';
+import Icon from '../Icon/Icon';
 
 const UsersList = ({
   userId,
@@ -72,7 +73,25 @@ const UsersList = ({
       ref={componentRef}
       style={{ overflowY: 'auto' }}
     >
-      {state.fetching ? (
+      {!followersCount && !followingCount ? (
+        <div style={{ padding: '2rem', textAlign: 'center' }}>
+          <Icon
+            style={{ margin: '0 auto' }}
+            className="icon--larger"
+            icon="person-add-outline"
+          />
+          <h2 className="heading-2 font-thin">
+            {following
+              ? 'People the user follows'
+              : 'People who follow the user'}
+          </h2>
+          <h4 className="heading-4 font-medium">
+            {following
+              ? "Once the user follows somebody, you'll see them here."
+              : "Once somebody follows the user, you'll see them here"}
+          </h4>
+        </div>
+      ) : state.fetching ? (
         <UsersListSkeleton />
       ) : (
         state.data.map((user, idx) => (

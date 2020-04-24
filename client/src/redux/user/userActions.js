@@ -51,6 +51,6 @@ export const bookmarkPost = (postId, authToken) => async (dispatch) => {
       payload: { ...response.data, postId },
     });
   } catch (err) {
-    console.warn(err);
+    return err;
   }
 };

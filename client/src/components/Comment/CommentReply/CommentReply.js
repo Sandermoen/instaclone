@@ -30,6 +30,7 @@ const CommentReply = ({
   profileDispatch,
   showModal,
   hideModal,
+  showAlert,
 }) => {
   const commentReplyRef = useRef();
   const [commentPostTime, setCommentPostTime] = useState(() =>
@@ -51,7 +52,9 @@ const CommentReply = ({
       });
       await voteCommentReply(comment._id, token);
     } catch (err) {
-      console.warn(err);
+      showAlert('Could not vote on the comment.', () =>
+        handleCommentReplyVote()
+      );
     }
   };
 
@@ -70,7 +73,9 @@ const CommentReply = ({
       });
       await deleteCommentReply(comment._id, token);
     } catch (err) {
-      console.warn(err);
+      showAlert("Could not get the comment's replies.", () =>
+        handleCommentReplyDelete()
+      );
     }
   };
 
@@ -105,7 +110,7 @@ const CommentReply = ({
           </Link>
           <Linkify options={linkifyOptions}>{comment.message}</Linkify>
         </p>
-        {comment.author.username === currentUser.username ? (
+        {currentUser && comment.author.username === currentUser.username ? (
           <div
             onClick={() =>
               showModal(
@@ -159,21 +164,25 @@ const CommentReply = ({
         </div>
       </div>
       <div className="comment__like">
-        <PulsatingIcon
-          toggle={
-            !!comment.commentReplyVotes.find(
-              (vote) => vote.author === currentUser._id
-            )
-          }
-          constantProps={{
-            onClick: () => handleCommentReplyVote(),
-          }}
-          toggledProps={[
-            { icon: 'heart', className: 'icon--tiny color-red' },
-            { icon: 'heart-outline', className: 'icon--tiny' },
-          ]}
-          elementRef={commentReplyRef}
-        />
+        {currentUser ? (
+          <PulsatingIcon
+            toggle={
+              !!comment.commentReplyVotes.find(
+                (vote) => vote.author === currentUser._id
+              )
+            }
+            constantProps={{
+              onClick: () => handleCommentReplyVote(),
+            }}
+            toggledProps={[
+              { icon: 'heart', className: 'icon--tiny color-red' },
+              { icon: 'heart-outline', className: 'icon--tiny' },
+            ]}
+            elementRef={commentReplyRef}
+          />
+        ) : (
+          <Icon icon="heart-outline" className="icon--tiny" />
+        )}
       </div>
     </div>
   );

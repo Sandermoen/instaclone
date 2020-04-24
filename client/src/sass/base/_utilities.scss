@@ -42,6 +42,10 @@
   color: $color-red !important;
 }
 
+.border-grey-2 {
+  border: 1px solid $color-grey-2;
+}
+
 .pulse {
   animation: pulse 300ms;
 }

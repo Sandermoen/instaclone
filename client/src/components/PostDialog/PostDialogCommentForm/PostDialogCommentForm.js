@@ -172,11 +172,11 @@ const PostDialogCommentForm = ({
 };
 
 PostDialogCommentForm.propTypes = {
-  token: PropTypes.string.isRequired,
+  token: PropTypes.string,
   postId: PropTypes.string.isRequired,
   commentsRef: PropTypes.object.isRequired,
   dialogDispatch: PropTypes.func.isRequired,
-  profileDispatch: PropTypes.func.isRequired,
+  profileDispatch: PropTypes.func,
   replying: PropTypes.oneOfType([PropTypes.bool, PropTypes.object]).isRequired,
 };
 

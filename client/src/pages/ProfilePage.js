@@ -79,7 +79,6 @@ const ProfilePage = ({ currentUser, token, showModal }) => {
       {
         postId,
         avatar: state.data.avatar,
-        username,
         profileDispatch: dispatch,
       },
       'PostDialog'

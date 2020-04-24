@@ -4,6 +4,8 @@ import { createStructuredSelector } from 'reselect';
 import { Link } from 'react-router-dom';
 
 import { hideModal, showModal } from '../../redux/modal/modalActions';
+import { showAlert } from '../../redux/alert/alertActions';
+
 import { selectCurrentUser } from '../../redux/user/userSelectors';
 
 import { followUser } from '../../services/profileService';
@@ -24,6 +26,7 @@ const UserCard = ({
   currentUser,
   followButton,
   onClick,
+  showAlert,
 }) => {
   const [isFollowing, setIsFollowing] = useState(following);
   const [loading, setLoading] = useState(false);
@@ -40,7 +43,7 @@ const UserCard = ({
         setLoading(false);
       } catch (err) {
         setLoading(false);
-        console.warn(err);
+        showAlert('Could not follow the user.', () => follow());
       }
     };
 
@@ -126,6 +129,7 @@ const UserCard = ({
 const mapDispatchToProps = (dispatch) => ({
   hideModal: (component) => dispatch(hideModal(component)),
   showModal: (props, component) => dispatch(showModal(props, component)),
+  showAlert: (text, onClick) => dispatch(showAlert(text, onClick)),
 });
 
 const mapStateToProps = createStructuredSelector({

@@ -12,6 +12,7 @@ import { linkifyOptions } from '../../utils/linkifyUtils';
 import Icon from '../Icon/Icon';
 
 import { showModal, hideModal } from '../../redux/modal/modalActions';
+import { showAlert } from '../../redux/alert/alertActions';
 
 import {
   voteComment,
@@ -35,6 +36,7 @@ const Comment = ({
   profileDispatch,
   showModal,
   hideModal,
+  showAlert,
 }) => {
   const commentRef = useRef();
   const [commentPostTime, setCommentPostTime] = useState(() =>
@@ -67,7 +69,7 @@ const Comment = ({
       });
       await voteComment(comment._id, token);
     } catch (err) {
-      console.warn(err);
+      showAlert('Could not vote on the comment.', () => handleVote());
     }
   };
 
@@ -86,7 +88,9 @@ const Comment = ({
         });
         !toggleCommentReplies && setToggleCommentReplies(true);
       } catch (err) {
-        console.warn(err);
+        showAlert("Could not get the comment's replies.", () =>
+          handleGetCommentReplies()
+        );
       }
     }
   };
@@ -105,7 +109,7 @@ const Comment = ({
       });
       await deleteComment(comment._id, token);
     } catch (err) {
-      console.warn(err);
+      showAlert('Could not delete comment.', () => handleDeleteComment());
     }
   };
 
@@ -148,7 +152,9 @@ const Comment = ({
             </Link>
             <Linkify options={linkifyOptions}>{comment.message}</Linkify>
           </p>
-          {!caption && author.username === currentUser.username ? (
+          {!caption &&
+          currentUser &&
+          author.username === currentUser.username ? (
             <div
               onClick={() =>
                 showModal(
@@ -220,21 +226,25 @@ const Comment = ({
         </div>
         {!caption && (
           <div className="comment__like">
-            <PulsatingIcon
-              toggle={
-                !!comment.commentVotes.find(
-                  (vote) => vote.author === currentUser._id
-                )
-              }
-              constantProps={{
-                onClick: () => handleVote(),
-              }}
-              toggledProps={[
-                { icon: 'heart', className: 'icon--tiny color-red' },
-                { icon: 'heart-outline', className: 'icon--tiny' },
-              ]}
-              elementRef={commentRef}
-            />
+            {currentUser ? (
+              <PulsatingIcon
+                toggle={
+                  !!comment.commentVotes.find(
+                    (vote) => vote.author === currentUser._id
+                  )
+                }
+                constantProps={{
+                  onClick: () => handleVote(),
+                }}
+                toggledProps={[
+                  { icon: 'heart', className: 'icon--tiny color-red' },
+                  { icon: 'heart-outline', className: 'icon--tiny' },
+                ]}
+                elementRef={commentRef}
+              />
+            ) : (
+              <Icon icon="heart-outline" className="icon--tiny" />
+            )}
           </div>
         )}
       </div>
@@ -251,6 +261,7 @@ const Comment = ({
               profileDispatch={profileDispatch}
               showModal={showModal}
               hideModal={hideModal}
+              showAlert={showAlert}
               key={idx}
             />
           ))
@@ -262,6 +273,7 @@ const Comment = ({
 const mapDispatchToProps = (dispatch) => ({
   hideModal: (component) => dispatch(hideModal(component)),
   showModal: (props, component) => dispatch(showModal(props, component)),
+  showAlert: (text, onClick) => dispatch(showAlert(text, onClick)),
 });
 
 Comment.propTypes = {
@@ -275,8 +287,8 @@ Comment.propTypes = {
   }).isRequired,
   caption: PropTypes.bool,
   post: PropTypes.object.isRequired,
-  token: PropTypes.string.isRequired,
-  currentUser: PropTypes.object.isRequired,
+  token: PropTypes.string,
+  currentUser: PropTypes.object,
   showModal: PropTypes.func.isRequired,
 };
 
