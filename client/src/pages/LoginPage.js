@@ -7,27 +7,24 @@ import { useHistory } from 'react-router-dom';
 import { selectCurrentUser } from '../redux/user/userSelectors';
 
 import LoginCard from '../components/LoginCard/LoginCard';
-import Card from '../components/Card/Card';
 
 const LoginPage = ({ currentUser }) => {
   let history = useHistory();
-  useEffect(() => {
-    if (currentUser) history.push('/');
-  }, [currentUser, history]);
+  if (currentUser) history.push('/');
+  useEffect(() => {}, [currentUser, history]);
   return (
     <div data-test="page-login" className="login-page">
       <LoginCard />
-      <Card>Don't have an account?</Card>
     </div>
   );
 };
 
 LoginPage.propTypes = {
-  currentUser: PropTypes.object
+  currentUser: PropTypes.object,
 };
 
 const mapStateToProps = createStructuredSelector({
-  currentUser: selectCurrentUser
+  currentUser: selectCurrentUser,
 });
 
 export default connect(mapStateToProps)(LoginPage);

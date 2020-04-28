@@ -105,15 +105,48 @@ module.exports.loginAuthentication = async (req, res, next) => {
 };
 
 module.exports.register = async (req, res, next) => {
-  const { username, email, password } = req.body;
-  if (!username || !email || !password) {
+  const { username, fullName, email, password } = req.body;
+  if (!username || !fullName || !email || !password) {
     return res.status(400).send({
       error: 'Please provide all the required information before registering.',
     });
   }
 
+  if (
+    !email.match(
+      /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    )
+  ) {
+    return res.status(400).send({ error: 'Enter a valid email address.' });
+  }
+
+  if (username.length > 30 || username.length < 3) {
+    return res.status(400).send({
+      error: 'Please choose a username between 3 and 30 characters.',
+    });
+  } else if (!username.match(/^[a-zA-Z0-9\_.]+$/)) {
+    return res.status(400).send({
+      error:
+        'A username can only contain the following: letters A-Z, numbers 0-9 and the symbols _ . ',
+    });
+  }
+
+  if (password.length < 6) {
+    return res.status(400).send({
+      error:
+        'For security purposes we require a password to be at least 6 characters.',
+    });
+  } else if (
+    !password.match(/^(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[0-9])(?=.*[a-z]).{6,}$/)
+  ) {
+    return res.status(400).send({
+      error:
+        'A password needs to have at least one uppercase letter, one lowercase letter, one special character and one number.',
+    });
+  }
+
   try {
-    const user = new User({ username, email, password });
+    const user = new User({ username, fullName, email, password });
     await user.save();
     res.status(201).send({
       user: {

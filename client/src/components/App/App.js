@@ -4,20 +4,15 @@ import { connect } from 'react-redux';
 import { useTransition } from 'react-spring';
 
 import { signInStart } from '../../redux/user/userActions';
-import { showAlert, hideAlert } from '../../redux/alert/alertActions';
+import { hideAlert } from '../../redux/alert/alertActions';
 
 import LoginPage from '../../pages/LoginPage';
+import SignUpPage from '../../pages/SignUpPage';
 import HeaderRoutes from '../../components/HeaderRoutes/HeaderRoutes';
 import Modal from '../../components/Modal/Modal';
 import Alert from '../../components/Alert/Alert';
 
-export function UnconnectedApp({
-  signInStart,
-  modal,
-  alert,
-  showAlert,
-  hideAlert,
-}) {
+export function UnconnectedApp({ signInStart, modal, alert, hideAlert }) {
   const token = localStorage.getItem('token');
   const ALERT_TIME = 10000;
   useEffect(() => {
@@ -72,11 +67,12 @@ export function UnconnectedApp({
           )
       )}
       <Switch>
-        {!token && (
-          <Route path="/login">
-            <LoginPage />
-          </Route>
-        )}
+        <Route path="/login">
+          <LoginPage />
+        </Route>
+        <Route path="/signup">
+          <SignUpPage />
+        </Route>
         <Route component={HeaderRoutes} />
       </Switch>
     </div>
@@ -91,7 +87,6 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
   signInStart: (usernameOrEmail, password, token) =>
     dispatch(signInStart(usernameOrEmail, password, token)),
-  showAlert: (text, onClick) => dispatch(showAlert(text, onClick)),
   hideAlert: () => dispatch(hideAlert()),
 });
 export default connect(mapStateToProps, mapDispatchToProps)(UnconnectedApp);

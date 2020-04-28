@@ -1,7 +1,17 @@
 import React from 'react';
+import classNames from 'classnames';
 
-const Card = ({ className, children }) => (
-  <div className={`card ${className ? className : ''}`}>{children}</div>
-);
+const Card = ({ className, style, children }) => {
+  const cardClassNames = classNames({
+    card: true,
+    [className]: className,
+  });
+
+  return (
+    <div className={cardClassNames} style={style}>
+      {children}
+    </div>
+  );
+};
 
 export default Card;

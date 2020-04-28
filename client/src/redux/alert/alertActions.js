@@ -23,8 +23,4 @@ export const showAlert = (text, onClick = null) => (dispatch, getState) => {
       payload: { text, onClick },
     });
   }
-  // return {
-  //   type: alertTypes.SHOW_ALERT,
-  //   payload: { text, onClick },
-  // };
 };

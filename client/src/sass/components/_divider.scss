@@ -1,0 +1,22 @@
+.divider {
+  display: grid;
+  grid-template-columns: 1fr min-content 1fr;
+  align-items: center;
+  grid-column-gap: 2rem;
+  padding: 2rem 0;
+
+  &::before {
+    grid-column: 1;
+    content: '';
+    background-color: currentColor;
+    height: 1px;
+    display: block;
+  }
+  &::after {
+    grid-column: 3;
+    content: '';
+    background-color: currentColor;
+    height: 1px;
+    display: block;
+  }
+}

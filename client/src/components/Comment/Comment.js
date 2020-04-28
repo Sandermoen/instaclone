@@ -98,15 +98,16 @@ const Comment = ({
   const handleDeleteComment = async () => {
     try {
       dialogDispatch({ type: 'REMOVE_COMMENT', payload: comment._id });
-      profileDispatch({
-        type: 'DECREMENT_POST_COMMENTS_COUNT',
-        payload: {
-          decrementCount: comment.commentReplies
-            ? 1 + comment.commentReplies
-            : 1,
-          postId: post._id,
-        },
-      });
+      profileDispatch &&
+        profileDispatch({
+          type: 'DECREMENT_POST_COMMENTS_COUNT',
+          payload: {
+            decrementCount: comment.commentReplies
+              ? 1 + comment.commentReplies
+              : 1,
+            postId: post._id,
+          },
+        });
       await deleteComment(comment._id, token);
     } catch (err) {
       showAlert('Could not delete comment.', () => handleDeleteComment());

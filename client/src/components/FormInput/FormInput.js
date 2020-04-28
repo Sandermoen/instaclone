@@ -1,9 +1,19 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
-const FormInput = ({ placeholder, type, onChange, required, style, id }) => {
-  const [inputType, setInputType] = useState('password');
+import Icon from '../Icon/Icon';
 
+const FormInput = ({
+  placeholder,
+  type,
+  onChange,
+  required,
+  style,
+  name,
+  fieldProps,
+  valid,
+}) => {
+  const [inputType, setInputType] = useState('password');
   const handleClick = () => {
     inputType === 'password' ? setInputType('text') : setInputType('password');
   };
@@ -11,32 +21,42 @@ const FormInput = ({ placeholder, type, onChange, required, style, id }) => {
   return (
     <div
       style={{ ...style }}
-      id={id}
       data-test="component-input"
       className="form-group"
     >
       <input
+        name={name}
         className="form-group__input"
         type={type === 'password' ? inputType : type}
         id="form-input"
         placeholder={placeholder}
         onChange={onChange}
         required={required}
+        {...fieldProps}
       />
       <span className="form-group__placeholder">{placeholder}</span>
-      {type === 'password' && (
-        <span onClick={() => handleClick()} className="form-group__toggle">
-          {inputType === 'password' ? 'Show' : 'Hide'}
-        </span>
-      )}
+      <div className="input-icons">
+        {typeof valid === 'boolean' ? (
+          valid ? (
+            <Icon className="color-grey" icon="checkmark-circle-outline" />
+          ) : (
+            <Icon className="color-red" icon="close-circle-outline" />
+          )
+        ) : null}
+        {type === 'password' && (
+          <span onClick={() => handleClick()} className="form-group__toggle">
+            {inputType === 'password' ? 'Show' : 'Hide'}
+          </span>
+        )}
+      </div>
     </div>
   );
 };
 
 FormInput.propTypes = {
   placeholder: PropTypes.string.isRequired,
-  type: PropTypes.string.isRequired,
-  onChange: PropTypes.func
+  type: PropTypes.string,
+  onChange: PropTypes.func,
 };
 
 export default FormInput;

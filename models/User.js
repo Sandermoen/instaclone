@@ -16,6 +16,10 @@ const UserSchema = new Schema({
       }
     },
   },
+  fullName: {
+    type: String,
+    required: true,
+  },
   username: {
     type: String,
     required: true,
@@ -55,7 +59,6 @@ UserSchema.pre('save', function (next) {
       if (err) return next(err);
       bcrypt.hash(this.password, salt, (err, hash) => {
         if (err) return next(err);
-        console.log(this);
         this.password = hash;
         next();
       });
@@ -68,6 +71,11 @@ UserSchema.pre('save', function (next) {
 UserSchema.pre('save', async function (next) {
   if (this.isNew) {
     try {
+      const document = await User.findOne({
+        $or: [{ email: this.email }, { username: this.username }],
+      });
+      if (document)
+        next(new Error('A user with that email or username already exists.'));
       await mongoose.model('Followers').create({ user: this._id });
       await mongoose.model('Following').create({ user: this._id });
     } catch (err) {

@@ -67,10 +67,11 @@ const CommentReply = ({
           parentCommentId: parentComment._id,
         },
       });
-      profileDispatch({
-        type: 'DECREMENT_POST_COMMENTS_COUNT',
-        payload: { decrementCount: 1, postId: post._id },
-      });
+      profileDispatch &&
+        profileDispatch({
+          type: 'DECREMENT_POST_COMMENTS_COUNT',
+          payload: { decrementCount: 1, postId: post._id },
+        });
       await deleteCommentReply(comment._id, token);
     } catch (err) {
       showAlert("Could not get the comment's replies.", () =>

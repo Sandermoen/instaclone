@@ -1,0 +1,13 @@
+.form-card {
+  padding: 2rem 4rem;
+  text-align: center;
+  & > :not(:first-child) {
+    margin-top: 1rem;
+  }
+
+  &__form {
+    & > * {
+      width: 100%;
+    }
+  }
+}

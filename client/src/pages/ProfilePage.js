@@ -147,7 +147,7 @@ const ProfilePage = ({ currentUser, token, showModal }) => {
       const {
         followers,
         following,
-        user: { avatar, username, bio },
+        user: { avatar, username, bio, fullName },
         posts,
         postCount,
       } = state.data;
@@ -162,7 +162,7 @@ const ProfilePage = ({ currentUser, token, showModal }) => {
               </div>
               <div className="profile-stats">
                 <p className="heading-3">
-                  <b>{postCount}</b> posts
+                  <b>{postCount}</b> {postCount === 1 ? 'post' : 'posts'}
                 </p>
                 <p
                   onClick={() =>
@@ -215,9 +215,11 @@ const ProfilePage = ({ currentUser, token, showModal }) => {
                 </p>
               </div>
               <div>
-                <p className="heading-3">
-                  <b>John Marston</b>
-                </p>
+                {fullName && (
+                  <p className="heading-3">
+                    <b>{fullName}</b>
+                  </p>
+                )}
                 <p className="heading-3">{bio}</p>
               </div>
             </div>

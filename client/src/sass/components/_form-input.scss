@@ -43,11 +43,7 @@
 
   &__toggle {
     cursor: pointer;
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    padding: 1rem;
+    padding: 5px;
 
     font-size: 1.2rem;
     font-weight: 700;
@@ -63,4 +59,13 @@
   &__input:placeholder-shown {
     padding: 1rem 1rem;
   }
+}
+
+.input-icons {
+  display: flex;
+  align-items: center;
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
 }

@@ -10,7 +10,7 @@ module.exports.retrieveUser = async (req, res, next) => {
   try {
     const user = await User.findOne(
       { username },
-      'username avatar bio bookmarks _id'
+      'username avatar bio bookmarks fullName _id'
     );
     if (!user) {
       return res
@@ -93,6 +93,8 @@ module.exports.retrieveUser = async (req, res, next) => {
     const followingDocument = await Following.findOne({
       user: ObjectId(user._id),
     });
+
+    console.log(user);
 
     return res.send({
       user,

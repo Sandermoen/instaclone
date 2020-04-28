@@ -22,7 +22,7 @@ const UploadMediaButton = ({ showModal }) => {
         className="icon"
         htmlFor="file-upload"
       >
-        <Icon icon="cloud-upload-outline" />
+        <Icon icon="image-outline" />
       </label>
       <input
         id="file-upload"
@@ -30,14 +30,14 @@ const UploadMediaButton = ({ showModal }) => {
         style={{ display: 'none' }}
         accept="image/*"
         // Get the first selected file
-        onChange={event => setFile(event.target.files[0])}
+        onChange={(event) => setFile(event.target.files[0])}
       />
     </Fragment>
   );
 };
 
-const mapDispatchToProps = dispatch => ({
-  showModal: (props, component) => dispatch(showModal(props, component))
+const mapDispatchToProps = (dispatch) => ({
+  showModal: (props, component) => dispatch(showModal(props, component)),
 });
 
 export default connect(null, mapDispatchToProps)(UploadMediaButton);

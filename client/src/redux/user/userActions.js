@@ -1,6 +1,9 @@
 import userTypes from './userTypes';
 import axios from 'axios';
 
+import { bookmarkPost as bookmark } from '../../services/postService';
+import { registerUser, login } from '../../services/authenticationServices';
+
 const signOut = () => {
   localStorage.removeItem('token');
   return {
@@ -24,31 +27,35 @@ export const signInFailure = (err) => ({
 export const signInStart = (usernameOrEmail, password, authToken) => async (
   dispatch
 ) => {
-  const request =
-    usernameOrEmail && password
-      ? { data: { usernameOrEmail, password } }
-      : { headers: { authorization: authToken } };
+  dispatch({ type: userTypes.SIGN_IN_START });
   try {
     dispatch({ type: userTypes.SIGN_IN_START });
-    const response = await axios('/api/auth/login', {
-      method: 'POST',
-      ...request,
-    });
-    dispatch(signInSuccess(response.data));
+    const response = await login(usernameOrEmail, password, authToken);
+    dispatch(signInSuccess(response));
   } catch (err) {
     if (authToken) dispatch(signOut);
-    dispatch(signInFailure(err.response.data));
+    dispatch(signInFailure({ error: err.message }));
+  }
+};
+
+export const signUpStart = (email, fullName, username, password) => async (
+  dispatch
+) => {
+  try {
+    dispatch({ type: userTypes.SIGN_IN_START });
+    const response = await registerUser(email, fullName, username, password);
+    dispatch(signInStart(null, null, response.token));
+  } catch (err) {
+    dispatch({ type: userTypes.SIGN_UP_FAILURE, payload: err.message });
   }
 };
 
 export const bookmarkPost = (postId, authToken) => async (dispatch) => {
   try {
-    const response = await axios.post(`/api/user/${postId}/bookmark`, null, {
-      headers: { authorization: authToken },
-    });
+    const response = await bookmark(postId, authToken);
     dispatch({
       type: userTypes.BOOKMARK_POST,
-      payload: { ...response.data, postId },
+      payload: { ...response, postId },
     });
   } catch (err) {
     return err;

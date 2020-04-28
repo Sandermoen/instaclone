@@ -43,14 +43,15 @@ const PostDialog = ({
       null,
       `/post/${postId}`
     );
-    try {
-      (async function () {
+    (async function () {
+      try {
         const response = await getPost(postId);
         dispatch({ type: 'FETCH_POST_SUCCESS', payload: response });
-      })();
-    } catch (err) {
-      dispatch({ type: 'FETCH_POST_FAILURE', payload: err });
-    }
+      } catch (err) {
+        history.push('/');
+        dispatch({ type: 'FETCH_POST_FAILURE', payload: err });
+      }
+    })();
     return () =>
       window.history.pushState(
         'profile',
@@ -77,10 +78,12 @@ const PostDialog = ({
   const handleDeletePost = async () => {
     try {
       await deletePost(postId, token);
-      profileDispatch({
-        type: 'DELETE_POST',
-        payload: postId,
-      });
+      profileDispatch
+        ? profileDispatch({
+            type: 'DELETE_POST',
+            payload: postId,
+          })
+        : history.push(`/${state.data.author.username}`);
       hideModal('PostDialog');
     } catch (err) {
       showAlert('Unable to delete post.', () => handleDeletePost());

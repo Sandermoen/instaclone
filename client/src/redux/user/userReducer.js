@@ -1,48 +1,56 @@
-import authTypes from './userTypes';
+import userTypes from './userTypes';
 
 export const INITIAL_STATE = {
   currentUser: null,
   error: false,
-  token: localStorage.getItem('token')
+  fetching: false,
+  token: localStorage.getItem('token'),
 };
 
 const userReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
-    case authTypes.SIGN_IN_SUCCESS: {
+    case userTypes.SIGN_UP_START:
+    case userTypes.SIGN_IN_START: {
+      return { ...state, error: false, fetching: true };
+    }
+    case userTypes.SIGN_IN_SUCCESS: {
       return {
         ...state,
         currentUser: action.payload.user,
         error: false,
-        token: action.payload.token
+        fetching: false,
+        token: action.payload.token,
       };
     }
-    case authTypes.SIGN_IN_FAILURE: {
+    case userTypes.SIGN_UP_FAILURE:
+    case userTypes.SIGN_IN_FAILURE: {
       return {
         ...state,
-        error: action.payload
+        fetching: false,
+        error: action.payload,
       };
     }
-    case authTypes.SIGN_OUT: {
+    case userTypes.SIGN_OUT: {
       return {
         ...state,
         currentUser: null,
-        token: null
+        token: null,
       };
     }
-    case authTypes.BOOKMARK_POST: {
+    case userTypes.BOOKMARK_POST: {
       const { operation, postId } = action.payload;
       let bookmarks = JSON.parse(JSON.stringify(state.currentUser.bookmarks));
       if (operation === 'add') {
         bookmarks.push({ post: postId });
       } else {
-        bookmarks = bookmarks.filter(bookmark => bookmark.post !== postId);
+        bookmarks = bookmarks.filter((bookmark) => bookmark.post !== postId);
       }
       return {
         ...state,
         currentUser: {
           ...state.currentUser,
-          bookmarks
-        }
+          bookmarks,
+        },
       };
     }
     default:

@@ -77,3 +77,20 @@ export const deletePost = async (postId, authToken) => {
     throw new Error(err);
   }
 };
+
+/**
+ * Toggles bookmarking a post
+ * @param {string} postId The id of the post to bookmark
+ * @param {string} authToken A user's auth token
+ * @return {object}
+ */
+export const bookmarkPost = async (postId, authToken) => {
+  try {
+    const response = await axios.post(`/api/user/${postId}/bookmark`, null, {
+      headers: { authorization: authToken },
+    });
+    return response.data;
+  } catch (err) {
+    throw new Error(err);
+  }
+};

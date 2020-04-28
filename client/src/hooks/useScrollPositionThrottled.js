@@ -36,7 +36,7 @@ const useScrollPositionThrottled = (callback, element) => {
   };
 
   // Throttle the function to improve performance
-  const handleScrollThrottled = throttle(handleScroll, 250);
+  const handleScrollThrottled = throttle(handleScroll, 20000);
   useEffect(() => {
     element
       ? element.addEventListener('scroll', handleScrollThrottled)

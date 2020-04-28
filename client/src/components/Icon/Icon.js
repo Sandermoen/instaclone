@@ -11,7 +11,7 @@ const Icon = ({ onClick, className, icon, style }) => {
 
   return (
     <animated.div style={style} onClick={onClick} className={iconClassNames}>
-      <ion-icon size="large" name={icon}></ion-icon>
+      <ion-icon size="small" name={icon}></ion-icon>
     </animated.div>
   );
 };
