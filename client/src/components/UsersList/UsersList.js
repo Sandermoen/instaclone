@@ -22,7 +22,6 @@ const UsersList = ({
 }) => {
   const [state, dispatch] = useReducer(usersListReducer, INITIAL_STATE);
   const componentRef = useRef();
-  const refer = useRef(useScrollPositionThrottled);
 
   useScrollPositionThrottled(async ({ atBottom }) => {
     const count = followingCount ? followingCount : followersCount;
@@ -34,11 +33,9 @@ const UsersList = ({
     ) {
       try {
         dispatch({ type: 'FETCH_ADDITIONAL_START' });
-        const response = await retrieveUserFollowing(
-          userId,
-          state.data.length,
-          token
-        );
+        const response = following
+          ? await retrieveUserFollowing(userId, state.data.length, token)
+          : await retrieveUserFollowers(userId, state.data.length, token);
         dispatch({ type: 'ADD_USERS', payload: response });
       } catch (err) {
         dispatch({ type: 'FETCH_FAILURE', payload: err });

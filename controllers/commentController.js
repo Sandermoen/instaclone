@@ -67,7 +67,6 @@ module.exports.deleteComment = async (req, res, next) => {
     }
     res.status(204).send();
   } catch (err) {
-    console.log(err);
     next(err);
   }
 };
@@ -168,7 +167,6 @@ module.exports.deleteCommentReply = async (req, res, next) => {
       _id: commentReplyId,
     });
     if (!commentReplyDeletion.deletedCount) {
-      console.log(commentReplyDeletion);
       return res
         .status(500)
         .send({ error: 'Could not delete the comment reply.' });

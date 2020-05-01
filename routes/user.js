@@ -9,6 +9,7 @@ const {
   retrieveFollowing,
   retrieveFollowers,
   searchUsers,
+  confirmUser,
 } = require('../controllers/userController');
 const { requireAuth, optionalAuth } = require('../controllers/authController');
 
@@ -17,6 +18,8 @@ userRouter.get('/:username/posts/:offset', retrievePosts);
 userRouter.get('/:userId/:offset/following', requireAuth, retrieveFollowing);
 userRouter.get('/:userId/:offset/followers', requireAuth, retrieveFollowers);
 userRouter.get('/:username/:offset/search', searchUsers);
+
+userRouter.put('/confirm', requireAuth, confirmUser);
 
 userRouter.post('/:postId/bookmark', requireAuth, bookmarkPost);
 userRouter.post('/:userId/follow', requireAuth, followUser);

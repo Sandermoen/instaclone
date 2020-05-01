@@ -27,7 +27,6 @@ export const signInFailure = (err) => ({
 export const signInStart = (usernameOrEmail, password, authToken) => async (
   dispatch
 ) => {
-  dispatch({ type: userTypes.SIGN_IN_START });
   try {
     dispatch({ type: userTypes.SIGN_IN_START });
     const response = await login(usernameOrEmail, password, authToken);

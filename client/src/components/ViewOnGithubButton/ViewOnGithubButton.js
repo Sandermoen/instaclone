@@ -8,6 +8,7 @@ const ViewOnGithubButton = () => (
     style={{ textDecoration: 'none' }}
     href="https://github.com/Sandermoen/instaclone"
     target="_blank"
+    rel="noopener noreferrer"
   >
     <Button
       style={{

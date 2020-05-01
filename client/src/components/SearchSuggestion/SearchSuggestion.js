@@ -16,7 +16,7 @@ const SearchSuggestion = ({ fetching, result, onClick, username }) => {
 
   useEffect(() => {
     if (result.length === offset && !shouldFetch) setShouldFetch(true);
-  }, [result]);
+  }, [result, shouldFetch]);
 
   useScrollPositionThrottled(async ({ atBottom }) => {
     if (atBottom && shouldFetch && !fetching && !fetchingAdditionalUsers) {

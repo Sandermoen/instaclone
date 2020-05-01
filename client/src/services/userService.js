@@ -15,3 +15,27 @@ export const searchUsers = async (username, offset = 0) => {
     console.warn(err);
   }
 };
+
+/**
+ * Verifies a user's email
+ * @function verifyUser
+ * @param {string} authToken A user's auth token
+ * @param {string} confirmationToken The token to verify an emailk
+ */
+export const confirmUser = async (authToken, confirmationToken) => {
+  try {
+    await axios.put(
+      '/api/user/confirm',
+      {
+        token: confirmationToken,
+      },
+      {
+        headers: {
+          authorization: authToken,
+        },
+      }
+    );
+  } catch (err) {
+    throw new Error(err);
+  }
+};

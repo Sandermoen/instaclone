@@ -1,6 +1,12 @@
+const fs = require('fs');
+const handlebars = require('handlebars');
 const jwt = require('jwt-simple');
+const crypto = require('crypto');
 const User = require('../models/User');
+const ConfirmationToken = require('../models/ConfirmationToken');
 const bcrypt = require('bcrypt');
+
+const { sendEmail } = require('./utils');
 
 module.exports.verifyJwt = (token) => {
   return new Promise(async (resolve, reject) => {
@@ -99,13 +105,14 @@ module.exports.loginAuthentication = async (req, res, next) => {
       });
     });
   } catch (err) {
-    console.log(err);
     next(err);
   }
 };
 
 module.exports.register = async (req, res, next) => {
   const { username, fullName, email, password } = req.body;
+  let user = null;
+  let confirmationToken = null;
   if (!username || !fullName || !email || !password) {
     return res.status(400).send({
       error: 'Please provide all the required information before registering.',
@@ -146,8 +153,13 @@ module.exports.register = async (req, res, next) => {
   }
 
   try {
-    const user = new User({ username, fullName, email, password });
+    user = new User({ username, fullName, email, password });
+    confirmationToken = new ConfirmationToken({
+      user: user._id,
+      token: crypto.randomBytes(20).toString('hex'),
+    });
     await user.save();
+    await confirmationToken.save();
     res.status(201).send({
       user: {
         email: user.email,
@@ -157,5 +169,23 @@ module.exports.register = async (req, res, next) => {
     });
   } catch (err) {
     next(err);
+  }
+  if (process.env.NODE_ENV === 'production') {
+    try {
+      // Sending confirmation email
+      const source = fs.readFileSync(
+        'templates/confirmationEmail.html',
+        'utf8'
+      );
+      template = handlebars.compile(source);
+      const html = template({
+        username: user.username,
+        confirmationUrl: `${process.env.HOME_URL}/confirm/${confirmationToken.token}`,
+        url: process.env.HOME_URL,
+      });
+      await sendEmail(user.email, 'Confirm your instaclone account', html);
+    } catch (err) {
+      console.log(err);
+    }
   }
 };

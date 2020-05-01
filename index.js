@@ -22,9 +22,13 @@ app.use(morgan('dev'));
 app.use('/api', apiRouter);
 
 app.use((err, req, res, next) => {
-  console.error(err.message);
   if (!err.statusCode) err.statusCode = 500;
-  res.status(err.statusCode).send({ error: err.message });
+  res.status(err.statusCode).send({
+    error:
+      err.statusCode >= 500
+        ? 'An unexpected error ocurred, please try again later.'
+        : err.message,
+  });
 });
 
 if (process.env.NODE_ENV === 'production') {

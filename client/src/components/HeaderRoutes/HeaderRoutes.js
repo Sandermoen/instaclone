@@ -6,6 +6,7 @@ import Header from '../Header/Header';
 import HomePage from '../../pages/HomePage';
 import ProfilePage from '../../pages/ProfilePage';
 import PostPage from '../../pages/PostPage';
+import ConfirmationPage from '../../pages/ConfirmationPage';
 
 /**
  * Renders routes that require a header at the top
@@ -21,6 +22,7 @@ const HeaderRoutes = () => (
       </ProtectedRoute>
       <Route exact path="/:username" component={ProfilePage} />
       <Route path="/post/:postId" component={PostPage} />
+      <ProtectedRoute path="/confirm/:token" component={ConfirmationPage} />
     </Switch>
   </Fragment>
 );

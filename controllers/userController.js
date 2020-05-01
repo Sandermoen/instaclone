@@ -2,6 +2,7 @@ const User = require('../models/User');
 const Post = require('../models/Post');
 const Followers = require('../models/Followers');
 const Following = require('../models/Following');
+const ConfirmationToken = require('../models/ConfirmationToken');
 const ObjectId = require('mongoose').Types.ObjectId;
 
 module.exports.retrieveUser = async (req, res, next) => {
@@ -93,8 +94,6 @@ module.exports.retrieveUser = async (req, res, next) => {
     const followingDocument = await Following.findOne({
       user: ObjectId(user._id),
     });
-
-    console.log(user);
 
     return res.send({
       user,
@@ -421,6 +420,28 @@ module.exports.searchUsers = async (req, res, next) => {
         .send({ error: 'Could not find any users matching the criteria.' });
     }
     return res.send(users);
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports.confirmUser = async (req, res, next) => {
+  const { token } = req.body;
+  const user = res.locals.user;
+
+  try {
+    const confirmationToken = await ConfirmationToken.findOne({
+      token,
+      user: user._id,
+    });
+    if (!confirmationToken) {
+      return res
+        .status(404)
+        .send({ error: 'Invalid or expired confirmation link.' });
+    }
+    await ConfirmationToken.deleteOne({ token, user: user._id });
+    await User.updateOne({ _id: user._id }, { confirmed: true });
+    return res.send();
   } catch (err) {
     next(err);
   }

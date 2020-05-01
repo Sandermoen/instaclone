@@ -1,5 +1,6 @@
 const Comment = require('../models/Comment');
 const ObjectId = require('mongoose').Types.ObjectId;
+const nodemailer = require('nodemailer');
 
 /**
  * Retrieves a post's comments with a specified offset
@@ -88,4 +89,23 @@ module.exports.retrieveComments = async (postId, offset, exclude = 0) => {
   } catch (err) {
     throw new Error(err);
   }
+};
+
+module.exports.sendEmail = async (to, subject, template) => {
+  const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: process.env.SMTP_PORT,
+    secure: false,
+    auth: {
+      user: process.env.EMAIL_USERNAME,
+      pass: process.env.EMAIL_PASSWORD,
+    },
+  });
+  console.log(to);
+  await transporter.sendMail({
+    from: '"Instaclone Support" <support@instaclone.net>',
+    to,
+    subject,
+    html: template,
+  });
 };
