@@ -1,0 +1,35 @@
+.settings-page {
+  min-height: 100vh;
+}
+
+.settings-card {
+  grid-column: center-start / center-end;
+  display: grid;
+  grid-template-columns: 25rem 1fr;
+
+  &__sidebar {
+    border-right: 1px solid $color-grey-2;
+    list-style-type: none;
+  }
+}
+
+.sidebar-link {
+  text-decoration: none;
+  color: $color-black;
+  font-size: 1.6rem;
+  display: block;
+  border-left: 2px solid transparent;
+
+  &--active {
+    border-left: 2px solid $color-black;
+  }
+
+  &__text {
+    padding: 1.5rem 2.5rem;
+  }
+
+  &:hover {
+    background-color: $color-grey-3;
+    border-color: $color-grey-2;
+  }
+}

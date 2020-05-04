@@ -10,7 +10,6 @@ const Modal = memo(({ component, hideModal, ...additionalProps }) => {
   const el = document.createElement('div');
   const Child = require(`../../components/${component}/${component}`).default;
   el.className = 'modal grid';
-  el.style = 'padding-top: 0;';
 
   useEffect(() => {
     const hide = ({ target }) => {

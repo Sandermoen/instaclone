@@ -31,11 +31,15 @@
 @import './components/alert';
 @import './components/divider';
 @import './components/form-card';
+@import './components/change-password-form';
 
 @import './layout/grid';
 @import './layout/header';
+@import './layout/footer';
 
 @import './pages/loginPage';
 @import './pages/HomePage';
 @import './pages/ProfilePage';
 @import './pages/signUpPage';
+@import './pages/settingsPage';
+@import './pages/loadingPage';

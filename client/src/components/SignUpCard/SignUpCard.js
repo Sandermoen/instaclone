@@ -5,8 +5,14 @@ import { Link } from 'react-router-dom';
 import { useFormik } from 'formik';
 
 import { signUpStart } from '../../redux/user/userActions';
-
 import { selectError, selectFetching } from '../../redux/user/userSelectors';
+
+import {
+  validateEmail,
+  validateFullName,
+  validateUsername,
+  validatePassword,
+} from '../../utils/validation';
 
 import Button from '../Button/Button';
 import TextButton from '../Button/TextButton/TextButton';
@@ -19,42 +25,17 @@ import ViewOnGithubButton from '../ViewOnGithubButton/ViewOnGithubButton';
 const SignUpCard = ({ signUpStart, error, fetching }) => {
   const validate = (values) => {
     const errors = {};
-    if (!values.email) {
-      errors.email = 'Enter a valid email address.';
-    } else if (
-      !values.email.match(
-        /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-      )
-    ) {
-      errors.email = 'Enter a valid email address.';
-    }
+    const emailError = validateEmail(values.email);
+    if (emailError) errors.email = emailError;
 
-    if (!values.fullName) {
-      errors.fullName = 'Enter a valid name.';
-    }
+    const fullNameError = validateFullName(values.fullName);
+    if (fullNameError) errors.fullName = fullNameError;
 
-    if (!values.username) {
-      errors.username = 'Enter a valid username.';
-    } else if (values.username.length > 30 || values.username.length < 3) {
-      errors.username = 'Please choose a username between 3 and 30 characters.';
-    } else if (!values.username.match(/^[a-zA-Z0-9\_.]+$/)) {
-      errors.username =
-        'A username can only contain the following: letters A-Z, numbers 0-9 and the symbols _ . ';
-    }
+    const usernameError = validateUsername(values.username);
+    if (usernameError) errors.username = usernameError;
 
-    if (!values.password) {
-      errors.password = 'Enter a valid password.';
-    } else if (values.password.length < 6) {
-      errors.password =
-        'For security purposes we require a password to be at least 6 characters.';
-    } else if (
-      !values.password.match(
-        /^(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[0-9])(?=.*[a-z]).{6,}$/
-      )
-    ) {
-      errors.password =
-        'A password needs to have at least one uppercase letter, one lowercase letter, one special character and one number.';
-    }
+    const passwordError = validatePassword(values.password);
+    if (passwordError) errors.password = passwordError;
     return errors;
   };
 
@@ -138,7 +119,7 @@ const SignUpCard = ({ signUpStart, error, fetching }) => {
         </form>
         <p className="error">
           {error
-            ? error
+            ? error.error
             : formik.submitCount > 0 && Object.values(formik.errors)[0]}
         </p>
         <p className="heading-5 color-grey">

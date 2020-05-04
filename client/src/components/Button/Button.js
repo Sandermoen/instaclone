@@ -15,6 +15,7 @@ const Button = ({ children, onClick, inverted, style, disabled, loading }) => {
       style={style}
       className={buttonClasses}
       onClick={loading ? () => {} : onClick}
+      type={disabled ? 'button' : 'submit'}
     >
       {loading && <Loader />}
       {children}

@@ -1,18 +1,27 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, Fragment } from 'react';
 import { Switch, Route } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { useTransition } from 'react-spring';
 
 import { signInStart } from '../../redux/user/userActions';
+import { selectCurrentUser } from '../../redux/user/userSelectors';
 import { hideAlert } from '../../redux/alert/alertActions';
 
 import LoginPage from '../../pages/LoginPage';
 import SignUpPage from '../../pages/SignUpPage';
+import LoadingPage from '../../pages/LoadingPage';
 import HeaderRoutes from '../../components/HeaderRoutes/HeaderRoutes';
 import Modal from '../../components/Modal/Modal';
 import Alert from '../../components/Alert/Alert';
+import Footer from '../../components/Footer/Footer';
 
-export function UnconnectedApp({ signInStart, modal, alert, hideAlert }) {
+export function UnconnectedApp({
+  signInStart,
+  modal,
+  alert,
+  hideAlert,
+  currentUser,
+}) {
   const token = localStorage.getItem('token');
   const ALERT_TIME = 10000;
   useEffect(() => {
@@ -55,26 +64,42 @@ export function UnconnectedApp({ signInStart, modal, alert, hideAlert }) {
     },
   });
 
+  const renderApp = () => {
+    if (!currentUser && token) {
+      return <LoadingPage />;
+    }
+    return (
+      <Fragment>
+        {renderModals()}
+        {transitions.map(
+          ({ item, props, key }) =>
+            item && (
+              <Alert key={key} style={props} onClick={alert.onClick}>
+                {alert.text}
+              </Alert>
+            )
+        )}
+        <Switch>
+          <Route path="/login">
+            <LoginPage />
+          </Route>
+          <Route path="/signup">
+            <SignUpPage />
+          </Route>
+          <Route component={HeaderRoutes} />
+        </Switch>
+        <Footer />
+      </Fragment>
+    );
+  };
+
   return (
-    <div className="app" data-test="component-app">
-      {renderModals()}
-      {transitions.map(
-        ({ item, props, key }) =>
-          item && (
-            <Alert key={key} style={props} onClick={alert.onClick}>
-              {alert.text}
-            </Alert>
-          )
-      )}
-      <Switch>
-        <Route path="/login">
-          <LoginPage />
-        </Route>
-        <Route path="/signup">
-          <SignUpPage />
-        </Route>
-        <Route component={HeaderRoutes} />
-      </Switch>
+    <div
+      className="app"
+      data-test="component-app"
+      style={{ minHeight: '100vh', position: 'relative' }}
+    >
+      {renderApp()}
     </div>
   );
 }
@@ -82,6 +107,7 @@ export function UnconnectedApp({ signInStart, modal, alert, hideAlert }) {
 const mapStateToProps = (state) => ({
   modal: state.modal,
   alert: state.alert,
+  currentUser: selectCurrentUser(state),
 });
 
 const mapDispatchToProps = (dispatch) => ({

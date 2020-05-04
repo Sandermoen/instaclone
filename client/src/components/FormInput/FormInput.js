@@ -20,7 +20,7 @@ const FormInput = ({
 
   return (
     <div
-      style={{ ...style }}
+      style={{ ...style, marginBottom: !placeholder ? '0' : '0.5rem' }}
       data-test="component-input"
       className="form-group"
     >
@@ -33,6 +33,7 @@ const FormInput = ({
         onChange={onChange}
         required={required}
         {...fieldProps}
+        style={!placeholder ? { padding: '1rem' } : {}}
       />
       <span className="form-group__placeholder">{placeholder}</span>
       <div className="input-icons">

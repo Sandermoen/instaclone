@@ -5,7 +5,7 @@ const CommentReplyVote = require('../models/CommentReplyVote');
 const Post = require('../models/Post');
 const ObjectId = require('mongoose').Types.ObjectId;
 
-const { retrieveComments } = require('./utils');
+const { retrieveComments } = require('../utils/controllerUtils');
 
 module.exports.createComment = async (req, res, next) => {
   const { postId } = req.params;

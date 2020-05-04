@@ -1,7 +1,7 @@
 import React, { useReducer, useEffect, Fragment } from 'react';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 
 import { selectCurrentUser, selectToken } from '../redux/user/userSelectors';
 
@@ -90,7 +90,9 @@ const ProfilePage = ({ currentUser, token, showModal }) => {
       if (currentUser.username === username) {
         return (
           <Fragment>
-            <Button inverted>Edit Profile</Button>
+            <Link to="/settings/edit">
+              <Button inverted>Edit Profile</Button>
+            </Link>
             <div className="icon">
               <Icon icon="aperture-outline" />
             </div>

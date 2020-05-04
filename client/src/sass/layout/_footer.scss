@@ -1,0 +1,16 @@
+.footer {
+  position: absolute;
+  bottom: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: $footer-height;
+  padding: 0 25%;
+
+  &__left {
+    & > :not(:last-child) {
+      margin-right: 1.5rem;
+    }
+  }
+}

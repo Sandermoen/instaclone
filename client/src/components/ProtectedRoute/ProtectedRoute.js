@@ -12,7 +12,7 @@ const ProtectedRoute = ({ token, children, ...props }) => {
 };
 
 const mapStateToProps = createStructuredSelector({
-  token: selectToken
+  token: selectToken,
 });
 
 export default connect(mapStateToProps)(ProtectedRoute);

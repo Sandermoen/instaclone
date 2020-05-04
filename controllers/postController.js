@@ -4,7 +4,7 @@ const PostVote = require('../models/PostVote');
 const fs = require('fs');
 const ObjectId = require('mongoose').Types.ObjectId;
 
-const { retrieveComments } = require('./utils');
+const { retrieveComments } = require('../utils/controllerUtils');
 
 module.exports.createPost = async (req, res, next) => {
   const user = res.locals.user;

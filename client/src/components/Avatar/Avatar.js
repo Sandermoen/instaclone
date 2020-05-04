@@ -15,18 +15,13 @@ const Avatar = ({
   });
 
   return (
-    <div
-      style={size && { width: size, height: size }}
+    <img
       className={avatarClasses}
       onClick={onClick}
       style={style}
-    >
-      <img
-        style={size && { width: size, height: size }}
-        src={imageSrc}
-        alt="Avatar"
-      />
-    </div>
+      src={imageSrc}
+      alt="Avatar"
+    />
   );
 };
 

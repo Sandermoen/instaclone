@@ -101,7 +101,6 @@ module.exports.sendEmail = async (to, subject, template) => {
       pass: process.env.EMAIL_PASSWORD,
     },
   });
-  console.log(to);
   await transporter.sendMail({
     from: '"Instaclone Support" <support@instaclone.net>',
     to,

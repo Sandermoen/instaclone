@@ -6,7 +6,13 @@ const User = require('../models/User');
 const ConfirmationToken = require('../models/ConfirmationToken');
 const bcrypt = require('bcrypt');
 
-const { sendEmail } = require('./utils');
+const { sendEmail } = require('../utils/controllerUtils');
+const {
+  validateEmail,
+  validateFullName,
+  validateUsername,
+  validatePassword,
+} = require('../utils/validation');
 
 module.exports.verifyJwt = (token) => {
   return new Promise(async (resolve, reject) => {
@@ -18,9 +24,11 @@ module.exports.verifyJwt = (token) => {
       );
       if (user) {
         return resolve(user);
+      } else {
+        reject('Not authorized.');
       }
     } catch (err) {
-      return reject('Not authorized');
+      return reject('Not authorized.');
     }
   });
 };
@@ -113,44 +121,18 @@ module.exports.register = async (req, res, next) => {
   const { username, fullName, email, password } = req.body;
   let user = null;
   let confirmationToken = null;
-  if (!username || !fullName || !email || !password) {
-    return res.status(400).send({
-      error: 'Please provide all the required information before registering.',
-    });
-  }
 
-  if (
-    !email.match(
-      /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-    )
-  ) {
-    return res.status(400).send({ error: 'Enter a valid email address.' });
-  }
+  const usernameError = validateUsername(username);
+  if (usernameError) return res.status(400).send({ error: usernameError });
 
-  if (username.length > 30 || username.length < 3) {
-    return res.status(400).send({
-      error: 'Please choose a username between 3 and 30 characters.',
-    });
-  } else if (!username.match(/^[a-zA-Z0-9\_.]+$/)) {
-    return res.status(400).send({
-      error:
-        'A username can only contain the following: letters A-Z, numbers 0-9 and the symbols _ . ',
-    });
-  }
+  const fullNameError = validateFullName(fullName);
+  if (fullNameError) return res.status(400).send({ error: fullNameError });
 
-  if (password.length < 6) {
-    return res.status(400).send({
-      error:
-        'For security purposes we require a password to be at least 6 characters.',
-    });
-  } else if (
-    !password.match(/^(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[0-9])(?=.*[a-z]).{6,}$/)
-  ) {
-    return res.status(400).send({
-      error:
-        'A password needs to have at least one uppercase letter, one lowercase letter, one special character and one number.',
-    });
-  }
+  const emailError = validateEmail(email);
+  if (emailError) return res.status(400).send({ error: emailError });
+
+  const passwordError = validatePassword(password);
+  if (passwordError) return res.status(400).send({ error: passwordError });
 
   try {
     user = new User({ username, fullName, email, password });
@@ -187,5 +169,33 @@ module.exports.register = async (req, res, next) => {
     } catch (err) {
       console.log(err);
     }
+  }
+};
+
+module.exports.changePassword = async (req, res, next) => {
+  const { oldPassword, newPassword } = req.body;
+  const user = res.locals.user;
+  let currentPassword = undefined;
+
+  try {
+    const userDocument = await User.findById(user._id);
+    currentPassword = userDocument.password;
+
+    const result = await bcrypt.compare(oldPassword, currentPassword);
+    if (!result) {
+      return res.status('401').send({
+        error: 'Your old password was entered incorrectly, please try again.',
+      });
+    }
+
+    const newPasswordError = validatePassword(newPassword);
+    if (newPasswordError)
+      return res.status(400).send({ error: newPasswordError });
+
+    userDocument.password = newPassword;
+    await userDocument.save();
+    return res.send();
+  } catch (err) {
+    return next(err);
   }
 };

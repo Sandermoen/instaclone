@@ -1,6 +1,7 @@
 .grid {
   display: grid;
   padding-top: 12rem;
+  padding-bottom: $footer-height;
   grid-template-columns:
     [full-start] 1fr [center-start] repeat(
       8,

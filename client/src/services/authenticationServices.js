@@ -45,3 +45,29 @@ export const registerUser = async (email, fullName, username, password) => {
     throw new Error(err.response.data.error);
   }
 };
+
+/**
+ * Changes a users password
+ * @function changePassword
+ * @param {string} oldPassword The user's current password
+ * @param {string} newPassword The new password
+ * @param {string} authToken A user's auth token
+ */
+export const changePassword = async (oldPassword, newPassword, authToken) => {
+  try {
+    await axios.put(
+      '/api/auth/password',
+      {
+        oldPassword,
+        newPassword,
+      },
+      {
+        headers: {
+          authorization: authToken,
+        },
+      }
+    );
+  } catch (err) {
+    throw new Error(err.response.data.error);
+  }
+};
