@@ -4,7 +4,6 @@ import classNames from 'classnames';
 
 const Avatar = ({
   imageSrc = require('../../assets/img/default-avatar.png'),
-  size,
   className,
   onClick,
   style,

@@ -13,7 +13,7 @@ const OptionsDialog = ({
   cancelButton = true,
 }) => {
   const transitions = useTransition(true, null, {
-    from: { transform: 'scale(1.1)', opacity: 0.5 },
+    from: { transform: 'scale(1.2)', opacity: 0.5 },
     enter: { transform: 'scale(1)', opacity: 1 },
     leave: { opacity: 0 },
     config: {
@@ -40,6 +40,7 @@ const OptionsDialog = ({
         const buttonClassNames = classNames({
           'options-dialog__button': true,
           'options-dialog__button--warning': option.warning,
+          [option.className]: option.className,
         });
         return (
           <button

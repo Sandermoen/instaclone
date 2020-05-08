@@ -6,31 +6,31 @@ import Icon from '../Icon/Icon';
 const Footer = () => (
   <footer className="footer">
     <div className="footer__left">
-      <TextButton className="font-medium" small darkBlue>
+      <TextButton bold small darkBlue>
         ABOUT
       </TextButton>
-      <TextButton small darkBlue>
+      <TextButton bold small darkBlue>
         HELP
       </TextButton>
-      <TextButton small darkBlue>
+      <TextButton bold small darkBlue>
         PRESS
       </TextButton>
-      <TextButton small darkBlue>
+      <TextButton bold small darkBlue>
         API
       </TextButton>
-      <TextButton small darkBlue>
+      <TextButton bold small darkBlue>
         JOBS
       </TextButton>
-      <TextButton small darkBlue>
+      <TextButton bold small darkBlue>
         PRIVACY
       </TextButton>
-      <TextButton small darkBlue>
+      <TextButton bold small darkBlue>
         TERMS
       </TextButton>
     </div>
     <div className="footer__right">
       <h4
-        className="heading-4 color-grey font-medium"
+        className="heading-4 color-grey font-bold"
         style={{ display: 'flex', alignItems: 'center' }}
       >
         MADE WITH

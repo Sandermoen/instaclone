@@ -4,6 +4,18 @@ const Followers = require('../models/Followers');
 const Following = require('../models/Following');
 const ConfirmationToken = require('../models/ConfirmationToken');
 const ObjectId = require('mongoose').Types.ObjectId;
+const cloudinary = require('cloudinary').v2;
+const fs = require('fs');
+const crypto = require('crypto');
+
+const {
+  validateEmail,
+  validateFullName,
+  validateUsername,
+  validateBio,
+  validateWebsite,
+} = require('../utils/validation');
+const { sendConfirmationEmail } = require('../utils/controllerUtils');
 
 module.exports.retrieveUser = async (req, res, next) => {
   const { username } = req.params;
@@ -11,7 +23,7 @@ module.exports.retrieveUser = async (req, res, next) => {
   try {
     const user = await User.findOne(
       { username },
-      'username avatar bio bookmarks fullName _id'
+      'username avatar bio bookmarks fullName _id website'
     );
     if (!user) {
       return res
@@ -442,6 +454,145 @@ module.exports.confirmUser = async (req, res, next) => {
     await ConfirmationToken.deleteOne({ token, user: user._id });
     await User.updateOne({ _id: user._id }, { confirmed: true });
     return res.send();
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports.changeAvatar = async (req, res, next) => {
+  const user = res.locals.user;
+
+  if (!req.file) {
+    return res
+      .status(400)
+      .send({ error: 'Please provide the image to upload.' });
+  }
+
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+  });
+
+  try {
+    const response = await cloudinary.uploader.upload(req.file.path, {
+      width: 200,
+      height: 200,
+      gravity: 'face',
+      crop: 'thumb',
+    });
+    fs.unlinkSync(req.file.path);
+
+    const avatarUpdate = await User.updateOne(
+      { _id: user._id },
+      { avatar: response.secure_url }
+    );
+
+    if (!avatarUpdate.nModified) {
+      throw new Error('Could not update user avatar.');
+    }
+
+    return res.send({ avatar: response.secure_url });
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports.removeAvatar = async (req, res, next) => {
+  const user = res.locals.user;
+
+  try {
+    const avatarUpdate = await User.updateOne(
+      { _id: user._id },
+      { $unset: { avatar: '' } }
+    );
+    if (!avatarUpdate.nModified) {
+      next(err);
+    }
+    return res.status(204).send();
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports.updateProfile = async (req, res, next) => {
+  const user = res.locals.user;
+  const { fullName, username, website, bio, email } = req.body;
+  let confirmationToken = undefined;
+  let updatedFields = {};
+  try {
+    const userDocument = await User.findOne({ _id: user._id });
+
+    if (fullName) {
+      const fullNameError = validateFullName(fullName);
+      if (fullNameError) return res.status(400).send({ error: fullNameError });
+      userDocument.fullName = fullName;
+      updatedFields.fullName = fullName;
+    }
+
+    if (username) {
+      const usernameError = validateUsername(username);
+      if (usernameError) return res.status(400).send({ error: usernameError });
+      // Make sure the username to update to is not the current one
+      if (username !== user.username) {
+        const existingUser = await User.findOne({ username });
+        if (existingUser)
+          return res
+            .status(400)
+            .send({ error: 'Please choose another username.' });
+        userDocument.username = username;
+        updatedFields.username = username;
+      }
+    }
+
+    if (website) {
+      const websiteError = validateWebsite(website);
+      if (websiteError) return res.status(400).send({ error: websiteError });
+      if (!website.includes('http://') && !website.includes('https://')) {
+        userDocument.website = 'https://' + website;
+        updatedFields.website = 'https://' + website;
+      } else {
+        userDocument.website = website;
+        updatedFields.website = website;
+      }
+    }
+
+    if (bio) {
+      const bioError = validateBio(bio);
+      if (bioError) return res.status(400).send({ error: bioError });
+      userDocument.bio = bio;
+      updatedFields.bio = bio;
+    }
+
+    if (email) {
+      const emailError = validateEmail(email);
+      if (emailError) return res.status(400).send({ error: emailError });
+      // Make sure the email to update to is not the current one
+      if (email !== user.email) {
+        const existingUser = await User.findOne({ email });
+        if (existingUser)
+          return res
+            .status(400)
+            .send({ error: 'Please choose another email.' });
+        confirmationToken = new ConfirmationToken({
+          user: user._id,
+          token: crypto.randomBytes(20).toString('hex'),
+        });
+        await confirmationToken.save();
+        userDocument.email = email;
+        userDocument.confirmed = false;
+        updatedFields = { ...updatedFields, email, confirmed: false };
+      }
+    }
+    const updatedUser = await userDocument.save();
+    res.send(updatedFields);
+    if (email && email !== user.email) {
+      sendConfirmationEmail(
+        updatedUser.username,
+        updatedUser.email,
+        confirmationToken.token
+      );
+    }
   } catch (err) {
     next(err);
   }

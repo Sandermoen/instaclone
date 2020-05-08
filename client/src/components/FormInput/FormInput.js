@@ -4,14 +4,12 @@ import PropTypes from 'prop-types';
 import Icon from '../Icon/Icon';
 
 const FormInput = ({
-  placeholder,
   type,
-  onChange,
-  required,
   style,
-  name,
-  fieldProps,
   valid,
+  placeholder,
+  fieldProps,
+  ...additionalProps
 }) => {
   const [inputType, setInputType] = useState('password');
   const handleClick = () => {
@@ -25,15 +23,13 @@ const FormInput = ({
       className="form-group"
     >
       <input
-        name={name}
         className="form-group__input"
         type={type === 'password' ? inputType : type}
         id="form-input"
         placeholder={placeholder}
-        onChange={onChange}
-        required={required}
-        {...fieldProps}
         style={!placeholder ? { padding: '1rem' } : {}}
+        {...fieldProps}
+        {...additionalProps}
       />
       <span className="form-group__placeholder">{placeholder}</span>
       <div className="input-icons">
@@ -55,7 +51,7 @@ const FormInput = ({
 };
 
 FormInput.propTypes = {
-  placeholder: PropTypes.string.isRequired,
+  placeholder: PropTypes.string,
   type: PropTypes.string,
   onChange: PropTypes.func,
 };

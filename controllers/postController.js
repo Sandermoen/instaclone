@@ -13,7 +13,7 @@ module.exports.createPost = async (req, res, next) => {
   if (!req.file) {
     return res
       .status(400)
-      .send({ error: 'Please provide the req.file to upload.' });
+      .send({ error: 'Please provide the image to upload.' });
   }
 
   cloudinary.config({
@@ -22,34 +22,29 @@ module.exports.createPost = async (req, res, next) => {
     api_secret: process.env.CLOUDINARY_API_SECRET,
   });
 
-  cloudinary.uploader.upload(
-    req.file.path,
-    {
-      eager: [{ width: 300, height: 300, crop: 'fit' }],
-    },
-    async (err, result) => {
-      if (err) next(err);
-      if (result) {
-        try {
-          fs.unlinkSync(req.file.path);
-          const post = new Post({
-            image: result.secure_url,
-            thumbnail: result.eager[0].secure_url,
-            caption,
-            author: user._id,
-          });
-          const postVote = new PostVote({
-            post: post._id,
-          });
-          await post.save();
-          await postVote.save();
-          return res.status(201).send(result);
-        } catch (err) {
-          next(err);
-        }
-      }
-    }
-  );
+  try {
+    const response = await cloudinary.uploader.upload(req.file.path);
+
+    const splitUrl = response.secure_url.split('upload/');
+    splitUrl[0] += 'upload/w_400,h_400,c_thumb/';
+    const thumbnailUrl = splitUrl[0] + splitUrl[1];
+
+    fs.unlinkSync(req.file.path);
+    const post = new Post({
+      image: response.secure_url,
+      thumbnail: thumbnailUrl,
+      caption,
+      author: user._id,
+    });
+    const postVote = new PostVote({
+      post: post._id,
+    });
+    await post.save();
+    await postVote.save();
+    return res.status(201).send(response);
+  } catch (err) {
+    next(err);
+  }
 };
 
 module.exports.deletePost = async (req, res, next) => {

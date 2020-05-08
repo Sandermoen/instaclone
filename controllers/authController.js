@@ -6,7 +6,7 @@ const User = require('../models/User');
 const ConfirmationToken = require('../models/ConfirmationToken');
 const bcrypt = require('bcrypt');
 
-const { sendEmail } = require('../utils/controllerUtils');
+const { sendConfirmationEmail } = require('../utils/controllerUtils');
 const {
   validateEmail,
   validateFullName,
@@ -20,7 +20,7 @@ module.exports.verifyJwt = (token) => {
       const id = jwt.decode(token, process.env.JWT_SECRET).id;
       const user = await User.findOne(
         { _id: id },
-        'email username avatar bookmarks'
+        'email username avatar bookmarks bio fullName confirmed website'
       );
       if (user) {
         return resolve(user);
@@ -152,24 +152,7 @@ module.exports.register = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-  if (process.env.NODE_ENV === 'production') {
-    try {
-      // Sending confirmation email
-      const source = fs.readFileSync(
-        'templates/confirmationEmail.html',
-        'utf8'
-      );
-      template = handlebars.compile(source);
-      const html = template({
-        username: user.username,
-        confirmationUrl: `${process.env.HOME_URL}/confirm/${confirmationToken.token}`,
-        url: process.env.HOME_URL,
-      });
-      await sendEmail(user.email, 'Confirm your instaclone account', html);
-    } catch (err) {
-      console.log(err);
-    }
-  }
+  sendConfirmationEmail(user.username, user.email, confirmationToken.token);
 };
 
 module.exports.changePassword = async (req, res, next) => {

@@ -38,6 +38,10 @@ const UserSchema = new Schema({
     type: String,
     maxlength: 130,
   },
+  website: {
+    type: String,
+    maxlength: 65,
+  },
   bookmarks: [
     {
       post: {

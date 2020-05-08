@@ -65,6 +65,7 @@ export function UnconnectedApp({
   });
 
   const renderApp = () => {
+    // Wait for authentication
     if (!currentUser && token) {
       return <LoadingPage />;
     }

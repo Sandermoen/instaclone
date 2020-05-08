@@ -1,0 +1,17 @@
+.settings-form {
+  & > :not(:last-child) {
+    margin-bottom: 2rem;
+  }
+
+  &__form-group {
+    display: grid;
+    grid-template-columns: 12rem 1fr;
+    grid-column-gap: 4rem;
+    align-items: center;
+
+    & > :first-child {
+      justify-self: right;
+      text-align: right;
+    }
+  }
+}

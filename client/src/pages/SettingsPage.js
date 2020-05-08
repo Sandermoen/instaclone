@@ -4,6 +4,7 @@ import { NavLink, Switch } from 'react-router-dom';
 import ProtectedRoute from '../components/ProtectedRoute/ProtectedRoute';
 import Card from '../components/Card/Card';
 import ChangePasswordForm from '../components/ChangePasswordForm/ChangePasswordForm';
+import EditProfileForm from '../components/EditProfileForm/EditProfileForm';
 
 const SettingsPage = () => (
   <div className="settings-page grid">
@@ -24,12 +25,16 @@ const SettingsPage = () => (
           <li className="sidebar-link__text">Change Password</li>
         </NavLink>
       </ul>
-      <Switch>
-        <ProtectedRoute path="/settings/edit">Edit profile</ProtectedRoute>
-        <ProtectedRoute path="/settings/password">
-          <ChangePasswordForm />
-        </ProtectedRoute>
-      </Switch>
+      <article style={{ padding: '4rem 5rem' }}>
+        <Switch>
+          <ProtectedRoute path="/settings/edit">
+            <EditProfileForm />
+          </ProtectedRoute>
+          <ProtectedRoute path="/settings/password">
+            <ChangePasswordForm />
+          </ProtectedRoute>
+        </Switch>
+      </article>
     </Card>
   </div>
 );

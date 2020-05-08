@@ -97,7 +97,11 @@ const UserCard = ({
           style={{ cursor: 'pointer' }}
         />
       ) : (
-        <Link onClick={() => hideModal('OptionsDialog')} to={`/${username}`}>
+        <Link
+          style={{ display: 'flex' }}
+          onClick={() => hideModal('OptionsDialog')}
+          to={`/${username}`}
+        >
           <Avatar className="avatar--small" imageSrc={avatar} />
         </Link>
       )}

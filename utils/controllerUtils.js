@@ -1,6 +1,8 @@
 const Comment = require('../models/Comment');
 const ObjectId = require('mongoose').Types.ObjectId;
 const nodemailer = require('nodemailer');
+const handlebars = require('handlebars');
+const fs = require('fs');
 
 /**
  * Retrieves a post's comments with a specified offset
@@ -91,6 +93,12 @@ module.exports.retrieveComments = async (postId, offset, exclude = 0) => {
   }
 };
 
+/**
+ * @function sendEmail
+ * @param {string} to The destination email address to send an email to
+ * @param {string} subject The subject of the email
+ * @param {html} template Html to include in the email
+ */
 module.exports.sendEmail = async (to, subject, template) => {
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
@@ -107,4 +115,35 @@ module.exports.sendEmail = async (to, subject, template) => {
     subject,
     html: template,
   });
+};
+
+/**
+ * Sends a confirmation email to an email address
+ * @function sendConfirmationEmail
+ * @param {string} username The username of the user to send the email to
+ * @param {string} email The email of the user to send the email to
+ * @param {string} confirmationToken The token to use to confirm the email
+ */
+module.exports.sendConfirmationEmail = async (
+  username,
+  email,
+  confirmationToken
+) => {
+  if (process.env.NODE_ENV === 'production') {
+    try {
+      const source = fs.readFileSync(
+        'templates/confirmationEmail.html',
+        'utf8'
+      );
+      template = handlebars.compile(source);
+      const html = template({
+        username: username,
+        confirmationUrl: `${process.env.HOME_URL}/confirm/${confirmationToken}`,
+        url: process.env.HOME_URL,
+      });
+      await this.sendEmail(email, 'Confirm your instaclone account', html);
+    } catch (err) {
+      console.log(err);
+    }
+  }
 };

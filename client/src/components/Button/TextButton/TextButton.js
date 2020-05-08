@@ -3,13 +3,12 @@ import ClassNames from 'classnames';
 
 const TextButton = ({
   children,
-  onClick,
-  style,
   blue,
   darkBlue,
   bold,
   medium,
   small,
+  ...additionalProps
 }) => {
   const textButtonClassNames = ClassNames({
     'text-button': true,
@@ -20,7 +19,7 @@ const TextButton = ({
     'font-bold': bold,
   });
   return (
-    <button style={style} onClick={onClick} className={textButtonClassNames}>
+    <button {...additionalProps} className={textButtonClassNames}>
       {children}
     </button>
   );

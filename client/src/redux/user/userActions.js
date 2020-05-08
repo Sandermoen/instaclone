@@ -1,8 +1,12 @@
 import userTypes from './userTypes';
-import axios from 'axios';
 
 import { bookmarkPost as bookmark } from '../../services/postService';
 import { registerUser, login } from '../../services/authenticationServices';
+import {
+  changeAvatar,
+  removeAvatar,
+  updateProfile,
+} from '../../services/userService';
 
 const signOut = () => {
   localStorage.removeItem('token');
@@ -58,5 +62,41 @@ export const bookmarkPost = (postId, authToken) => async (dispatch) => {
     });
   } catch (err) {
     return err;
+  }
+};
+
+export const changeAvatarStart = (formData, authToken) => async (dispatch) => {
+  try {
+    dispatch({ type: userTypes.CHANGE_AVATAR_START });
+    const response = await changeAvatar(formData, authToken);
+    dispatch({
+      type: userTypes.CHANGE_AVATAR_SUCCESS,
+      payload: response.avatar,
+    });
+  } catch (err) {
+    dispatch({
+      type: userTypes.CHANGE_AVATAR_FAILURE,
+      payload: err.message,
+    });
+  }
+};
+
+export const removeAvatarStart = (authToken) => async (dispatch) => {
+  try {
+    dispatch({ type: userTypes.REMOVE_AVATAR_START });
+    await removeAvatar(authToken);
+    dispatch({ type: userTypes.REMOVE_AVATAR_SUCCESS });
+  } catch (err) {
+    dispatch({ type: userTypes.REMOVE_AVATAR_FAILURE, payload: err.message });
+  }
+};
+
+export const updateProfileStart = (authToken, updates) => async (dispatch) => {
+  try {
+    dispatch({ type: userTypes.UPDATE_PROFILE_START });
+    const response = await updateProfile(authToken, updates);
+    dispatch({ type: userTypes.UPDATE_PROFILE_SUCCESS, payload: response });
+  } catch (err) {
+    dispatch({ type: userTypes.UPDATE_PROFILE_FAILURE, payload: err.message });
   }
 };

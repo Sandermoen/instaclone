@@ -22,7 +22,7 @@ postRouter.post(
   requireAuth,
   multer({
     dest: 'temp/',
-    limits: { fieldSize: 8 * 1024 * 1024, fileSize: 500000 },
+    limits: { fieldSize: 8 * 1024 * 1024, fileSize: 1000000 },
   }).single('image'),
   createPost
 );

@@ -1,5 +1,6 @@
 const express = require('express');
 const userRouter = express.Router();
+const multer = require('multer');
 
 const {
   retrieveUser,
@@ -10,6 +11,9 @@ const {
   retrieveFollowers,
   searchUsers,
   confirmUser,
+  changeAvatar,
+  removeAvatar,
+  updateProfile,
 } = require('../controllers/userController');
 const { requireAuth, optionalAuth } = require('../controllers/authController');
 
@@ -20,6 +24,18 @@ userRouter.get('/:userId/:offset/followers', requireAuth, retrieveFollowers);
 userRouter.get('/:username/:offset/search', searchUsers);
 
 userRouter.put('/confirm', requireAuth, confirmUser);
+userRouter.put(
+  '/avatar',
+  requireAuth,
+  multer({
+    dest: 'temp/',
+    limits: { fieldSize: 8 * 1024 * 1024, fileSize: 1000000 },
+  }).single('image'),
+  changeAvatar
+);
+userRouter.put('/', requireAuth, updateProfile);
+
+userRouter.delete('/avatar', requireAuth, removeAvatar);
 
 userRouter.post('/:postId/bookmark', requireAuth, bookmarkPost);
 userRouter.post('/:userId/follow', requireAuth, followUser);

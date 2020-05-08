@@ -13,6 +13,8 @@ import Avatar from '../Avatar/Avatar';
 import FormInput from '../FormInput/FormInput';
 import Button from '../Button/Button';
 import TextButton from '../Button/TextButton/TextButton';
+import SettingsForm from '../SettingsForm/SettingsForm';
+import SettingsFormGroup from '../SettingsForm/SettingsFormGroup/SettingsFormGroup';
 
 const ChangePasswordForm = ({ currentUser, token, showAlert }) => {
   const [oldPassword, setOldPassword] = useState('');
@@ -21,7 +23,7 @@ const ChangePasswordForm = ({ currentUser, token, showAlert }) => {
   const [fetching, setFetching] = useState(false);
   useEffect(() => {
     document.title = 'Change Password • Instaclone';
-  });
+  }, []);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -45,36 +47,36 @@ const ChangePasswordForm = ({ currentUser, token, showAlert }) => {
   };
 
   return (
-    <form
-      onSubmit={(event) => handleSubmit(event)}
-      className="change-password-form"
-    >
-      <aside className="change-password-form__left">
-        <Avatar
-          className="avatar--small"
-          style={{ justifySelf: 'right' }}
-          imageSrc={currentUser.avatar}
-        />
-        <h2 className="heading-3 font-bold">Old Password</h2>
-        <h2 className="heading-3 font-bold">New Password</h2>
-        <h2 className="heading-3 font-bold">Confirm New Password</h2>
-      </aside>
-      <div className="change-password-form__right">
-        <h1 className="font-medium" style={{ fontSize: '2.5rem', gridRow: '' }}>
+    <SettingsForm onSubmit={(event) => handleSubmit(event)}>
+      <SettingsFormGroup>
+        <Avatar className="avatar--small" imageSrc={currentUser.avatar} />
+        <h1 className="font-medium" style={{ fontSize: '2.5rem' }}>
           {currentUser.username}
         </h1>
+      </SettingsFormGroup>
+      <SettingsFormGroup>
+        <label className="heading-3 font-bold">Old Password</label>
         <FormInput
           onChange={(event) => setOldPassword(event.target.value)}
           type="password"
         />
+      </SettingsFormGroup>
+      <SettingsFormGroup>
+        <label className="heading-3 font-bold">New Password</label>
         <FormInput
           onChange={(event) => setNewPassword(event.target.value)}
           type="password"
         />
+      </SettingsFormGroup>
+      <SettingsFormGroup>
+        <label className="heading-3 font-bold">Confirm New Password</label>
         <FormInput
           onChange={(event) => setConfirmNewPassword(event.target.value)}
           type="password"
         />
+      </SettingsFormGroup>
+      <SettingsFormGroup>
+        <label></label>
         <Button
           style={{ width: '15rem' }}
           loading={fetching}
@@ -86,21 +88,24 @@ const ChangePasswordForm = ({ currentUser, token, showAlert }) => {
         >
           Change Password
         </Button>
+      </SettingsFormGroup>
+      <SettingsFormGroup>
+        <label></label>
         <TextButton style={{ width: '15rem', textAlign: 'left' }} blue bold>
           Forgot Password?
         </TextButton>
-      </div>
-    </form>
+      </SettingsFormGroup>
+    </SettingsForm>
   );
 };
+
+const mapDispatchToProps = (dispatch) => ({
+  showAlert: (text, onClick) => dispatch(showAlert(text, onClick)),
+});
 
 const mapStateToProps = createStructuredSelector({
   currentUser: selectCurrentUser,
   token: selectToken,
-});
-
-const mapDispatchToProps = (dispatch) => ({
-  showAlert: (text, onClick) => dispatch(showAlert(text, onClick)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ChangePasswordForm);

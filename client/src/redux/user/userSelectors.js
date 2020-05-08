@@ -15,3 +15,13 @@ export const selectFetching = createSelector(
   [selectUser],
   (user) => user.fetching
 );
+
+export const selectFetchingAvatar = createSelector(
+  [selectUser],
+  (user) => user.fetchingAvatar
+);
+
+export const selectUpdatingProfile = createSelector(
+  [selectUser],
+  (user) => user.updatingProfile
+);

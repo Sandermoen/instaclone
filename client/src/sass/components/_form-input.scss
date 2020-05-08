@@ -27,6 +27,12 @@
     }
   }
 
+  &__textarea {
+    @extend .form-group__input;
+    resize: vertical;
+    padding: 1rem;
+  }
+
   &__placeholder {
     color: $color-grey-1;
     font-size: 1rem;

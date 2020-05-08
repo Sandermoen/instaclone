@@ -14,6 +14,7 @@ import { getPosts } from '../services/postService';
 import useScrollPositionThrottled from '../hooks/useScrollPositionThrottled';
 
 import Avatar from '../components/Avatar/Avatar';
+import ChangeAvatarButton from '../components/ChangeAvatarButton/ChangeAvatarButton';
 import Button from '../components/Button/Button';
 import ProfileCategory from '../components/ProfileCategory/ProfileCategory';
 import Icon from '../components/Icon/Icon';
@@ -149,14 +150,21 @@ const ProfilePage = ({ currentUser, token, showModal }) => {
       const {
         followers,
         following,
-        user: { avatar, username, bio, fullName },
+        user: { avatar, username, bio, website, fullName },
         posts,
         postCount,
       } = state.data;
       return (
         <Fragment>
           <header className="profile-header">
-            <Avatar imageSrc={avatar} />
+            {currentUser && currentUser.username === username ? (
+              <ChangeAvatarButton>
+                <Avatar imageSrc={currentUser.avatar} />
+              </ChangeAvatarButton>
+            ) : (
+              <Avatar imageSrc={avatar} />
+            )}
+
             <div className="profile-header__info">
               <div className="profile-buttons">
                 <h1 className="heading-1 font-thin">{username}</h1>
@@ -168,6 +176,7 @@ const ProfilePage = ({ currentUser, token, showModal }) => {
                 </p>
                 <p
                   onClick={() =>
+                    token &&
                     showModal(
                       {
                         options: [],
@@ -193,6 +202,7 @@ const ProfilePage = ({ currentUser, token, showModal }) => {
                 </p>
                 <p
                   onClick={() =>
+                    token &&
                     showModal(
                       {
                         options: [],
@@ -222,7 +232,19 @@ const ProfilePage = ({ currentUser, token, showModal }) => {
                     <b>{fullName}</b>
                   </p>
                 )}
-                <p className="heading-3">{bio}</p>
+                <p className="heading-3" style={{ whiteSpace: 'pre-wrap' }}>
+                  {bio}
+                </p>
+                {website && (
+                  <a
+                    href={website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="heading-3 link font-bold"
+                  >
+                    {website}
+                  </a>
+                )}
               </div>
             </div>
           </header>

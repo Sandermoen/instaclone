@@ -4,6 +4,8 @@ export const INITIAL_STATE = {
   currentUser: null,
   error: false,
   fetching: false,
+  fetchingAvatar: false,
+  updatingProfile: false,
   token: localStorage.getItem('token'),
 };
 
@@ -51,6 +53,56 @@ const userReducer = (state = INITIAL_STATE, action) => {
           ...state.currentUser,
           bookmarks,
         },
+      };
+    }
+    case userTypes.REMOVE_AVATAR_START:
+    case userTypes.CHANGE_AVATAR_START: {
+      return { ...state, fetchingAvatar: true };
+    }
+    case userTypes.CHANGE_AVATAR_SUCCESS: {
+      return {
+        ...state,
+        currentUser: { ...state.currentUser, avatar: action.payload },
+        fetchingAvatar: false,
+      };
+    }
+    case userTypes.REMOVE_AVATAR_FAILURE:
+    case userTypes.CHANGE_AVATAR_FAILURE: {
+      return {
+        ...state,
+        fetchingAvatar: false,
+        error: action.payload,
+      };
+    }
+    case userTypes.REMOVE_AVATAR_SUCCESS: {
+      // Removing the avatar key from the currentUser object
+      const { avatar, ...additionalKeys } = state.currentUser;
+      return {
+        ...state,
+        currentUser: { ...additionalKeys },
+        fetchingAvatar: false,
+        error: false,
+      };
+    }
+    case userTypes.UPDATE_PROFILE_START: {
+      return {
+        ...state,
+        updatingProfile: true,
+      };
+    }
+    case userTypes.UPDATE_PROFILE_SUCCESS: {
+      return {
+        ...state,
+        error: false,
+        updatingProfile: false,
+        currentUser: { ...state.currentUser, ...action.payload },
+      };
+    }
+    case userTypes.UPDATE_PROFILE_FAILURE: {
+      return {
+        ...state,
+        updatingProfile: false,
+        error: action.payload,
       };
     }
     default:
