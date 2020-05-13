@@ -115,7 +115,10 @@ const PostDialog = ({
               style={{ height: '4rem', width: '4rem', borderRadius: '100px' }}
             />
           ) : (
-            <Link to={`/${state.data.author.username}`}>
+            <Link
+              to={`/${state.data.author.username}`}
+              style={{ display: 'flex' }}
+            >
               <Avatar
                 className="avatar--small"
                 imageSrc={state.data.author.avatar}

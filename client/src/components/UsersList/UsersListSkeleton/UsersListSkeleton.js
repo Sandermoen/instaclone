@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 
 import SkeletonLoader from '../../SkeletonLoader/SkeletonLoader';
 
-const UsersListSkeleton = ({ amount = 3 }) => {
+const UsersListSkeleton = ({ amount = 3, style }) => {
   const renderSkeleton = () => {
     const skeleton = [];
     for (let i = 0; i < amount; i++) {
@@ -13,10 +13,15 @@ const UsersListSkeleton = ({ amount = 3 }) => {
             display: 'flex',
             alignItems: 'center',
             padding: '0.5rem 1.5rem',
+            ...style,
           }}
         >
           <SkeletonLoader
-            style={{ width: '40px', height: '40px', borderRadius: '100px' }}
+            style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '100px',
+            }}
           />
           <div
             style={{

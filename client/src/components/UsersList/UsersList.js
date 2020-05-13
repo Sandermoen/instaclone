@@ -12,6 +12,7 @@ import { usersListReducer, INITIAL_STATE } from './usersListReducer';
 import UserCard from '../UserCard/UserCard';
 import UsersListSkeleton from './UsersListSkeleton/UsersListSkeleton';
 import Icon from '../Icon/Icon';
+import FollowButton from '../Button/FollowButton/FollowButton';
 
 const UsersList = ({
   userId,
@@ -97,11 +98,17 @@ const UsersList = ({
             key={idx}
             avatar={user.avatar}
             username={user.username}
+            subText={user.fullName}
             userId={user._id}
             following={user.isFollowing}
-            token={token}
-            followButton
-          />
+          >
+            <FollowButton
+              userId={user._id}
+              following={user.isFollowing}
+              username={user.username}
+              avatar={user.avatar}
+            />
+          </UserCard>
         ))
       )}
       {state.fetchingAdditional && <UsersListSkeleton />}

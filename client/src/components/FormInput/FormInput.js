@@ -25,7 +25,6 @@ const FormInput = ({
       <input
         className="form-group__input"
         type={type === 'password' ? inputType : type}
-        id="form-input"
         placeholder={placeholder}
         style={!placeholder ? { padding: '1rem' } : {}}
         {...fieldProps}

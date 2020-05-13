@@ -1,5 +1,3 @@
-const fs = require('fs');
-const handlebars = require('handlebars');
 const jwt = require('jwt-simple');
 const crypto = require('crypto');
 const User = require('../models/User');

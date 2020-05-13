@@ -37,35 +37,28 @@ const SearchSuggestion = ({ fetching, result, onClick, username }) => {
     }
   }, componentRef.current);
 
+  const renderUserCard = (user, idx) => (
+    <li key={idx}>
+      <UserCard
+        username={user.username}
+        avatar={user.avatar}
+        subText={user.fullName}
+        onClick={() => onClick(user)}
+      />
+    </li>
+  );
+
   return (
     <ul ref={componentRef} className="search-suggestion">
       {fetching ? (
         <UsersListSkeleton />
       ) : (
-        result.map((user, idx) => (
-          <li key={idx}>
-            <UserCard
-              username={user.username}
-              avatar={user.avatar}
-              name={user.name}
-              onClick={() => onClick(user)}
-            />
-          </li>
-        ))
+        result.map((user, idx) => renderUserCard(user, idx))
       )}
       {fetchingAdditionalUsers ? (
         <UsersListSkeleton />
       ) : (
-        additionalUsers.map((user, idx) => (
-          <li key={idx}>
-            <UserCard
-              username={user.username}
-              avatar={user.avatar}
-              name={user.name}
-              onClick={() => onClick(user)}
-            />
-          </li>
-        ))
+        additionalUsers.map((user, idx) => renderUserCard(user, idx))
       )}
     </ul>
   );

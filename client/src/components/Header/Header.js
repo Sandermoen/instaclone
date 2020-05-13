@@ -11,6 +11,7 @@ import useScrollPositionThrottled from '../../hooks/useScrollPositionThrottled';
 import { ReactComponent as LogoCamera } from '../../assets/svg/logo-camera.svg';
 import SearchBox from '../SearchBox/SearchBox';
 import UploadMediaButton from '../UploadMediaButton/UploadMediaButton';
+import NotificationButton from '../NotificationButton/NotificationButton';
 import Button from '../Button/Button';
 import Icon from '../Icon/Icon';
 
@@ -43,20 +44,8 @@ const Header = memo(({ currentUser }) => {
         <div className="header__icons">
           {currentUser ? (
             <Fragment>
-              <NavLink
-                className="icon"
-                activeClassName="icon--active"
-                to="/oosdosoosos"
-              >
-                <Icon icon="compass-outline" />
-              </NavLink>
-              <NavLink
-                className="icon"
-                activeClassName="icon--active"
-                to="/lakopoeo"
-              >
-                <Icon icon="heart-outline" />
-              </NavLink>
+              <Icon icon="compass-outline" />
+              <NotificationButton />
               <NavLink
                 className="icon"
                 activeClassName="icon--active"

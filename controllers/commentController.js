@@ -5,12 +5,18 @@ const CommentReplyVote = require('../models/CommentReplyVote');
 const Post = require('../models/Post');
 const ObjectId = require('mongoose').Types.ObjectId;
 
-const { retrieveComments } = require('../utils/controllerUtils');
+const {
+  retrieveComments,
+  formatCloudinaryUrl,
+  sendCommentNotification,
+  sendMentionNotification,
+} = require('../utils/controllerUtils');
 
 module.exports.createComment = async (req, res, next) => {
   const { postId } = req.params;
   const { message } = req.body;
   const user = res.locals.user;
+  let post = undefined;
 
   if (!message) {
     return res
@@ -24,11 +30,11 @@ module.exports.createComment = async (req, res, next) => {
   }
 
   try {
-    const post = await Post.findById(postId);
+    post = await Post.findById(postId);
     if (!post) {
       return res
         .status(404)
-        .send({ error: 'Could not find a post with that post id' });
+        .send({ error: 'Could not find a post with that post id.' });
     }
 
     const comment = new Comment({ message, author: user._id, post: postId });
@@ -40,6 +46,21 @@ module.exports.createComment = async (req, res, next) => {
     });
   } catch (err) {
     next(err);
+  }
+
+  try {
+    // Sending comment notification
+    let image = formatCloudinaryUrl(post.image, 50);
+    sendCommentNotification(req, user, post.author, image, message, post._id);
+
+    // Find the username of the post author
+    const postDocument = await Post.findById(post._id).populate('author');
+    image = formatCloudinaryUrl(post.image, 50);
+
+    // Sending a mention notification
+    sendMentionNotification(req, message, image, postDocument, user);
+  } catch (err) {
+    console.log(err);
   }
 };
 
@@ -137,13 +158,35 @@ module.exports.createCommentReply = async (req, res, next) => {
     });
 
     await commentReply.save();
-    return res.status(201).send({
+    res.status(201).send({
       ...commentReply.toObject(),
       author: { username: user.username, avatar: user.avatar },
       commentReplyVotes: [],
     });
   } catch (err) {
     next(err);
+  }
+
+  try {
+    // Sending comment notification
+    const parentCommentDocument = await Comment.findById(parentCommentId);
+    const postDocument = await Post.findById(
+      parentCommentDocument.post
+    ).populate('author');
+    const image = formatCloudinaryUrl(postDocument.image, 50);
+
+    sendCommentNotification(
+      req,
+      user,
+      postDocument.author._id,
+      image,
+      message,
+      postDocument._id
+    );
+
+    sendMentionNotification(req, message, image, postDocument, user);
+  } catch (err) {
+    console.log(err);
   }
 };
 

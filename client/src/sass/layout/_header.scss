@@ -66,14 +66,14 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    height: 100%;
 
-    a:link,
-    a:visited {
+    & > * {
       cursor: pointer;
+    }
 
-      &:not(:last-child) {
-        margin-right: 2.5rem;
-      }
+    & > *:not(:last-child) {
+      margin-right: 2.5rem;
     }
   }
 

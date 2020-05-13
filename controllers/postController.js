@@ -1,10 +1,15 @@
 const cloudinary = require('cloudinary').v2;
 const Post = require('../models/Post');
 const PostVote = require('../models/PostVote');
+const Notification = require('../models/Notification');
+const notificationHandler = require('../handlers/notificationHandler');
 const fs = require('fs');
 const ObjectId = require('mongoose').Types.ObjectId;
 
-const { retrieveComments } = require('../utils/controllerUtils');
+const {
+  retrieveComments,
+  formatCloudinaryUrl,
+} = require('../utils/controllerUtils');
 
 module.exports.createPost = async (req, res, next) => {
   const user = res.locals.user;
@@ -24,10 +29,7 @@ module.exports.createPost = async (req, res, next) => {
 
   try {
     const response = await cloudinary.uploader.upload(req.file.path);
-
-    const splitUrl = response.secure_url.split('upload/');
-    splitUrl[0] += 'upload/w_400,h_400,c_thumb/';
-    const thumbnailUrl = splitUrl[0] + splitUrl[1];
+    const thumbnailUrl = formatCloudinaryUrl(response.secure_url, 400);
 
     fs.unlinkSync(req.file.path);
     const post = new Post({
@@ -143,9 +145,37 @@ module.exports.votePost = async (req, res, next) => {
       if (!postDislikeUpdate.nModified) {
         return res.status(500).send({ error: 'Could not vote on the post.' });
       }
+    } else {
+      // Sending a like notification
+      const post = await Post.findById(postId);
+      if (String(post.author) !== String(user._id)) {
+        // Create thumbnail link
+        const image = formatCloudinaryUrl(post.image, 50);
+        const notification = new Notification({
+          sender: user._id,
+          receiver: post.author,
+          notificationType: 'like',
+          date: Date.now(),
+          notificationData: {
+            postId,
+            image,
+          },
+        });
+
+        await notification.save();
+        notificationHandler.sendNotification(req, {
+          ...notification.toObject(),
+          sender: {
+            _id: user._id,
+            username: user.username,
+            avatar: user.avatar,
+          },
+        });
+      }
     }
     return res.send({ success: true });
   } catch (err) {
+    console.log(err);
     next(err);
   }
 };

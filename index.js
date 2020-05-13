@@ -6,6 +6,8 @@ const morgan = require('morgan');
 const mongoose = require('mongoose');
 const compression = require('compression');
 const path = require('path');
+const socketio = require('socket.io');
+const jwt = require('jwt-simple');
 require('dotenv').config();
 
 const apiRouter = require('./routes');
@@ -56,6 +58,28 @@ if (process.env.NODE_ENV === 'production') {
   }
 })();
 
-app.listen(PORT, () => {
+const expressServer = app.listen(PORT, () => {
   console.log(`Backend listening on port ${PORT}`);
+});
+
+const io = socketio(expressServer);
+app.set('socketio', io);
+console.log('Socket.io listening for connections');
+
+// Authenticate before establishing a socket connection
+io.use((socket, next) => {
+  const token = socket.handshake.query.token;
+  if (token) {
+    const user = jwt.decode(token, process.env.JWT_SECRET);
+    if (!user) {
+      return next(new Error('Not authorized.'));
+    }
+    socket.user = user;
+    return next();
+  } else {
+    return next(new Error('Not authorized.'));
+  }
+}).on('connection', (socket) => {
+  socket.join(socket.user.id);
+  console.log('socket connected:', socket.id);
 });

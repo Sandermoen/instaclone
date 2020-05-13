@@ -44,8 +44,9 @@ const OptionsDialog = ({
         });
         return (
           <button
-            onClick={() => {
+            onClick={(event) => {
               if (option.hasOwnProperty('onClick')) {
+                event.stopPropagation();
                 option.onClick();
                 hide();
               }

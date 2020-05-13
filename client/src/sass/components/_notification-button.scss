@@ -1,0 +1,49 @@
+.notification-button {
+  border: none;
+  font-family: inherit;
+  background-color: transparent;
+  display: flex;
+  align-items: center;
+  position: relative;
+  outline: none;
+  height: 100%;
+  margin: 0;
+
+  &__popup {
+    @include horizontalAbsoluteCenter;
+    display: flex;
+    align-items: center;
+    top: 120%;
+    padding: 1rem;
+    border-radius: 10px;
+    background-color: $color-red;
+    font-size: 1.5rem;
+    transform-origin: top left;
+
+    & > *:not(:last-child) {
+      margin-right: 1rem;
+    }
+
+    & > div {
+      display: flex;
+
+      & > * {
+        color: $color-white;
+        &:not(:last-child) {
+          margin-right: 5px;
+        }
+      }
+    }
+
+    &:before {
+      @include horizontalAbsoluteCenter;
+      content: '';
+      background-color: $color-red;
+      width: 2.5rem;
+      height: 1rem;
+      bottom: 98%;
+      position: absolute;
+      clip-path: polygon(50% 0, 100% 100%, 0% 100%);
+    }
+  }
+}

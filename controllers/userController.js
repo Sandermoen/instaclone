@@ -3,6 +3,8 @@ const Post = require('../models/Post');
 const Followers = require('../models/Followers');
 const Following = require('../models/Following');
 const ConfirmationToken = require('../models/ConfirmationToken');
+const Notification = require('../models/Notification');
+const notificationHandler = require('../handlers/notificationHandler');
 const ObjectId = require('mongoose').Types.ObjectId;
 const cloudinary = require('cloudinary').v2;
 const fs = require('fs');
@@ -23,7 +25,7 @@ module.exports.retrieveUser = async (req, res, next) => {
   try {
     const user = await User.findOne(
       { username },
-      'username avatar bio bookmarks fullName _id website'
+      'username fullName avatar bio bookmarks fullName _id website'
     );
     if (!user) {
       return res
@@ -267,7 +269,34 @@ module.exports.followUser = async (req, res, next) => {
       }
       return res.send({ success: true, operation: 'unfollow' });
     }
-    return res.send({ success: true, operation: 'follow' });
+
+    const notification = new Notification({
+      notificationType: 'follow',
+      sender: user._id,
+      receiver: userId,
+      date: Date.now(),
+    });
+
+    const sender = await User.findById(user._id, 'username avatar');
+    const isFollowing = await Following.findOne({
+      user: userId,
+      'following.user': user._id,
+    });
+
+    await notification.save();
+    notificationHandler.sendNotification(req, {
+      notificationType: 'follow',
+      sender: {
+        _id: sender._id,
+        username: sender.username,
+        avatar: sender.avatar,
+      },
+      receiver: userId,
+      date: notification.date,
+      isFollowing: !!isFollowing,
+    });
+
+    res.send({ success: true, operation: 'follow' });
   } catch (err) {
     next(err);
   }
@@ -325,6 +354,7 @@ const retrieveRelatedUsers = async (user, userId, offset, followers) => {
         'users._id': true,
         'users.username': true,
         'users.avatar': true,
+        'users.fullName': true,
         userFollowers: true,
       },
     },

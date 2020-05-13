@@ -3,9 +3,11 @@ import { Switch, Route } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { useTransition } from 'react-spring';
 
-import { signInStart } from '../../redux/user/userActions';
 import { selectCurrentUser } from '../../redux/user/userSelectors';
+import { signInStart } from '../../redux/user/userActions';
 import { hideAlert } from '../../redux/alert/alertActions';
+import { connectSocket } from '../../redux/socket/socketActions';
+import { fetchNotificationsStart } from '../../redux/notification/notificationActions';
 
 import LoginPage from '../../pages/LoginPage';
 import SignUpPage from '../../pages/SignUpPage';
@@ -21,12 +23,16 @@ export function UnconnectedApp({
   alert,
   hideAlert,
   currentUser,
+  connectSocket,
+  fetchNotificationsStart,
 }) {
   const token = localStorage.getItem('token');
   const ALERT_TIME = 10000;
   useEffect(() => {
     if (token) {
       signInStart(null, null, token);
+      connectSocket();
+      fetchNotificationsStart(token);
     }
   }, [signInStart, token]);
 
@@ -115,5 +121,8 @@ const mapDispatchToProps = (dispatch) => ({
   signInStart: (usernameOrEmail, password, token) =>
     dispatch(signInStart(usernameOrEmail, password, token)),
   hideAlert: () => dispatch(hideAlert()),
+  connectSocket: () => dispatch(connectSocket()),
+  fetchNotificationsStart: (authToken) =>
+    dispatch(fetchNotificationsStart(authToken)),
 });
 export default connect(mapStateToProps, mapDispatchToProps)(UnconnectedApp);
