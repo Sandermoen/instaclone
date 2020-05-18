@@ -32,32 +32,48 @@ const PostDialog = ({
   showAlert,
   style,
   className,
+  postData,
+  loading,
+  simple,
 }) => {
   const commentsRef = useRef();
   const [state, dispatch] = useReducer(postDialogReducer, INITIAL_STATE);
   const history = useHistory();
 
+  const fetching = loading !== undefined ? loading : state.fetching;
+
   useEffect(() => {
-    window.history.pushState(
-      { prevUrl: window.location.href },
-      null,
-      `/post/${postId}`
-    );
-    (async function () {
-      try {
-        const response = await getPost(postId);
-        dispatch({ type: 'FETCH_POST_SUCCESS', payload: response });
-      } catch (err) {
-        history.push('/');
-        dispatch({ type: 'FETCH_POST_FAILURE', payload: err });
+    if (!loading) {
+      // Check if the post data is already provided by another component
+      if (postData) {
+        dispatch({ type: 'FETCH_POST_SUCCESS', payload: postData });
+      } else {
+        window.history.pushState(
+          { prevUrl: window.location.href },
+          null,
+          `/post/${postId}`
+        );
+        (async function () {
+          try {
+            const response = await getPost(postId);
+            dispatch({ type: 'FETCH_POST_SUCCESS', payload: response });
+          } catch (err) {
+            history.push('/');
+            dispatch({ type: 'FETCH_POST_FAILURE', payload: err });
+          }
+        })();
       }
-    })();
-    return () =>
-      window.history.pushState(
-        'profile',
-        'Profile',
-        window.history.state.prevUrl
-      );
+    }
+
+    return () => {
+      if (window.history.state && window.history.state.prevUrl) {
+        window.history.pushState(
+          'profile',
+          'Profile',
+          window.history.state.prevUrl
+        );
+      }
+    };
   }, [postId]);
 
   const fetchAdditionalComments = async () => {
@@ -92,7 +108,28 @@ const PostDialog = ({
 
   const postDialogClassNames = classNames({
     'post-dialog': true,
+    'post-dialog--simple': simple,
     [className]: className,
+  });
+
+  const postDialogImageClassNames = classNames({
+    'post-dialog__image': true,
+    'post-dialog__image--simple': simple,
+  });
+
+  const postDialogHeaderClassNames = classNames({
+    'post-dialog__header': true,
+    'post-dialog__header--simple': simple,
+  });
+
+  const postDialogContentClassNames = classNames({
+    'post-dialog__content': true,
+    'post-dialog__content--simple': simple,
+  });
+
+  const commentsClassNames = classNames({
+    comments: true,
+    'comments--simple': simple,
   });
 
   return (
@@ -102,15 +139,15 @@ const PostDialog = ({
       style={style}
     >
       <Fragment>
-        <div className="post-dialog__image">
-          {state.fetching ? (
+        <div className={postDialogImageClassNames}>
+          {fetching ? (
             <SkeletonLoader animated />
           ) : (
             <img src={state.data.image} alt="Post" />
           )}
         </div>
-        <header className="post-dialog__header">
-          {state.fetching ? (
+        <header className={postDialogHeaderClassNames}>
+          {fetching ? (
             <SkeletonLoader
               style={{ height: '4rem', width: '4rem', borderRadius: '100px' }}
             />
@@ -125,7 +162,7 @@ const PostDialog = ({
               />
             </Link>
           )}
-          {state.fetching ? (
+          {fetching ? (
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <SkeletonLoader style={{ height: '1rem', width: '10rem' }} />
               <SkeletonLoader
@@ -142,7 +179,7 @@ const PostDialog = ({
               </p>
             </Link>
           )}
-          {!state.fetching && (
+          {!fetching && (
             <div
               onClick={() => {
                 const options = [
@@ -192,11 +229,11 @@ const PostDialog = ({
         </header>
         <div
           data-test="component-post-dialog-content"
-          className="post-dialog__content"
+          className={postDialogContentClassNames}
         >
-          <div ref={commentsRef} className="comments">
+          <div ref={commentsRef} className={commentsClassNames}>
             {/* Render a caption if there is one as a Comment component with the caption prop */}
-            {state.data.caption && !state.fetching ? (
+            {state.data.caption && !fetching ? (
               <Comment
                 comment={{
                   message: state.data.caption,
@@ -207,9 +244,10 @@ const PostDialog = ({
                 token={token}
                 post={state.data}
                 caption
+                simple={simple}
               />
             ) : null}
-            {!state.fetching &&
+            {!fetching &&
               state.data.comments.map((comment, idx) => (
                 <Comment
                   comment={comment}
@@ -219,24 +257,26 @@ const PostDialog = ({
                   key={idx}
                   dialogDispatch={dispatch}
                   profileDispatch={profileDispatch}
+                  simple={simple}
                 />
               ))}
-            {state.data.comments.length - state.localStateComments.size <
-              state.data.commentCount - state.localStateComments.size && (
-              <div
-                style={{ padding: '2rem', cursor: 'pointer' }}
-                onClick={() => fetchAdditionalComments()}
-              >
-                <Icon
-                  style={{
-                    margin: '0 auto',
-                  }}
-                  icon="add-circle-outline"
-                />
-              </div>
-            )}
+            {!postData &&
+              state.data.comments.length - state.localStateComments.size <
+                state.data.commentCount - state.localStateComments.size && (
+                <div
+                  style={{ padding: '2rem', cursor: 'pointer' }}
+                  onClick={() => fetchAdditionalComments()}
+                >
+                  <Icon
+                    style={{
+                      margin: '0 auto',
+                    }}
+                    icon="add-circle-outline"
+                  />
+                </div>
+              )}
           </div>
-          {state.fetching ? (
+          {fetching ? (
             <div
               style={{
                 display: 'flex',
@@ -259,9 +299,10 @@ const PostDialog = ({
               post={state.data}
               dispatch={dispatch}
               profileDispatch={profileDispatch}
+              simple={simple}
             />
           )}
-          {!state.fetching && (
+          {!fetching && (
             <PostDialogCommentForm
               postId={postId}
               token={token}
@@ -278,7 +319,7 @@ const PostDialog = ({
 };
 
 PostDialog.propTypes = {
-  postId: PropTypes.string.isRequired,
+  postId: PropTypes.string,
   token: PropTypes.string,
   currentUser: PropTypes.object,
   profileDispatch: PropTypes.func,

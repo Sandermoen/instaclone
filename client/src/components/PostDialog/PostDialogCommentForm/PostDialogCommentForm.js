@@ -97,10 +97,11 @@ const PostDialogCommentForm = ({
         dialogDispatch({ type: 'SET_REPLYING' });
       }
       // Increment the comment count on the overlay of the image on the profile page
-      profileDispatch({
-        type: 'INCREMENT_POST_COMMENTS_COUNT',
-        payload: postId,
-      });
+      profileDispatch &&
+        profileDispatch({
+          type: 'INCREMENT_POST_COMMENTS_COUNT',
+          payload: postId,
+        });
     } catch (err) {
       dispatch({ type: 'POST_COMMENT_FAILURE', payload: err });
     }

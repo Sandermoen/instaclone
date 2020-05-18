@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { formatDateDistance } from '../../utils/timeUtils';
 import { Link } from 'react-router-dom';
+import classNames from 'classnames';
 import Linkify from 'linkifyjs/react';
 import * as linkify from 'linkifyjs';
 import mention from 'linkifyjs/plugins/mention';
@@ -29,6 +30,7 @@ mention(linkify);
 const Comment = ({
   comment,
   caption,
+  simple,
   post,
   token,
   currentUser,
@@ -63,10 +65,11 @@ const Comment = ({
 
   const handleVote = async () => {
     try {
-      dialogDispatch({
-        type: 'VOTE_COMMENT',
-        payload: { commentId: comment._id, currentUser },
-      });
+      dialogDispatch &&
+        dialogDispatch({
+          type: 'VOTE_COMMENT',
+          payload: { commentId: comment._id, currentUser },
+        });
       await voteComment(comment._id, token);
     } catch (err) {
       showAlert('Could not vote on the comment.', () => handleVote());
@@ -125,9 +128,14 @@ const Comment = ({
     }
   };
 
+  const commentClassNames = classNames({
+    comment: true,
+    'comment--simple': simple,
+  });
+
   return (
     <Fragment>
-      <div className="comment" ref={commentRef}>
+      <div className={commentClassNames} ref={commentRef}>
         <Link
           onClick={() => hideModal('PostDialog')}
           to={`/${author.username}`}
@@ -209,7 +217,16 @@ const Comment = ({
               </Fragment>
             )}
           </div>
-          {!caption && comment.commentReplies > 0 ? (
+          {caption && post.commentData ? (
+            <Link
+              className="heading-4 color-grey font-medium"
+              style={{ textDecoration: 'none' }}
+              to={`/post/${post._id}`}
+            >
+              View all {post.commentData.commentCount} comments
+            </Link>
+          ) : null}
+          {dialogDispatch && !caption && comment.commentReplies > 0 ? (
             <p
               onClick={() => handleGetCommentReplies()}
               style={{

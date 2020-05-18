@@ -7,6 +7,11 @@
   &::-webkit-scrollbar {
     display: none;
   }
+
+  &--simple {
+    border-top: none;
+    padding-bottom: 1rem;
+  }
 }
 
 .comment {
@@ -26,6 +31,10 @@
   &__content {
     width: 100%;
     position: relative;
+
+    & > a {
+      display: none;
+    }
 
     &:hover .comment__menu-dots {
       opacity: 0.9;
@@ -54,5 +63,27 @@
     opacity: 0;
     padding: 0 5px;
     background-color: $color-white;
+  }
+
+  &--simple {
+    & > a {
+      display: none;
+    }
+
+    & .comment__stats {
+      display: none;
+    }
+
+    & > .comment__content {
+      & > a {
+        display: inline-block;
+      }
+    }
+
+    padding: 0 1.5rem;
+
+    &:nth-child(1) {
+      padding: 0 1.5rem;
+    }
   }
 }

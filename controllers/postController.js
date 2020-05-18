@@ -1,8 +1,11 @@
 const cloudinary = require('cloudinary').v2;
 const Post = require('../models/Post');
 const PostVote = require('../models/PostVote');
+const Following = require('../models/Following');
+const Followers = require('../models/Followers');
+const User = require('../models/User');
 const Notification = require('../models/Notification');
-const notificationHandler = require('../handlers/notificationHandler');
+const socketHandler = require('../handlers/socketHandler');
 const fs = require('fs');
 const ObjectId = require('mongoose').Types.ObjectId;
 
@@ -14,6 +17,7 @@ const {
 module.exports.createPost = async (req, res, next) => {
   const user = res.locals.user;
   const { caption } = req.body;
+  let post = undefined;
 
   if (!req.file) {
     return res
@@ -30,9 +34,8 @@ module.exports.createPost = async (req, res, next) => {
   try {
     const response = await cloudinary.uploader.upload(req.file.path);
     const thumbnailUrl = formatCloudinaryUrl(response.secure_url, 400);
-
     fs.unlinkSync(req.file.path);
-    const post = new Post({
+    post = new Post({
       image: response.secure_url,
       thumbnail: thumbnailUrl,
       caption,
@@ -43,9 +46,30 @@ module.exports.createPost = async (req, res, next) => {
     });
     await post.save();
     await postVote.save();
-    return res.status(201).send(response);
+    res.status(201).send(response);
   } catch (err) {
     next(err);
+  }
+
+  try {
+    // Updating followers feed with post
+    const followersDocument = await Followers.find({ user: user._id });
+    const followers = followersDocument[0].followers;
+    followers.forEach((follower) => {
+      socketHandler.sendPost(
+        req,
+        // Since the post is new there is no need to look up any fields
+        {
+          ...post.toObject(),
+          author: { username: user.username, avatar: user.avatar },
+          commentData: { commentCount: 0, comments: [] },
+          postVotes: [],
+        },
+        follower.user
+      );
+    });
+  } catch (err) {
+    console.log(err);
   }
 };
 
@@ -96,6 +120,7 @@ module.exports.retrievePost = async (req, res, next) => {
         },
       },
       { $unwind: '$author' },
+      { $unwind: '$postVotes' },
       {
         $unset: [
           'author.password',
@@ -103,6 +128,9 @@ module.exports.retrievePost = async (req, res, next) => {
           'author.private',
           'author.bio',
         ],
+      },
+      {
+        $addFields: { postVotes: '$postVotes.votes' },
       },
     ]);
     if (post.length === 0) {
@@ -163,7 +191,7 @@ module.exports.votePost = async (req, res, next) => {
         });
 
         await notification.save();
-        notificationHandler.sendNotification(req, {
+        socketHandler.sendNotification(req, {
           ...notification.toObject(),
           sender: {
             _id: user._id,
@@ -175,7 +203,159 @@ module.exports.votePost = async (req, res, next) => {
     }
     return res.send({ success: true });
   } catch (err) {
-    console.log(err);
+    next(err);
+  }
+};
+
+module.exports.retrievePostFeed = async (req, res, next) => {
+  const user = res.locals.user;
+  const { offset } = req.params;
+
+  try {
+    const followingDocument = await Following.findOne({ user: user._id });
+    if (!followingDocument) {
+      return res.status(404).send({ error: 'Could not find any posts.' });
+    }
+    const following = followingDocument.following.map(
+      (following) => following.user
+    );
+
+    // Fields to not include on the user object
+    const unwantedUserFields = [
+      'author.password',
+      'author.private',
+      'author.confirmed',
+      'author.bookmarks',
+      'author.email',
+      'author.website',
+      'author.bio',
+    ];
+
+    const posts = await Post.aggregate([
+      { $match: { author: { $in: following } } },
+      { $sort: { date: -1 } },
+      { $skip: Number(offset) },
+      { $limit: 5 },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'author',
+          foreignField: '_id',
+          as: 'author',
+        },
+      },
+      {
+        $lookup: {
+          from: 'postvotes',
+          localField: '_id',
+          foreignField: 'post',
+          as: 'postVotes',
+        },
+      },
+      {
+        $lookup: {
+          from: 'comments',
+          let: { postId: '$_id' },
+          pipeline: [
+            {
+              // Finding comments related to the postId
+              $match: {
+                $expr: {
+                  $eq: ['$post', '$$postId'],
+                },
+              },
+            },
+            { $sort: { date: -1 } },
+            { $limit: 3 },
+            // Populating the author field
+            {
+              $lookup: {
+                from: 'users',
+                localField: 'author',
+                foreignField: '_id',
+                as: 'author',
+              },
+            },
+            {
+              $lookup: {
+                from: 'commentvotes',
+                localField: '_id',
+                foreignField: 'comment',
+                as: 'commentVotes',
+              },
+            },
+            {
+              $unwind: '$author',
+            },
+            {
+              $unwind: {
+                path: '$commentVotes',
+                preserveNullAndEmptyArrays: true,
+              },
+            },
+            {
+              $unset: unwantedUserFields,
+            },
+            {
+              $addFields: {
+                commentVotes: '$commentVotes.votes',
+              },
+            },
+          ],
+          as: 'comments',
+        },
+      },
+      {
+        $lookup: {
+          from: 'comments',
+          let: { postId: '$_id' },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $eq: ['$post', '$$postId'],
+                },
+              },
+            },
+            {
+              $group: { _id: null, count: { $sum: 1 } },
+            },
+            {
+              $project: {
+                _id: false,
+              },
+            },
+          ],
+          as: 'commentCount',
+        },
+      },
+      {
+        $unwind: {
+          path: '$commentCount',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $unwind: '$postVotes',
+      },
+      {
+        $unwind: '$author',
+      },
+      {
+        $addFields: {
+          postVotes: '$postVotes.votes',
+          commentData: {
+            comments: '$comments',
+            commentCount: '$commentCount.count',
+          },
+        },
+      },
+      {
+        $unset: [...unwantedUserFields, 'comments', 'commentCount'],
+      },
+    ]);
+    return res.send(posts);
+  } catch (err) {
     next(err);
   }
 };

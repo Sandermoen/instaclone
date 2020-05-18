@@ -1,7 +1,7 @@
 export const INITIAL_STATE = {
   posting: false,
   error: false,
-  comment: ''
+  comment: '',
 };
 
 export const postDialogCommentFormReducer = (state, action) => {
@@ -14,15 +14,16 @@ export const postDialogCommentFormReducer = (state, action) => {
     }
     case 'POST_COMMENT_SUCCESS': {
       const { comment, dispatch } = action.payload;
-      dispatch({ type: 'ADD_COMMENT', payload: comment });
+      dispatch && dispatch({ type: 'ADD_COMMENT', payload: comment });
       return INITIAL_STATE;
     }
     case 'POST_COMMENT_REPLY_SUCCESS': {
       const { comment, dispatch, parentCommentId } = action.payload;
-      dispatch({
-        type: 'ADD_COMMENT_REPLY',
-        payload: { comment, parentCommentId }
-      });
+      dispatch &&
+        dispatch({
+          type: 'ADD_COMMENT_REPLY',
+          payload: { comment, parentCommentId },
+        });
       return INITIAL_STATE;
     }
     case 'SET_COMMENT': {

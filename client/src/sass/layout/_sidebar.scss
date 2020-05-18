@@ -1,0 +1,8 @@
+.sidebar {
+  grid-column: 7 / center-end;
+  padding: 2rem;
+
+  &__content {
+    position: fixed;
+  }
+}

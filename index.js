@@ -26,8 +26,9 @@ app.use('/api', apiRouter);
 app.use((err, req, res, next) => {
   if (!err.statusCode) {
     err.statusCode = 500;
-    console.log(err.message);
+    console.log(err);
   }
+  console.log(err.message);
   res.status(err.statusCode).send({
     error:
       err.statusCode >= 500

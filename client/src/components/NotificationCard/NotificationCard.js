@@ -41,7 +41,12 @@ const NotificationCard = ({
   return (
     <Card className="notification-card">
       <ul
-        style={{ listStyleType: 'none', maxHeight: '30rem', overflowY: 'auto' }}
+        style={{
+          listStyleType: 'none',
+          maxHeight: '30rem',
+          overflowY: 'auto',
+          backgroundColor: 'white',
+        }}
         // Prevent hiding the component when clicking inside the component
         onClick={(event) => event.stopPropagation()}
       >

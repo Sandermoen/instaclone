@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import classNames from 'classnames';
 
 import { bookmarkPost } from '../../../redux/user/userActions';
 import { showAlert } from '../../../redux/alert/alertActions';
@@ -19,6 +20,7 @@ const PostDialogStats = ({
   profileDispatch,
   bookmarkPost,
   showAlert,
+  simple,
 }) => {
   const ref = useRef();
 
@@ -35,19 +37,22 @@ const PostDialogStats = ({
     }
   };
 
+  const postDialogStatsClassNames = classNames({
+    'post-dialog__stats': true,
+    'post-dialog__stats--simple': simple,
+  });
+
   return (
     <div
       ref={ref}
-      className="post-dialog__stats"
+      className={postDialogStatsClassNames}
       data-test="component-post-dialog-stats"
     >
       <div className="post-dialog__actions">
         {currentUser ? (
           <PulsatingIcon
             toggle={
-              !!post.postVotes[0].votes.find(
-                (vote) => vote.author === currentUser._id
-              )
+              !!post.postVotes.find((vote) => vote.author === currentUser._id)
             }
             elementRef={ref}
             constantProps={{
@@ -91,7 +96,7 @@ const PostDialogStats = ({
         />
       </div>
       <p className="heading-4">
-        {post.postVotes[0].votes.length === 0 ? (
+        {post.postVotes.length === 0 ? (
           <span>
             Be the first to{' '}
             <b
@@ -108,8 +113,8 @@ const PostDialogStats = ({
         ) : (
           <span>
             <b>
-              {post.postVotes[0].votes.length}{' '}
-              {post.postVotes[0].votes.length === 1 ? 'like' : 'likes'}
+              {post.postVotes.length}{' '}
+              {post.postVotes.length === 1 ? 'like' : 'likes'}
             </b>
           </span>
         )}

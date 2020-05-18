@@ -4,7 +4,7 @@ const Followers = require('../models/Followers');
 const Following = require('../models/Following');
 const ConfirmationToken = require('../models/ConfirmationToken');
 const Notification = require('../models/Notification');
-const notificationHandler = require('../handlers/notificationHandler');
+const socketHandler = require('../handlers/socketHandler');
 const ObjectId = require('mongoose').Types.ObjectId;
 const cloudinary = require('cloudinary').v2;
 const fs = require('fs');
@@ -284,7 +284,7 @@ module.exports.followUser = async (req, res, next) => {
     });
 
     await notification.save();
-    notificationHandler.sendNotification(req, {
+    socketHandler.sendNotification(req, {
       notificationType: 'follow',
       sender: {
         _id: sender._id,

@@ -8,7 +8,7 @@ const linkify = require('linkifyjs');
 require('linkifyjs/plugins/mention')(linkify);
 const fs = require('fs');
 
-const notificationHandler = require('../handlers/notificationHandler');
+const socketHandler = require('../handlers/socketHandler');
 
 /**
  * Retrieves a post's comments with a specified offset
@@ -201,7 +201,7 @@ module.exports.sendCommentNotification = async (
         },
       });
       await notification.save();
-      notificationHandler.sendNotification(req, {
+      socketHandler.sendNotification(req, {
         ...notification.toObject(),
         sender: {
           _id: sender._id,
@@ -255,7 +255,7 @@ module.exports.sendMentionNotification = (req, message, image, post, user) => {
           },
         });
         await notification.save();
-        notificationHandler.sendNotification(req, {
+        socketHandler.sendNotification(req, {
           ...notification.toObject(),
           sender: {
             _id: user._id,

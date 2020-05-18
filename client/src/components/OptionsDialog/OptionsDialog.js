@@ -24,7 +24,7 @@ const OptionsDialog = ({
   });
 
   return transitions.map(({ item, key, props }) => (
-    <animated.div style={props} className="options-dialog">
+    <animated.div style={props} key={key} className="options-dialog">
       {title && (
         <header className="options-dialog__title">
           <h1 className="heading-3">{title}</h1>

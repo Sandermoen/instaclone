@@ -20,10 +20,6 @@
   display: block;
   border-left: 2px solid transparent;
 
-  &--active {
-    border-left: 2px solid $color-black;
-  }
-
   &__text {
     padding: 1.5rem 2.5rem;
   }
@@ -31,5 +27,13 @@
   &:hover {
     background-color: $color-grey-3;
     border-color: $color-grey-2;
+  }
+
+  &--active {
+    border-left: 2px solid $color-black;
+    &:hover {
+      background-color: $color-white;
+      border-color: $color-black;
+    }
   }
 }

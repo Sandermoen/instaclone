@@ -37,28 +37,24 @@ export const postDialogReducer = (state, action) => {
     }
     case 'VOTE_POST': {
       const { currentUser, postId, dispatch } = action.payload;
-      let postVotes = JSON.parse(JSON.stringify(state.data.postVotes[0]));
-      const liked = !!postVotes.votes.find(
-        (vote) => vote.author === currentUser._id
-      );
+      let postVotes = JSON.parse(JSON.stringify(state.data.postVotes));
+      const liked = !!postVotes.find((vote) => vote.author === currentUser._id);
       if (!liked) {
-        postVotes.votes.push({ author: currentUser._id });
+        postVotes.push({ author: currentUser._id });
       } else {
-        postVotes.votes = postVotes.votes.filter(
-          (vote) => vote.author !== currentUser._id
-        );
+        postVotes = postVotes.filter((vote) => vote.author !== currentUser._id);
       }
       dispatch &&
         dispatch({
           type: 'SET_POST_VOTES_COUNT',
-          payload: { postId, votes: postVotes.votes.length },
+          payload: { postId, votes: postVotes.length },
         });
 
       return {
         ...state,
         data: {
           ...state.data,
-          postVotes: [postVotes],
+          postVotes,
         },
       };
     }

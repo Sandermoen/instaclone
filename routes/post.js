@@ -9,6 +9,7 @@ const {
   retrievePost,
   votePost,
   deletePost,
+  retrievePostFeed,
 } = require('../controllers/postController');
 
 const postLimiter = rateLimit({
@@ -29,6 +30,8 @@ postRouter.post(
 postRouter.post('/:postId/vote', requireAuth, votePost);
 
 postRouter.get('/:postId', retrievePost);
-module.exports = postRouter;
+postRouter.get('/feed/:offset', requireAuth, retrievePostFeed);
 
 postRouter.delete('/:postId', requireAuth, deletePost);
+
+module.exports = postRouter;
