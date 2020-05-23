@@ -2,25 +2,28 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
-const morgan = require('morgan');
 const mongoose = require('mongoose');
 const compression = require('compression');
 const path = require('path');
 const socketio = require('socket.io');
 const jwt = require('jwt-simple');
-require('dotenv').config();
 
 const apiRouter = require('./routes');
 
 const app = express();
 const PORT = process.env.PORT || 9000;
 
+if (process.env.NODE_ENV !== 'production') {
+  const morgan = require('morgan');
+  app.use(morgan('dev'));
+  require('dotenv').config();
+}
+
 app.use(helmet());
 app.use(helmet.hidePoweredBy());
 app.use(cors());
 app.use(bodyParser.json());
 app.set('trust proxy', 1);
-app.use(morgan('dev'));
 app.use('/api', apiRouter);
 
 app.use((err, req, res, next) => {
