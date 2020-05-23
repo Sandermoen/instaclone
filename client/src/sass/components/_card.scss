@@ -2,4 +2,8 @@
   background-color: $color-white;
   border: 1px solid $color-grey-2;
   border-radius: 3px;
+
+  @include respond(phone) {
+    border: none;
+  }
 }

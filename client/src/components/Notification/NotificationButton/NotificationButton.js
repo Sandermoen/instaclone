@@ -6,26 +6,17 @@ import { useTransition } from 'react-spring';
 import {
   selectNotifications,
   selectNotificationState,
-} from '../../redux/notification/notificationSelectors';
-import { selectToken } from '../../redux/user/userSelectors';
+} from '../../../redux/notification/notificationSelectors';
 
-import {
-  fetchNotificationsStart,
-  readNotificationsStart,
-  clearNotifications,
-} from '../../redux/notification/notificationActions';
-
-import Icon from '../Icon/Icon';
+import Icon from '../../Icon/Icon';
 import NotificationPopup from './NotificationPopup/NotificationPopup';
 import NotificationCard from '../NotificationCard/NotificationCard';
 
 const NotificationButton = ({
   notifications,
   notificationState,
-  fetchNotificationsStart,
-  readNotificationsStart,
-  clearNotifications,
-  token,
+  mobile,
+  icon,
 }) => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showNotificationPopup, setShowNotificationPopup] = useState(false);
@@ -79,7 +70,7 @@ const NotificationButton = ({
     <div style={{ position: 'relative', height: '100%' }}>
       <button className="notification-button">
         <Icon
-          icon={showNotifications ? 'heart' : 'heart-outline'}
+          icon={icon ? icon : showNotifications ? 'heart' : 'heart-outline'}
           className={notificationState.unreadCount > 0 ? 'icon--unread' : ''}
           onClick={() => setShowNotifications((previous) => !previous)}
           style={{ cursor: 'pointer' }}
@@ -95,16 +86,8 @@ const NotificationButton = ({
             )
         )}
       </button>
-      {showNotifications && (
-        <NotificationCard
-          notifications={notifications}
-          fetchNotificationsStart={fetchNotificationsStart}
-          readNotificationsStart={readNotificationsStart}
-          clearNotifications={clearNotifications}
-          notificationState={notificationState}
-          token={token}
-          setShowNotifications={setShowNotifications}
-        />
+      {showNotifications && !mobile && (
+        <NotificationCard setShowNotifications={setShowNotifications} />
       )}
     </div>
   );
@@ -113,15 +96,6 @@ const NotificationButton = ({
 const mapStateToProps = createStructuredSelector({
   notifications: selectNotifications,
   notificationState: selectNotificationState,
-  token: selectToken,
 });
 
-const mapDispatchToProps = (dispatch) => ({
-  fetchNotificationsStart: (authToken) =>
-    dispatch(fetchNotificationsStart(authToken)),
-  readNotificationsStart: (authToken) =>
-    dispatch(readNotificationsStart(authToken)),
-  clearNotifications: () => dispatch(clearNotifications()),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(NotificationButton);
+export default connect(mapStateToProps)(NotificationButton);

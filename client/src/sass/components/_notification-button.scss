@@ -46,4 +46,29 @@
       clip-path: polygon(50% 0, 100% 100%, 0% 100%);
     }
   }
+
+  @include respond(phone) {
+    &__popup {
+      transform-origin: bottom left;
+      bottom: calc(100% + 1.5rem);
+      top: auto;
+
+      &:before {
+        content: none;
+      }
+
+      &:after {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%) rotate(180deg);
+        content: '';
+        background-color: $color-red;
+        width: 2.5rem;
+        height: 1rem;
+        top: 98%;
+        position: absolute;
+        clip-path: polygon(50% 0, 100% 100%, 0% 100%);
+      }
+    }
+  }
 }

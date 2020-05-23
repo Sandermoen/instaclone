@@ -1,0 +1,6 @@
+.activity-page {
+  &__notifications {
+    grid-column: center-start / center-end;
+    list-style-type: none;
+  }
+}

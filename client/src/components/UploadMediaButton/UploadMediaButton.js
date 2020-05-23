@@ -17,13 +17,6 @@ const UploadMediaButton = ({ showModal }) => {
   }, [file, showModal]);
   return (
     <Fragment>
-      <label
-        style={{ cursor: 'pointer' }}
-        className="icon"
-        htmlFor="file-upload"
-      >
-        <Icon icon="image-outline" />
-      </label>
       <input
         id="file-upload"
         type="file"
@@ -32,6 +25,13 @@ const UploadMediaButton = ({ showModal }) => {
         // Get the first selected file
         onChange={(event) => setFile(event.target.files[0])}
       />
+      <label
+        style={{ cursor: 'pointer' }}
+        className="icon"
+        htmlFor="file-upload"
+      >
+        <Icon icon="camera-outline" />
+      </label>
     </Fragment>
   );
 };

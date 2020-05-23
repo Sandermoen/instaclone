@@ -10,13 +10,14 @@ import { createPost } from '../../services/postService';
 import Loader from '../Loader/Loader';
 import Avatar from '../Avatar/Avatar';
 import Icon from '../Icon/Icon';
+import MobileHeader from '../Header/MobileHeader/MobileHeader';
 
 const UploadMediaForm = ({ token, file, currentUser, hide }) => {
   const [previewImage, setPreviewImage] = useState(null);
   const [caption, setCaption] = useState('');
   const [formEvents, setFormEvents] = useState({
     error: null,
-    isLoading: false
+    isLoading: false,
   });
 
   const history = useHistory();
@@ -26,11 +27,14 @@ const UploadMediaForm = ({ token, file, currentUser, hide }) => {
   useEffect(() => {
     if (file.type === 'image/png' || file.type === 'image/jpeg') {
       reader.readAsDataURL(file);
-      reader.onload = e => {
+      reader.onload = (e) => {
         setPreviewImage(e.target.result);
       };
     } else {
-      setFormEvents(previous => ({ ...previous, error: 'Invalid file type.' }));
+      setFormEvents((previous) => ({
+        ...previous,
+        error: 'Invalid file type.',
+      }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [file]);
@@ -40,40 +44,43 @@ const UploadMediaForm = ({ token, file, currentUser, hide }) => {
    * @function handleClick
    * @param {object} event Event object passed from an input
    */
-  const handleClick = async event => {
+  const handleClick = async (event) => {
     event.preventDefault();
     const formData = new FormData();
     formData.append('image', file);
     formData.set('caption', caption);
     try {
-      setFormEvents(previous => ({ ...previous, isLoading: true }));
+      setFormEvents((previous) => ({ ...previous, isLoading: true }));
       await createPost(formData, token);
-      setFormEvents(previous => ({ ...previous, isLoading: false }));
+      setFormEvents((previous) => ({ ...previous, isLoading: false }));
       hide();
       history.push('/');
     } catch (err) {
       setFormEvents({
         isLoading: false,
-        error: `Failed to share your post ${err.response &&
-          `: ${err.response.data}`}`
+        error: `Failed to share your post ${
+          err.response && `: ${err.response.data}`
+        }`,
       });
     }
   };
 
   return (
     <form style={file && { display: 'block' }} className="upload-media-form">
-      <header className="upload-media-form__header">
-        <div onClick={hide} style={{ cursor: 'pointer' }} className="icon">
-          <Icon icon="chevron-back" />
-        </div>
-        <h2 className="heading-3">New Post</h2>
+      <MobileHeader show>
+        <Icon
+          onClick={hide}
+          style={{ cursor: 'pointer' }}
+          icon="chevron-back"
+        />
+        <h3 className="heading-3">New Post</h3>
         <h2
-          onClick={event => handleClick(event)}
+          onClick={(event) => handleClick(event)}
           className="heading-3 heading--button color-blue"
         >
           Share
         </h2>
-      </header>
+      </MobileHeader>
       {formEvents.isLoading ? (
         <Loader />
       ) : (
@@ -93,7 +100,7 @@ const UploadMediaForm = ({ token, file, currentUser, hide }) => {
             <textarea
               className="upload-media-form__textarea"
               placeholder="Write a caption..."
-              onChange={event => setCaption(event.target.value)}
+              onChange={(event) => setCaption(event.target.value)}
             />
             <div className="upload-media-form__preview">
               <img src={previewImage} alt="Preview" />
@@ -108,7 +115,7 @@ const UploadMediaForm = ({ token, file, currentUser, hide }) => {
 
 const mapStateToProps = createStructuredSelector({
   token: selectToken,
-  currentUser: selectCurrentUser
+  currentUser: selectCurrentUser,
 });
 
 export default connect(mapStateToProps)(UploadMediaForm);

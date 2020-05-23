@@ -1,7 +1,7 @@
 import React from 'react';
 import { animated } from 'react-spring';
 
-import Icon from '../../Icon/Icon';
+import Icon from '../../../Icon/Icon';
 
 const NotificationPopup = ({ style, notifications }) => {
   let newFollowers = 0;

@@ -10,12 +10,25 @@
   z-index: 10;
   transition: height 300ms ease;
 
+  @include respond(phone) {
+    display: none;
+    // justify-content: space-between;
+    // padding: 0 2rem;
+    // height: 5rem;
+  }
+
   &__content {
     display: grid;
     grid-template-columns: 1fr 20rem 1fr;
     justify-items: center;
     align-items: center;
     width: 130rem;
+
+    // @include respond(phone) {
+    //   & > form {
+    //     display: none;
+    //   }
+    // }
   }
 
   &__logo {
@@ -60,6 +73,13 @@
     &:active {
       color: $color-grey-3;
     }
+
+    // @include respond(phone) {
+    //   grid-column: 2 / span 1;
+    //   &-image {
+    //     display: none;
+    //   }
+    // }
   }
 
   &__icons {
@@ -72,9 +92,17 @@
       cursor: pointer;
     }
 
-    & > *:not(:last-child) {
+    & > :not(:last-child) {
       margin-right: 2.5rem;
     }
+
+    // @include respond(phone) {
+    //   justify-content: flex-end;
+    //   width: 100%;
+    //   & > :not(:last-child) {
+    //     display: none;
+    //   }
+    // }
   }
 
   &--small {
@@ -88,6 +116,22 @@
           opacity: 0;
         }
       }
+    }
+  }
+
+  &--mobile {
+    background-color: $color-white;
+    padding: 1rem 2rem;
+    border-bottom: 1px solid $color-grey-2;
+    display: none;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+    width: 100%;
+    height: $mobile-header-height;
+    @include respond(phone) {
+      position: fixed;
+      display: flex;
     }
   }
 }

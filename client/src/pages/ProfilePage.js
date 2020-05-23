@@ -23,6 +23,7 @@ import Loader from '../components/Loader/Loader';
 import SkeletonLoader from '../components/SkeletonLoader/SkeletonLoader';
 import UsersList from '../components/UsersList/UsersList';
 import UnfollowPrompt from '../components/UnfollowPrompt/UnfollowPrompt';
+import MobileHeader from '../components/Header/MobileHeader/MobileHeader';
 
 const ProfilePage = ({ currentUser, token, showModal }) => {
   const { username } = useParams();
@@ -64,15 +65,15 @@ const ProfilePage = ({ currentUser, token, showModal }) => {
 
   useEffect(() => {
     document.title = `@${username} • Instaclone photos`;
-    try {
-      (async function () {
+    (async function () {
+      try {
         dispatch({ type: 'FETCH_PROFILE_START' });
         const profile = await getUserProfile(username, token);
         dispatch({ type: 'FETCH_PROFILE_SUCCESS', payload: profile });
-      })();
-    } catch (err) {
-      dispatch({ type: 'FETCH_PROFILE_FAILURE', payload: err });
-    }
+      } catch (err) {
+        dispatch({ type: 'FETCH_PROFILE_FAILURE', payload: err });
+      }
+    })();
   }, [username]);
 
   const handleClick = (postId) => {
@@ -84,6 +85,46 @@ const ProfilePage = ({ currentUser, token, showModal }) => {
       },
       'PostDialog'
     );
+  };
+
+  const showFollowersModal = (followers) => {
+    token &&
+      showModal(
+        {
+          options: [],
+          title: 'Followers',
+          cancelButton: false,
+          children: (
+            <UsersList
+              userId={state.data.user._id}
+              token={token}
+              followersCount={followers}
+              followers
+            />
+          ),
+        },
+        'OptionsDialog'
+      );
+  };
+
+  const showFollowingModal = (following) => {
+    token &&
+      showModal(
+        {
+          options: [],
+          title: 'Following',
+          cancelButton: false,
+          children: (
+            <UsersList
+              userId={state.data.user._id}
+              token={token}
+              followingCount={following}
+              following
+            />
+          ),
+        },
+        'OptionsDialog'
+      );
   };
 
   const renderButton = () => {
@@ -146,7 +187,7 @@ const ProfilePage = ({ currentUser, token, showModal }) => {
     } else if (state.error) {
       return <h1 className="heading-1">This page does not exist</h1>;
     }
-    if (state.data) {
+    if (!state.fetching && state.data) {
       const {
         followers,
         following,
@@ -159,10 +200,13 @@ const ProfilePage = ({ currentUser, token, showModal }) => {
           <header className="profile-header">
             {currentUser && currentUser.username === username ? (
               <ChangeAvatarButton>
-                <Avatar imageSrc={currentUser.avatar} />
+                <Avatar
+                  className="profile-header__avatar"
+                  imageSrc={currentUser.avatar}
+                />
               </ChangeAvatarButton>
             ) : (
-              <Avatar imageSrc={avatar} />
+              <Avatar className="profile-header__avatar" imageSrc={avatar} />
             )}
 
             <div className="profile-header__info">
@@ -175,25 +219,7 @@ const ProfilePage = ({ currentUser, token, showModal }) => {
                   <b>{postCount}</b> {postCount === 1 ? 'post' : 'posts'}
                 </p>
                 <p
-                  onClick={() =>
-                    token &&
-                    showModal(
-                      {
-                        options: [],
-                        title: 'Followers',
-                        cancelButton: false,
-                        children: (
-                          <UsersList
-                            userId={state.data.user._id}
-                            token={token}
-                            followersCount={followers}
-                            followers
-                          />
-                        ),
-                      },
-                      'OptionsDialog'
-                    )
-                  }
+                  onClick={() => showFollowersModal(followers)}
                   style={{ cursor: 'pointer' }}
                   className="heading-3"
                 >
@@ -201,25 +227,7 @@ const ProfilePage = ({ currentUser, token, showModal }) => {
                   {followers > 1 || followers === 0 ? 'followers' : 'follower'}
                 </p>
                 <p
-                  onClick={() =>
-                    token &&
-                    showModal(
-                      {
-                        options: [],
-                        title: 'Following',
-                        cancelButton: false,
-                        children: (
-                          <UsersList
-                            userId={state.data.user._id}
-                            token={token}
-                            followingCount={following}
-                            following
-                          />
-                        ),
-                      },
-                      'OptionsDialog'
-                    )
-                  }
+                  onClick={() => showFollowingModal(following)}
                   style={{ cursor: 'pointer' }}
                   className="heading-3"
                 >
@@ -228,11 +236,11 @@ const ProfilePage = ({ currentUser, token, showModal }) => {
               </div>
               <div>
                 {fullName && (
-                  <p className="heading-3">
+                  <h3 className="heading-3">
                     <b>{fullName}</b>
-                  </p>
+                  </h3>
                 )}
-                <p className="heading-3" style={{ whiteSpace: 'pre-wrap' }}>
+                <p className="heading-3" style={{ whiteSpace: 'pre' }}>
                   {bio}
                 </p>
                 {website && (
@@ -247,8 +255,61 @@ const ProfilePage = ({ currentUser, token, showModal }) => {
                 )}
               </div>
             </div>
+            <div className="profile-header__mobile-user-details">
+              <div>
+                {fullName && (
+                  <p className="heading-3">
+                    <b>{fullName}</b>
+                  </p>
+                )}
+                <h3
+                  className="heading-3 font-medium"
+                  style={{ whiteSpace: 'pre-wrap' }}
+                >
+                  {bio}
+                </h3>
+                {website && (
+                  <a
+                    href={website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="heading-3 link font-bold"
+                  >
+                    {website}
+                  </a>
+                )}
+              </div>
+              <div className="profile-stats">
+                <h3 className="heading-3">
+                  <b>{postCount}</b>
+                  <span className="font-medium color-grey">
+                    {postCount === 1 ? 'post' : 'posts'}
+                  </span>
+                </h3>
+                <h3
+                  onClick={() => showFollowersModal(followers)}
+                  style={{ cursor: 'pointer' }}
+                  className="heading-3"
+                >
+                  <b>{followers}</b>{' '}
+                  <span className="font-medium color-grey">
+                    {followers > 1 || followers === 0
+                      ? 'followers'
+                      : 'follower'}
+                  </span>
+                </h3>
+                <h3
+                  onClick={() => showFollowingModal(following)}
+                  style={{ cursor: 'pointer' }}
+                  className="heading-3"
+                >
+                  <b>{following}</b>
+                  <span className="font-medium color-grey">following</span>
+                </h3>
+              </div>
+            </div>
           </header>
-          <ProfileCategory category="POSTS" icon="apps" />
+          <ProfileCategory category="POSTS" icon="apps-outline" />
           <div className="profile-images">
             {posts.map((post, idx) => {
               return (
@@ -280,7 +341,23 @@ const ProfilePage = ({ currentUser, token, showModal }) => {
     }
   };
 
-  return <div className="profile-page grid">{renderProfile()}</div>;
+  return (
+    <Fragment>
+      {currentUser && currentUser.username === username ? (
+        <MobileHeader>
+          <Icon icon="aperture-outline" />
+          <h3 className="heading-3">{username}</h3>
+          <div></div>
+        </MobileHeader>
+      ) : (
+        <MobileHeader backArrow>
+          <h3 className="heading-3">{username}</h3>
+          <div></div>
+        </MobileHeader>
+      )}
+      <div className="profile-page grid">{renderProfile()}</div>
+    </Fragment>
+  );
 };
 
 const mapStateToProps = createStructuredSelector({

@@ -35,7 +35,9 @@
 @import './components/notification-button';
 @import './components/notification-card';
 @import './components/feed';
+@import './components/mobile-nav';
 
+@import './layout/app';
 @import './layout/grid';
 @import './layout/header';
 @import './layout/footer';
@@ -47,3 +49,4 @@
 @import './pages/signUpPage';
 @import './pages/settingsPage';
 @import './pages/loadingPage';
+@import './pages/activityPage';

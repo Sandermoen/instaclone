@@ -1,5 +1,16 @@
 .settings-page {
   min-height: 100vh;
+
+  &__content {
+    padding: 4rem 5rem;
+  }
+
+  @include respond(phone) {
+    min-height: 100%;
+    &__content {
+      padding: 2rem;
+    }
+  }
 }
 
 .settings-card {
@@ -10,6 +21,15 @@
   &__sidebar {
     border-right: 1px solid $color-grey-2;
     list-style-type: none;
+  }
+
+  @include respond(phone) {
+    grid-column: full-start / full-end;
+    grid-template-columns: 1fr;
+
+    &__sidebar {
+      display: none;
+    }
   }
 }
 

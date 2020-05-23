@@ -10,3 +10,70 @@
   left: 50%;
   transform: translateX(-50%);
 }
+
+@mixin simplePostDialog($component) {
+  @if $component == postDialog {
+    grid-template-columns: 100%;
+    grid-template-rows: min-content 65rem min-content;
+    border: 1px solid $color-grey-2;
+    border-radius: 5px;
+    overflow: hidden;
+  }
+  @if $component == image {
+    grid-row: 2 / span 1;
+  }
+  @if $component == content {
+    grid-row: 3 / -1;
+    grid-template-rows: repeat(3, min-content);
+  }
+  @if $component == header {
+    grid-row: 1 / span 1;
+  }
+  @if $component == stats {
+    border-bottom: none;
+    grid-row: 1 / span 1;
+  }
+}
+
+// MEDIA QUERY MANAGER
+/*
+0 - 600px Phone
+600 - 900px Tablet portrait
+900 - 1200 Tablet landscape
+[1200 - 1800] normal styles apply
+1800px + Big desktop
+
+ORDER: Base + typography > general layout + grid > page layout > components
+
+$breakpoint arguments:
+- phone
+- tab-port
+- tab-land
+- big-desktop
+*/
+@mixin respond($breakpoint) {
+  @if $breakpoint == phone {
+    @media only screen and (max-width: 37.5em) {
+      // 600px
+      @content;
+    }
+  }
+  @if $breakpoint == tab-port {
+    @media only screen and (max-width: 56.26em) {
+      // 900px
+      @content;
+    }
+  }
+  @if $breakpoint == tab-land {
+    @media only screen and (max-width: 75em) {
+      // 1200px
+      @content;
+    }
+  }
+  @if $breakpoint == big-desktop {
+    @media only screen and (min-width: 112.5em) {
+      // 1800px
+      @content;
+    }
+  }
+}

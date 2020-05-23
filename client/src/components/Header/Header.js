@@ -11,7 +11,7 @@ import useScrollPositionThrottled from '../../hooks/useScrollPositionThrottled';
 import { ReactComponent as LogoCamera } from '../../assets/svg/logo-camera.svg';
 import SearchBox from '../SearchBox/SearchBox';
 import UploadMediaButton from '../UploadMediaButton/UploadMediaButton';
-import NotificationButton from '../NotificationButton/NotificationButton';
+import NotificationButton from '../Notification/NotificationButton/NotificationButton';
 import Button from '../Button/Button';
 import Icon from '../Icon/Icon';
 
@@ -20,7 +20,9 @@ const Header = memo(({ currentUser }) => {
   // Shrink header height and remove logo on scroll
   useScrollPositionThrottled(
     ({ previousScrollPosition, currentScrollPosition }) => {
-      setShouldMinimizeHeader(currentScrollPosition > 100);
+      if (window.outerWidth > 600) {
+        setShouldMinimizeHeader(currentScrollPosition > 100);
+      }
     }
   );
 
@@ -30,7 +32,7 @@ const Header = memo(({ currentUser }) => {
   });
 
   return (
-    <div className={headerClassNames}>
+    <header className={headerClassNames}>
       <div className="header__content">
         <Link to="/" className="header__logo">
           <div className="header__logo-image">
@@ -69,7 +71,7 @@ const Header = memo(({ currentUser }) => {
           )}
         </div>
       </div>
-    </div>
+    </header>
   );
 });
 

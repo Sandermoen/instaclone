@@ -1,3 +1,7 @@
+.profile-page {
+  overflow-x: hidden;
+}
+
 .profile-header {
   grid-column: center-start / center-end;
   display: grid;
@@ -13,6 +17,72 @@
     grid-template-rows: min-content;
     justify-items: start;
   }
+
+  &__mobile-user-details {
+    display: none;
+  }
+
+  @include respond(tab-port) {
+    padding: 0px 2rem;
+    grid-column: full-start / full-end;
+    // Fix for moz
+    grid-column-gap: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+
+    &__avatar {
+      width: 10rem;
+      height: 10rem;
+    }
+
+    &__info {
+      flex-grow: 1;
+      margin-left: 3rem;
+      & > :not(:nth-child(1)) {
+        display: none;
+      }
+    }
+
+    &__mobile-user-details {
+      display: block;
+      flex-basis: 100%;
+
+      & > :nth-child(1) {
+        padding: 2rem 0;
+      }
+
+      & > .profile-stats {
+        justify-content: space-around;
+        padding: 1.5rem 0;
+        position: relative;
+        &::before {
+          content: '';
+          position: absolute;
+          height: 1px;
+          background-color: $color-grey-2;
+          width: 100vw;
+          top: 0;
+        }
+
+        & > h3 {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          line-height: 2rem;
+        }
+      }
+    }
+  }
+
+  @include respond(phone) {
+    margin-top: 2rem;
+
+    &__avatar {
+      width: 7rem;
+      height: 7rem;
+    }
+  }
 }
 
 .profile-buttons {
@@ -23,6 +93,27 @@
   & > * {
     &:not(:last-child) {
       margin-right: 1.5rem;
+    }
+  }
+
+  @include respond(tab-port) {
+    flex-direction: column;
+    width: 100%;
+    align-items: flex-start;
+
+    & > .icon {
+      display: none;
+    }
+
+    & > .button {
+      width: 100%;
+    }
+
+    & > a {
+      width: 100%;
+      & > .button {
+        width: 100%;
+      }
     }
   }
 }
@@ -60,14 +151,54 @@
       }
     }
   }
+
+  @include respond(tab-port) {
+    transform: translateY(0);
+    &::after {
+      content: '';
+      position: absolute;
+      height: 1px;
+      background-color: $color-grey-2;
+      width: 100vw;
+      bottom: 0;
+    }
+
+    &__category {
+      border: none;
+      padding: 1rem 0;
+      & > h3 {
+        display: none;
+      }
+
+      & > .icon {
+        color: $color-secondary;
+        width: 3rem;
+        height: 3rem;
+      }
+    }
+  }
 }
 
 .profile-images {
   display: grid;
   grid-column: center-start / center-end;
   grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(auto-fit, 30rem);
-  grid-auto-rows: 30rem;
   grid-column-gap: 2.5rem;
   grid-row-gap: 2.5rem;
+
+  @include respond(tab-port) {
+    grid-column: full-start / full-end;
+    grid-column-gap: 2px;
+    grid-row-gap: 2px;
+  }
+}
+
+.profile-image {
+  height: 100%;
+
+  @include respond(phone) {
+    &__overlay {
+      display: none;
+    }
+  }
 }

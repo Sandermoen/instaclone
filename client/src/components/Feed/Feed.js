@@ -41,6 +41,7 @@ const Feed = ({
             postData={post}
             postId={post._id}
             {...props}
+            key={idx}
           />
         ))
       )}

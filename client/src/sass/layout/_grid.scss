@@ -9,4 +9,9 @@
     )
     [center-end] 1fr [full-end];
   justify-content: center;
+
+  @include respond(phone) {
+    padding-top: $mobile-header-height;
+    padding-bottom: 0;
+  }
 }

@@ -1,8 +1,16 @@
 .sidebar {
   grid-column: 7 / center-end;
   padding: 2rem;
+  transform: translateX(0px);
 
   &__content {
     position: fixed;
+    & > :not(:last-child) {
+      margin-bottom: 2rem;
+    }
+  }
+
+  @include respond(tab-port) {
+    display: none;
   }
 }

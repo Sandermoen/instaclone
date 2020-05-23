@@ -14,4 +14,18 @@
       text-align: right;
     }
   }
+
+  @include respond(phone) {
+    &__form-group {
+      display: block;
+      grid-column-gap: 0;
+
+      &:nth-child(1) {
+        display: flex;
+        & > :not(:last-child) {
+          margin-right: 2rem;
+        }
+      }
+    }
+  }
 }

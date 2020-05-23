@@ -1,0 +1,31 @@
+.mobile-nav {
+  height: $mobile-header-height;
+  background-color: $color-white;
+  border-top: 1px solid $color-grey-2;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  display: none;
+
+  &__list {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    list-style-type: none;
+    height: 100%;
+    & > li {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      & > a {
+        display: flex;
+        align-items: center;
+        height: 100%;
+      }
+    }
+  }
+
+  @include respond(phone) {
+    display: block;
+  }
+}

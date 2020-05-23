@@ -7,10 +7,31 @@
   width: 100%;
   height: $footer-height;
   padding: 0 25%;
+  @include respond(phone) {
+    display: none;
+  }
 
   &__left {
     & > :not(:last-child) {
       margin-right: 1.5rem;
+    }
+  }
+
+  &--small {
+    &__links > a {
+      color: $color-grey-2;
+      text-decoration: none;
+      font-size: 1.2rem;
+
+      &:not(:last-child)::after {
+        content: '\00B7';
+        margin: 0 3px;
+      }
+    }
+
+    &__copyright {
+      display: flex;
+      align-items: center;
     }
   }
 }

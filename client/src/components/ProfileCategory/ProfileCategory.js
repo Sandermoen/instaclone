@@ -6,9 +6,7 @@ import Icon from '../Icon/Icon';
 const ProfileCategory = ({ category, icon }) => (
   <div className="profile-categories">
     <div className="profile-categories__category">
-      <div className="icon icon--small">
-        <Icon icon={icon} />
-      </div>
+      <Icon icon={icon} />
       <h3 className="font-medium">{category}</h3>
     </div>
   </div>
@@ -16,7 +14,7 @@ const ProfileCategory = ({ category, icon }) => (
 
 ProfileCategory.propTypes = {
   category: PropTypes.string.isRequired,
-  icon: PropTypes.string.isRequired
+  icon: PropTypes.string.isRequired,
 };
 
 export default ProfileCategory;

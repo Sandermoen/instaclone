@@ -1,9 +1,11 @@
 export const INITIAL_STATE = {
-  fetching: false,
+  fetching: true,
   following: false,
   fetchingAdditionalPosts: false,
   error: false,
-  data: null,
+  data: {
+    posts: [],
+  },
 };
 
 export const profileReducer = (state, action) => {

@@ -1,5 +1,5 @@
 import React, { useEffect, Fragment } from 'react';
-import { Switch, Route } from 'react-router-dom';
+import { Switch, Route, useHistory } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { useTransition } from 'react-spring';
 
@@ -9,13 +9,21 @@ import { hideAlert } from '../../redux/alert/alertActions';
 import { connectSocket } from '../../redux/socket/socketActions';
 import { fetchNotificationsStart } from '../../redux/notification/notificationActions';
 
+import ProtectedRoute from '../ProtectedRoute/ProtectedRoute';
+import Header from '../Header/Header';
+import HomePage from '../../pages/HomePage';
+import ProfilePage from '../../pages/ProfilePage';
+import PostPage from '../../pages/PostPage';
+import ConfirmationPage from '../../pages/ConfirmationPage';
+import SettingsPage from '../../pages/SettingsPage';
+import ActivityPage from '../../pages/ActivityPage';
 import LoginPage from '../../pages/LoginPage';
 import SignUpPage from '../../pages/SignUpPage';
 import LoadingPage from '../../pages/LoadingPage';
-import HeaderRoutes from '../../components/HeaderRoutes/HeaderRoutes';
 import Modal from '../../components/Modal/Modal';
 import Alert from '../../components/Alert/Alert';
 import Footer from '../../components/Footer/Footer';
+import MobileNav from '../../components/MobileNav/MobileNav';
 
 export function UnconnectedApp({
   signInStart,
@@ -28,6 +36,10 @@ export function UnconnectedApp({
 }) {
   const token = localStorage.getItem('token');
   const ALERT_TIME = 10000;
+  const {
+    location: { pathname },
+  } = useHistory();
+
   useEffect(() => {
     if (token) {
       signInStart(null, null, token);
@@ -77,6 +89,7 @@ export function UnconnectedApp({
     }
     return (
       <Fragment>
+        {pathname !== '/login' && pathname !== '/signup' && <Header />}
         {renderModals()}
         {transitions.map(
           ({ item, props, key }) =>
@@ -87,15 +100,22 @@ export function UnconnectedApp({
             )
         )}
         <Switch>
-          <Route path="/login">
-            <LoginPage />
+          <Route path="/login" component={LoginPage} />
+          <Route path="/signup" component={SignUpPage} />
+          <ProtectedRoute exact path="/" component={HomePage} />
+          <ProtectedRoute path="/settings" component={SettingsPage} />
+          <ProtectedRoute path="/activity" component={ActivityPage} />
+          <Route exact path="/:username" component={ProfilePage} />
+          <Route path="/post/:postId" component={PostPage} />
+          <ProtectedRoute path="/confirm/:token" component={ConfirmationPage} />
+          <Route>
+            <h1>Oof</h1>
           </Route>
-          <Route path="/signup">
-            <SignUpPage />
-          </Route>
-          <Route component={HeaderRoutes} />
         </Switch>
-        <Footer />
+        {pathname !== '/' && <Footer />}
+        {pathname !== '/login' && pathname !== '/signup' && currentUser && (
+          <MobileNav currentUser={currentUser} />
+        )}
       </Fragment>
     );
   };
@@ -104,7 +124,7 @@ export function UnconnectedApp({
     <div
       className="app"
       data-test="component-app"
-      style={{ minHeight: '100vh', position: 'relative' }}
+      // style={{ minHeight: '100vh', position: 'relative' }}
     >
       {renderApp()}
     </div>
