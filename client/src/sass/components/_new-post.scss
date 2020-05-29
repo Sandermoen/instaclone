@@ -1,0 +1,167 @@
+.new-post {
+  min-height: 20rem;
+  width: 60rem;
+  grid-column: center-start / center-end;
+  justify-self: center;
+  background-color: $color-grey-3;
+  box-shadow: 0 1rem 2rem $color-black;
+  position: relative;
+  display: grid;
+  grid-template-rows: min-content 50rem 15rem min-content;
+
+  &__nav {
+    height: $mobile-header-height;
+    border-top: 1px solid $color-grey-2;
+    width: 100%;
+    grid-row: 4;
+
+    & > ul {
+      list-style-type: none;
+      display: flex;
+      height: 100%;
+      transform: translateY(-1px);
+    }
+  }
+
+  &__nav-item {
+    width: 50%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    & > * {
+      color: $color-grey-2;
+    }
+
+    &--active {
+      border-top: 1px solid $color-black;
+
+      & > * {
+        color: $color-black;
+      }
+    }
+  }
+
+  &__preview-image-container {
+    height: 100%;
+    border-bottom: 1px solid $color-grey-2;
+    overflow: hidden;
+    position: relative;
+  }
+
+  &__preview-image {
+    @include absoluteCenter;
+    width: 100%;
+    height: 100%;
+    background-repeat: no-repeat;
+    background-size: cover;
+
+    & > img {
+      max-height: 100%;
+      max-width: 100%;
+    }
+  }
+
+  &__crop-button {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 2px;
+    border-radius: 100px;
+    margin: 1rem;
+    cursor: pointer;
+    display: none;
+  }
+
+  @include respond(phone) {
+    width: 100%;
+    min-height: auto;
+    grid-column: full-start / full-end;
+    background-color: $color-white;
+    grid-template-rows: 40rem 15rem;
+    box-shadow: none;
+    position: unset;
+
+    &__preview {
+      margin-top: $mobile-header-height;
+    }
+
+    &__nav {
+      position: fixed;
+      bottom: 0;
+      background-color: $color-white;
+    }
+  }
+}
+
+.post-form {
+  &__header {
+    background-color: $color-white;
+    padding: 1rem 2rem;
+    border-bottom: 1px solid $color-grey-2;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &__input {
+    display: flex;
+    justify-content: center;
+    height: 10rem;
+    border-bottom: 1px solid $color-grey-2;
+  }
+
+  &__textarea {
+    resize: none;
+    background-color: $color-white;
+    border: none;
+    font-family: inherit;
+    font-size: 1.5rem;
+    padding: 2rem 1rem;
+    width: 100%;
+    outline: none;
+
+    &::placeholder {
+      color: $color-grey-1;
+    }
+  }
+
+  &__avatar {
+    background-color: $color-white;
+    padding-left: 2rem;
+    padding-top: 1.5rem;
+
+    div {
+      transform: translateY(30%);
+    }
+  }
+
+  &__preview {
+    background-color: $color-white;
+    display: flex;
+    align-items: center;
+    padding: 0 1rem;
+    img {
+      width: 9rem;
+      height: 6rem;
+      object-fit: cover;
+    }
+  }
+
+  &:active & {
+    background-color: black;
+  }
+
+  @include respond(phone) {
+    margin-top: $mobile-header-height;
+  }
+}
+
+.ReactCrop {
+  & > * {
+    width: 100%;
+    height: 100%;
+  }
+}

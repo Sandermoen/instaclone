@@ -36,6 +36,17 @@ const feedReducer = (state = INITIAL_STATE, action) => {
         posts: [action.payload, ...state.posts],
       };
     }
+    case feedTypes.REMOVE_POST: {
+      const posts = JSON.parse(JSON.stringify(state.posts));
+      const postIndex = posts.findIndex((post) => post._id === action.payload);
+      if (postIndex) {
+        posts.splice(postIndex, 1);
+      }
+      return {
+        ...state,
+        posts,
+      };
+    }
     default: {
       return state;
     }

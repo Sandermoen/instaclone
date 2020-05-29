@@ -8,7 +8,7 @@ import { hideModal } from '../../redux/modal/modalActions';
 const Modal = memo(({ component, hideModal, ...additionalProps }) => {
   const modalRoot = document.querySelector('#modal-root');
   const el = document.createElement('div');
-  const Child = require(`../../components/${component}/${component}`).default;
+  const Child = require(`../../components/${component}`).default;
   el.className = 'modal grid';
 
   useEffect(() => {
@@ -17,11 +17,11 @@ const Modal = memo(({ component, hideModal, ...additionalProps }) => {
         hideModal(component);
       }
     };
-    el.addEventListener('click', hide, false);
+    el.addEventListener('mousedown', hide, false);
     modalRoot.appendChild(el);
 
     return () => {
-      el.removeEventListener('click', hide, false);
+      el.removeEventListener('mousedown', hide, false);
       modalRoot.removeChild(el);
     };
   }, [el, modalRoot, hideModal, component]);

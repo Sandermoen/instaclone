@@ -94,13 +94,12 @@ const PostDialog = ({
   const handleDeletePost = async () => {
     try {
       await deletePost(postId, token);
-      profileDispatch
-        ? profileDispatch({
-            type: 'DELETE_POST',
-            payload: postId,
-          })
-        : history.push(`/${state.data.author.username}`);
-      hideModal('PostDialog');
+      profileDispatch &&
+        profileDispatch({
+          type: 'DELETE_POST',
+          payload: postId,
+        });
+      hideModal('PostDialog/PostDialog');
     } catch (err) {
       showAlert('Unable to delete post.', () => handleDeletePost());
     }
@@ -143,7 +142,11 @@ const PostDialog = ({
           {fetching ? (
             <SkeletonLoader animated />
           ) : (
-            <img src={state.data.image} alt="Post" />
+            <img
+              src={state.data.image}
+              alt="Post"
+              style={{ filter: state.data.filter }}
+            />
           )}
         </div>
         <header className={postDialogHeaderClassNames}>
@@ -186,7 +189,7 @@ const PostDialog = ({
                   {
                     text: 'Go to post',
                     onClick: () => {
-                      hideModal('PostDialog');
+                      hideModal('PostDialog/PostDialog');
                       history.push(`/post/${postId}`);
                     },
                   },
@@ -217,7 +220,7 @@ const PostDialog = ({
                           ]
                         : options,
                   },
-                  'OptionsDialog'
+                  'OptionsDialog/OptionsDialog'
                 );
               }}
               style={{ cursor: 'pointer' }}

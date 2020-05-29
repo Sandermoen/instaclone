@@ -176,7 +176,7 @@ const Comment = ({
                       },
                     ],
                   },
-                  'OptionsDialog'
+                  'OptionsDialog/OptionsDialog'
                 )
               }
               className="comment__menu-dots"

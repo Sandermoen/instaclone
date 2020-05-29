@@ -1,0 +1,41 @@
+.filter-selector {
+  list-style-type: none;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: 1rem;
+  text-align: center;
+  overflow-x: hidden;
+  position: relative;
+
+  &__item {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    margin-right: 5px;
+
+    & > :not(:last-child) {
+      margin-bottom: 5px;
+    }
+
+    & > img {
+      height: 8rem;
+      width: 12rem;
+      object-fit: cover;
+    }
+
+    &--active {
+      .filter-selector__filter-name {
+        color: $color-black;
+      }
+    }
+  }
+
+  &__filter-name {
+    color: $color-grey-1;
+  }
+
+  @include respond(tab-land) {
+    overflow-x: auto;
+  }
+}

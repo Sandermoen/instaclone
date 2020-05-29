@@ -10,7 +10,7 @@ import useScrollPositionThrottled from '../../hooks/useScrollPositionThrottled';
 
 import { ReactComponent as LogoCamera } from '../../assets/svg/logo-camera.svg';
 import SearchBox from '../SearchBox/SearchBox';
-import UploadMediaButton from '../UploadMediaButton/UploadMediaButton';
+import NewPostButton from '../NewPost/NewPostButton/NewPostButton';
 import NotificationButton from '../Notification/NotificationButton/NotificationButton';
 import Button from '../Button/Button';
 import Icon from '../Icon/Icon';
@@ -55,7 +55,7 @@ const Header = memo(({ currentUser }) => {
               >
                 <Icon icon="person-circle-outline" />
               </NavLink>
-              <UploadMediaButton />
+              <NewPostButton />
             </Fragment>
           ) : (
             <Fragment>

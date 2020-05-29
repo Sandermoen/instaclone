@@ -1,7 +1,7 @@
 import socketTypes from './socketTypes';
 import { connect } from '../../services/socketService';
 import { addNotification } from '../notification/notificationActions';
-import { addPost } from '../feed/feedActions';
+import { addPost, removePost } from '../feed/feedActions';
 
 export const connectSocket = () => (dispatch) => {
   const socket = connect();
@@ -13,5 +13,9 @@ export const connectSocket = () => (dispatch) => {
 
   socket.on('newPost', (data) => {
     dispatch(addPost(data));
+  });
+
+  socket.on('deletePost', (data) => {
+    dispatch(removePost(data));
   });
 };

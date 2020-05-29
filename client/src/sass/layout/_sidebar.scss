@@ -1,10 +1,10 @@
 .sidebar {
   grid-column: 7 / center-end;
-  padding: 2rem;
-  transform: translateX(0px);
 
   &__content {
+    padding: 3rem;
     position: fixed;
+    width: 360px;
     & > :not(:last-child) {
       margin-bottom: 2rem;
     }

@@ -1,7 +1,7 @@
 import React, { useReducer, useEffect, Fragment } from 'react';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useHistory, Link } from 'react-router-dom';
 
 import { selectCurrentUser, selectToken } from '../redux/user/userSelectors';
 
@@ -27,6 +27,7 @@ import MobileHeader from '../components/Header/MobileHeader/MobileHeader';
 
 const ProfilePage = ({ currentUser, token, showModal }) => {
   const { username } = useParams();
+  const history = useHistory();
   const [state, dispatch] = useReducer(profileReducer, INITIAL_STATE);
 
   const follow = async () => {
@@ -77,14 +78,18 @@ const ProfilePage = ({ currentUser, token, showModal }) => {
   }, [username]);
 
   const handleClick = (postId) => {
-    showModal(
-      {
-        postId,
-        avatar: state.data.avatar,
-        profileDispatch: dispatch,
-      },
-      'PostDialog'
-    );
+    if (window.outerWidth <= 600) {
+      history.push(`/post/${postId}`);
+    } else {
+      showModal(
+        {
+          postId,
+          avatar: state.data.avatar,
+          profileDispatch: dispatch,
+        },
+        'PostDialog/PostDialog'
+      );
+    }
   };
 
   const showFollowersModal = (followers) => {
@@ -103,7 +108,7 @@ const ProfilePage = ({ currentUser, token, showModal }) => {
             />
           ),
         },
-        'OptionsDialog'
+        'OptionsDialog/OptionsDialog'
       );
   };
 
@@ -123,7 +128,7 @@ const ProfilePage = ({ currentUser, token, showModal }) => {
             />
           ),
         },
-        'OptionsDialog'
+        'OptionsDialog/OptionsDialog'
       );
   };
 
@@ -161,7 +166,7 @@ const ProfilePage = ({ currentUser, token, showModal }) => {
                     />
                   ),
                 },
-                'OptionsDialog'
+                'OptionsDialog/OptionsDialog'
               )
             }
             inverted
@@ -318,6 +323,7 @@ const ProfilePage = ({ currentUser, token, showModal }) => {
                   image={post.image}
                   likes={post.postVotes}
                   comments={post.comments}
+                  filter={post.filter}
                   key={idx}
                 />
               );

@@ -1,4 +1,4 @@
-import React, { useEffect, Fragment } from 'react';
+import React, { useEffect, Fragment, Suspense, lazy } from 'react';
 import { Switch, Route, useHistory } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { useTransition } from 'react-spring';
@@ -8,22 +8,25 @@ import { signInStart } from '../../redux/user/userActions';
 import { hideAlert } from '../../redux/alert/alertActions';
 import { connectSocket } from '../../redux/socket/socketActions';
 import { fetchNotificationsStart } from '../../redux/notification/notificationActions';
+import { fetchFeedPostsStart } from '../../redux/feed/feedActions';
 
 import ProtectedRoute from '../ProtectedRoute/ProtectedRoute';
 import Header from '../Header/Header';
-import HomePage from '../../pages/HomePage';
-import ProfilePage from '../../pages/ProfilePage';
-import PostPage from '../../pages/PostPage';
-import ConfirmationPage from '../../pages/ConfirmationPage';
-import SettingsPage from '../../pages/SettingsPage';
-import ActivityPage from '../../pages/ActivityPage';
-import LoginPage from '../../pages/LoginPage';
-import SignUpPage from '../../pages/SignUpPage';
-import LoadingPage from '../../pages/LoadingPage';
 import Modal from '../../components/Modal/Modal';
 import Alert from '../../components/Alert/Alert';
 import Footer from '../../components/Footer/Footer';
 import MobileNav from '../../components/MobileNav/MobileNav';
+
+import LoadingPage from '../../pages/LoadingPage';
+const ProfilePage = lazy(() => import('../../pages/ProfilePage'));
+const PostPage = lazy(() => import('../../pages/PostPage'));
+const ConfirmationPage = lazy(() => import('../../pages/ConfirmationPage'));
+const SettingsPage = lazy(() => import('../../pages/SettingsPage'));
+const ActivityPage = lazy(() => import('../../pages/ActivityPage'));
+const LoginPage = lazy(() => import('../../pages/LoginPage'));
+const SignUpPage = lazy(() => import('../../pages/SignUpPage'));
+const HomePage = lazy(() => import('../../pages/HomePage'));
+const NewPostPage = lazy(() => import('../../pages/NewPostPage'));
 
 export function UnconnectedApp({
   signInStart,
@@ -33,6 +36,7 @@ export function UnconnectedApp({
   currentUser,
   connectSocket,
   fetchNotificationsStart,
+  fetchFeedPostsStart,
 }) {
   const token = localStorage.getItem('token');
   const ALERT_TIME = 10000;
@@ -45,6 +49,7 @@ export function UnconnectedApp({
       signInStart(null, null, token);
       connectSocket();
       fetchNotificationsStart(token);
+      fetchFeedPostsStart(token);
     }
   }, [signInStart, token]);
 
@@ -105,6 +110,7 @@ export function UnconnectedApp({
           <ProtectedRoute exact path="/" component={HomePage} />
           <ProtectedRoute path="/settings" component={SettingsPage} />
           <ProtectedRoute path="/activity" component={ActivityPage} />
+          <ProtectedRoute path="/new" component={NewPostPage} />
           <Route exact path="/:username" component={ProfilePage} />
           <Route path="/post/:postId" component={PostPage} />
           <ProtectedRoute path="/confirm/:token" component={ConfirmationPage} />
@@ -113,20 +119,17 @@ export function UnconnectedApp({
           </Route>
         </Switch>
         {pathname !== '/' && <Footer />}
-        {pathname !== '/login' && pathname !== '/signup' && currentUser && (
-          <MobileNav currentUser={currentUser} />
-        )}
+        {pathname !== '/login' &&
+          pathname !== '/signup' &&
+          pathname !== '/new' &&
+          currentUser && <MobileNav currentUser={currentUser} />}
       </Fragment>
     );
   };
 
   return (
-    <div
-      className="app"
-      data-test="component-app"
-      // style={{ minHeight: '100vh', position: 'relative' }}
-    >
-      {renderApp()}
+    <div className="app" data-test="component-app">
+      <Suspense fallback={<LoadingPage />}>{renderApp()}</Suspense>
     </div>
   );
 }
@@ -144,5 +147,7 @@ const mapDispatchToProps = (dispatch) => ({
   connectSocket: () => dispatch(connectSocket()),
   fetchNotificationsStart: (authToken) =>
     dispatch(fetchNotificationsStart(authToken)),
+  fetchFeedPostsStart: (authToken, offset) =>
+    dispatch(fetchFeedPostsStart(authToken, offset)),
 });
 export default connect(mapStateToProps, mapDispatchToProps)(UnconnectedApp);

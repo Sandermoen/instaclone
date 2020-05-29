@@ -10,4 +10,8 @@
       width: 100%;
     }
   }
+
+  @include respond(phone) {
+    padding: 2rem 0;
+  }
 }

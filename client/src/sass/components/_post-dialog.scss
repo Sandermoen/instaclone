@@ -3,6 +3,7 @@
   display: grid;
   grid-template-rows: 6rem 55rem;
   grid-template-columns: minmax(25vw, 100%) 35rem;
+  max-width: 100vw;
 
   &--simple {
     @include simplePostDialog(postDialog);

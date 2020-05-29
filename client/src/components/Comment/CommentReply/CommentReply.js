@@ -124,7 +124,7 @@ const CommentReply = ({
                     },
                   ],
                 },
-                'OptionsDialog'
+                'OptionsDialog/OptionsDialog'
               )
             }
             className="comment__menu-dots"

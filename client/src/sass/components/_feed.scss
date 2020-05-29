@@ -1,7 +1,19 @@
 .feed {
   grid-column: center-start / 7;
 
+  & > :not(:last-child) {
+    margin-bottom: 5rem;
+  }
+
   @include respond(tab-port) {
+    grid-column: center-start / center-end;
+  }
+
+  @include respond(phone) {
     grid-column: full-start / full-end;
+    & > :not(:last-child) {
+      margin-bottom: 0;
+      margin-top: 0;
+    }
   }
 }

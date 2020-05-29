@@ -161,9 +161,11 @@ module.exports.sendConfirmationEmail = async (
  * @param {size} number Desired size of the image
  * @return {string} Formatted url
  */
-module.exports.formatCloudinaryUrl = (url, size) => {
+module.exports.formatCloudinaryUrl = (url, size, thumb) => {
   const splitUrl = url.split('upload/');
-  splitUrl[0] += `upload/w_${size},h_${size},c_thumb/`;
+  splitUrl[0] += `upload/${
+    size.y && size.z ? `x_${size.x},y_${size.y},` : ''
+  }w_${size.width},h_${size.height}${thumb && ',c_thumb'}/`;
   const formattedUrl = splitUrl[0] + splitUrl[1];
   return formattedUrl;
 };
@@ -188,7 +190,6 @@ module.exports.sendCommentNotification = async (
 ) => {
   try {
     if (String(sender._id) !== String(receiver)) {
-      console.log(String(sender._id), String(receiver));
       const notification = new Notification({
         sender: sender._id,
         receiver,

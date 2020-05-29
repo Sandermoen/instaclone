@@ -3,6 +3,7 @@ import { Link, useHistory } from 'react-router-dom';
 
 import Icon from '../Icon/Icon';
 import NotificationButton from '../Notification/NotificationButton/NotificationButton';
+import NewPostButton from '../NewPost/NewPostButton/NewPostButton';
 
 const MobileNav = ({ currentUser }) => {
   const {
@@ -23,7 +24,7 @@ const MobileNav = ({ currentUser }) => {
           </Link>
         </li>
         <li>
-          <Icon icon="add-circle-outline" />
+          <NewPostButton plusIcon />
         </li>
         <li>
           <Link to="/activity">
@@ -31,7 +32,6 @@ const MobileNav = ({ currentUser }) => {
               mobile
               icon={pathname === '/activity' ? 'heart' : 'heart-outline'}
             />
-            {/* <Icon icon={pathname === '/activity' ? 'heart' : 'heart-outline'} /> */}
           </Link>
         </li>
         <li>

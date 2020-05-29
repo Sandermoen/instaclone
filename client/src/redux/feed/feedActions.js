@@ -16,3 +16,8 @@ export const addPost = (post) => ({
   type: feedTypes.ADD_POST,
   payload: post,
 });
+
+export const removePost = (postId) => ({
+  type: feedTypes.REMOVE_POST,
+  payload: postId,
+});

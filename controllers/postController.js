@@ -13,11 +13,16 @@ const {
   retrieveComments,
   formatCloudinaryUrl,
 } = require('../utils/controllerUtils');
+const filters = require('../utils/filters');
 
 module.exports.createPost = async (req, res, next) => {
   const user = res.locals.user;
-  const { caption } = req.body;
+  const { caption, filter: filterName } = req.body;
+  let crop = req.body.crop;
   let post = undefined;
+  const filterObject = filters.find((filter) => filter.name === filterName);
+  crop = JSON.parse(crop);
+  console.log(crop);
 
   if (!req.file) {
     return res
@@ -33,11 +38,19 @@ module.exports.createPost = async (req, res, next) => {
 
   try {
     const response = await cloudinary.uploader.upload(req.file.path);
-    const thumbnailUrl = formatCloudinaryUrl(response.secure_url, 400);
+    const thumbnailUrl = formatCloudinaryUrl(
+      response.secure_url,
+      {
+        width: 400,
+        height: 400,
+      },
+      true
+    );
     fs.unlinkSync(req.file.path);
     post = new Post({
       image: response.secure_url,
       thumbnail: thumbnailUrl,
+      filter: filterObject ? filterObject.filter : '',
       caption,
       author: user._id,
     });
@@ -55,16 +68,19 @@ module.exports.createPost = async (req, res, next) => {
     // Updating followers feed with post
     const followersDocument = await Followers.find({ user: user._id });
     const followers = followersDocument[0].followers;
+    const postObject = {
+      ...post.toObject(),
+      author: { username: user.username, avatar: user.avatar },
+      commentData: { commentCount: 0, comments: [] },
+      postVotes: [],
+    };
+
+    socketHandler.sendPost(req, postObject, user._id);
     followers.forEach((follower) => {
       socketHandler.sendPost(
         req,
         // Since the post is new there is no need to look up any fields
-        {
-          ...post.toObject(),
-          author: { username: user.username, avatar: user.avatar },
-          commentData: { commentCount: 0, comments: [] },
-          postVotes: [],
-        },
+        postObject,
         follower.user
       );
     });
@@ -94,6 +110,17 @@ module.exports.deletePost = async (req, res, next) => {
     res.status(204).send();
   } catch (err) {
     next(err);
+  }
+
+  try {
+    const followersDocument = await Followers.find({ user: user._id });
+    const followers = followersDocument[0].followers;
+    socketHandler.deletePost(req, postId, user._id);
+    followers.forEach((follower) =>
+      socketHandler.deletePost(req, postId, follower.user)
+    );
+  } catch (err) {
+    console.log(err);
   }
 };
 
@@ -178,7 +205,14 @@ module.exports.votePost = async (req, res, next) => {
       const post = await Post.findById(postId);
       if (String(post.author) !== String(user._id)) {
         // Create thumbnail link
-        const image = formatCloudinaryUrl(post.image, 50);
+        const image = formatCloudinaryUrl(
+          post.image,
+          {
+            height: 50,
+            width: 50,
+          },
+          true
+        );
         const notification = new Notification({
           sender: user._id,
           receiver: post.author,
@@ -232,7 +266,11 @@ module.exports.retrievePostFeed = async (req, res, next) => {
     ];
 
     const posts = await Post.aggregate([
-      { $match: { author: { $in: following } } },
+      {
+        $match: {
+          $or: [{ author: { $in: following } }, { author: ObjectId(user._id) }],
+        },
+      },
       { $sort: { date: -1 } },
       { $skip: Number(offset) },
       { $limit: 5 },

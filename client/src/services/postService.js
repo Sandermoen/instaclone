@@ -94,3 +94,17 @@ export const bookmarkPost = async (postId, authToken) => {
     throw new Error(err);
   }
 };
+
+/**
+ * Retrieves all filters
+ * @function getPostFilters
+ * @returns {array} Array of filters
+ */
+export const getPostFilters = async () => {
+  try {
+    const response = await axios.get('/api/post/filters');
+    return response.data;
+  } catch (err) {
+    throw new Error(err);
+  }
+};

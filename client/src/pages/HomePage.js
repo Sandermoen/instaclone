@@ -9,7 +9,7 @@ import UserCard from '../components/UserCard/UserCard';
 import SmallFooter from '../components/Footer/SmallFooter/SmallFooter';
 import MobileHeader from '../components/Header/MobileHeader/MobileHeader';
 import Icon from '../components/Icon/Icon';
-import UploadMediaButton from '../components/UploadMediaButton/UploadMediaButton';
+import NewPostButton from '../components/NewPost/NewPostButton/NewPostButton';
 
 const HomePage = ({ currentUser }) => {
   useEffect(() => {
@@ -19,7 +19,7 @@ const HomePage = ({ currentUser }) => {
   return (
     <Fragment>
       <MobileHeader>
-        <UploadMediaButton />
+        <NewPostButton />
         <h3 style={{ fontSize: '2.5rem' }} className="heading-logo">
           Instaclone
         </h3>
@@ -33,6 +33,7 @@ const HomePage = ({ currentUser }) => {
               avatar={currentUser.avatar}
               username={currentUser.username}
               subText={currentUser.fullName}
+              style={{ padding: '0' }}
               avatarMedium
             />
             <SmallFooter />

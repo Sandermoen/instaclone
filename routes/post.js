@@ -11,6 +11,7 @@ const {
   deletePost,
   retrievePostFeed,
 } = require('../controllers/postController');
+const filters = require('../utils/filters');
 
 const postLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -23,12 +24,15 @@ postRouter.post(
   requireAuth,
   multer({
     dest: 'temp/',
-    limits: { fieldSize: 8 * 1024 * 1024, fileSize: 1000000 },
+    limits: { fieldSize: 8 * 1024 * 1024 },
   }).single('image'),
   createPost
 );
 postRouter.post('/:postId/vote', requireAuth, votePost);
 
+postRouter.get('/filters', (req, res) => {
+  res.send({ filters });
+});
 postRouter.get('/:postId', retrievePost);
 postRouter.get('/feed/:offset', requireAuth, retrievePostFeed);
 

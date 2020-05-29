@@ -55,7 +55,7 @@ const ChangeAvatarButton = ({
             },
           ],
         },
-        'OptionsDialog'
+        'OptionsDialog/OptionsDialog'
       );
     }
     inputRef.current.click();

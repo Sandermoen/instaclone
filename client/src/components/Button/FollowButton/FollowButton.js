@@ -63,7 +63,7 @@ const FollowButton = ({
               ],
               children: <UnfollowPrompt avatar={avatar} username={username} />,
             },
-            'OptionsDialog'
+            'OptionsDialog/OptionsDialog'
           )
         }
         inverted

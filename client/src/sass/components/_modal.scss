@@ -14,4 +14,8 @@
   width: 100%;
 
   background-color: rgba($color-black, 0.7);
+
+  & > * {
+    max-width: 80vw;
+  }
 }

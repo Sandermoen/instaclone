@@ -40,7 +40,7 @@ const VerificationPage = ({ authToken, showModal }) => {
           cancelButton: false,
           children,
         },
-        'OptionsDialog'
+        'OptionsDialog/OptionsDialog'
       );
       return history.push('/');
     })();

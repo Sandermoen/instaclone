@@ -10,4 +10,9 @@
   grid-column: center-start / center-end;
 
   transform: translateY(15rem);
+
+  @include respond(phone) {
+    grid-template-columns: 100%;
+    padding: 0 4rem;
+  }
 }

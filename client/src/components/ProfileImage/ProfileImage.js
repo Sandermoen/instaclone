@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 
 import Icon from '../Icon/Icon';
 
-const ProfileImage = ({ onClick, image, likes, comments }) => (
+const ProfileImage = ({ onClick, image, likes, comments, filter }) => (
   <div onClick={onClick} key={image} className="profile-image">
-    <img src={image} alt="User post" />
+    <img src={image} alt="User post" style={{ filter }} />
     <div className="profile-image__overlay">
       <span className="profile-image__content">
         {likes > 0 && (
@@ -26,7 +26,7 @@ const ProfileImage = ({ onClick, image, likes, comments }) => (
 ProfileImage.propTypes = {
   onClick: PropTypes.func,
   image: PropTypes.string.isRequired,
-  likes: PropTypes.number.isRequired
+  likes: PropTypes.number.isRequired,
 };
 
 export default ProfileImage;
