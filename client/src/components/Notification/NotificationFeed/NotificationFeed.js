@@ -42,16 +42,8 @@ const NotificationFeed = ({
       await fetchNotificationsStart(token);
       await readNotificationsStart(token);
     })();
-    let hideNotificationCard = undefined;
-    if (setShowNotifications) {
-      hideNotificationCard = () => setShowNotifications(false);
-    }
-    window.addEventListener('click', hideNotificationCard);
 
     return () => {
-      if (hideNotificationCard) {
-        window.removeEventListener('click', hideNotificationCard);
-      }
       clearNotifications();
     };
   }, []);

@@ -454,6 +454,7 @@ module.exports.searchUsers = async (req, res, next) => {
           _id: true,
           username: true,
           avatar: true,
+          fullName: true,
         },
       },
     ]);

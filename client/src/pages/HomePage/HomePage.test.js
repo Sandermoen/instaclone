@@ -1,7 +1,7 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 
-import { findByTestAttribute } from '../utils/test/testUtils';
+import { findByTestAttribute } from '../../utils/test/testUtils';
 
 import HomePage from './HomePage';
 

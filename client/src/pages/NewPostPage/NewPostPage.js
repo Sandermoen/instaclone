@@ -1,7 +1,7 @@
 import React from 'react';
 import { useHistory, Redirect } from 'react-router-dom';
 
-import NewPost from '../components/NewPost/NewPost';
+import NewPost from '../../components/NewPost/NewPost';
 
 const NewPostPage = ({ location }) => {
   const history = useHistory();

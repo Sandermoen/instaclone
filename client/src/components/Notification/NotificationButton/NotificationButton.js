@@ -10,7 +10,8 @@ import {
 
 import Icon from '../../Icon/Icon';
 import NotificationPopup from './NotificationPopup/NotificationPopup';
-import NotificationCard from '../NotificationCard/NotificationCard';
+import PopupCard from '../../PopupCard/PopupCard';
+import NotificationFeed from '../NotificationFeed/NotificationFeed';
 
 const NotificationButton = ({
   notifications,
@@ -87,7 +88,9 @@ const NotificationButton = ({
         )}
       </button>
       {showNotifications && !mobile && (
-        <NotificationCard setShowNotifications={setShowNotifications} />
+        <PopupCard hide={() => setShowNotifications(false)} leftAlign>
+          <NotificationFeed setShowNotifications={setShowNotifications} />
+        </PopupCard>
       )}
     </div>
   );

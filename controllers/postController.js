@@ -75,7 +75,7 @@ module.exports.createPost = async (req, res, next) => {
       postVotes: [],
     };
 
-    socketHandler.sendPost(req, postObject, user._id);
+    // socketHandler.sendPost(req, postObject, user._id);
     followers.forEach((follower) => {
       socketHandler.sendPost(
         req,

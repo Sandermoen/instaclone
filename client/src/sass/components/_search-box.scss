@@ -6,18 +6,16 @@
   &__input {
     border: 1px solid $color-grey-2;
     border-radius: 3px;
-    padding: 5px 0;
+    padding: 5px 3rem;
     font-family: inherit;
     font-size: inherit;
     background-color: $color-grey-3;
     width: 100%;
     text-align: center;
     color: $color-grey-1;
-    padding-left: 5rem;
 
-    &::placeholder {
+    &:focus ::placeholder {
       visibility: hidden;
-      opacity: 0;
     }
 
     &:focus {
@@ -25,15 +23,6 @@
       text-align: left;
       outline: none;
       border: 1px solid $color-grey-1;
-      padding-left: 2.3rem;
-    }
-
-    &:focus + .search-box__placeholder {
-      left: 3.5rem;
-    }
-
-    &:placeholder-shown + .search-box__placeholder {
-      color: $color-grey-1;
     }
   }
 
@@ -43,12 +32,35 @@
     pointer-events: none;
     display: flex;
     align-items: center;
+    width: 100%;
+    height: 100%;
+    color: $color-grey-1;
+    overflow: hidden;
 
-    svg {
+    .icon {
       width: 1.5rem;
       height: 1.5rem;
-      margin-right: 5px;
       fill: $color-grey-1;
+      position: absolute;
+      left: 1rem;
+    }
+
+    & > .loader {
+      top: unset;
+      left: unset;
+      right: 0;
+      width: 3rem;
+      background-color: transparent;
+      filter: invert(30%);
+    }
+  }
+
+  @include respond(phone) {
+    height: 65%;
+    &__input {
+      height: 100%;
+      background-color: $color-white;
+      border-radius: 5px;
     }
   }
 }

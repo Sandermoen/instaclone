@@ -2,15 +2,15 @@ import React, { Fragment } from 'react';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 
-import { selectToken } from '../../redux/user/userSelectors';
 import {
   selectFeedPosts,
   selectFeedFetching,
 } from '../../redux/feed/feedSelectors';
 
 import PostDialog from '../PostDialog/PostDialog';
+import FeedBottom from './FeedBottom/FeedBottom';
 
-const Feed = ({ feedPosts, feedFetching, token, ...props }) => {
+const Feed = ({ feedPosts, feedFetching }) => {
   return (
     <section className="feed">
       {feedPosts &&
@@ -24,12 +24,12 @@ const Feed = ({ feedPosts, feedFetching, token, ...props }) => {
           <PostDialog simple loading />
         </Fragment>
       )}
+      {!feedFetching && feedPosts.length > 0 && <FeedBottom />}
     </section>
   );
 };
 
 const mapStateToProps = createStructuredSelector({
-  token: selectToken,
   feedPosts: selectFeedPosts,
   feedFetching: selectFeedFetching,
 });

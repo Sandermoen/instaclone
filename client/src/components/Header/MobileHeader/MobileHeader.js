@@ -1,17 +1,19 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
 import Icon from '../../Icon/Icon';
 
-const MobileHeader = ({ children, backArrow, show }) => (
-  <header style={show && { display: 'flex' }} className="header--mobile">
-    {backArrow && (
-      <Link to="/">
-        <Icon icon="chevron-back" />
-      </Link>
-    )}
-    {children}
-  </header>
-);
+const MobileHeader = ({ children, backArrow, style, show }) => {
+  const { goBack } = useHistory();
+  return (
+    <header
+      style={{ ...style, display: `${show && 'grid'}` }}
+      className="header--mobile"
+    >
+      {backArrow && <Icon onClick={() => goBack()} icon="chevron-back" />}
+      {children}
+    </header>
+  );
+};
 
 export default MobileHeader;

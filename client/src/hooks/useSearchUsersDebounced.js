@@ -1,21 +1,21 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import debounce from 'lodash/debounce';
 
 import { searchUsers } from '../services/userService';
 
 /**
- * A debounced function to search for users with a given offset
+ * A memoized debounced hook to search for users with a given offset
  * @function useSearchUsersDebounced
  * @returns {object} Search function and search result
  */
 const useSearchUsersDebounced = () => {
-  const [result, setResult] = useState(null);
+  const [result, setResult] = useState([]);
   const [fetching, setFetching] = useState(false);
 
   const handleSearch = async (string, offset) => {
     if (!string) {
       setFetching(false);
-      return setResult(null);
+      return setResult([]);
     }
 
     try {
@@ -28,7 +28,17 @@ const useSearchUsersDebounced = () => {
     }
   };
   const handleSearchDebounced = debounce(handleSearch, 500);
-  return { handleSearchDebounced, result, setResult, fetching, setFetching };
+  const handleSearchDebouncedMemoized = useCallback(
+    (string, offset) => handleSearchDebounced(string, offset),
+    []
+  );
+  return {
+    handleSearchDebouncedMemoized,
+    result,
+    setResult,
+    fetching,
+    setFetching,
+  };
 };
 
 export default useSearchUsersDebounced;

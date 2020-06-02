@@ -3,12 +3,12 @@ import { shallow } from 'enzyme';
 
 import LoginPage from './LoginPage';
 
-import { findByTestAttribute, storeFactory } from '../utils/test/testUtils';
+import { findByTestAttribute, storeFactory } from '../../utils/test/testUtils';
 
 jest.mock('react-router-dom', () => ({
   useHistory: () => ({
-    push: jest.fn()
-  })
+    push: jest.fn(),
+  }),
 }));
 
 /**

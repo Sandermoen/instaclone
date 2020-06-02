@@ -16,3 +16,8 @@ export const selectFeedFetching = createSelector(
   [selectFeed],
   (feed) => feed.fetching
 );
+
+export const selectHasMore = createSelector(
+  [selectFeed],
+  (feed) => feed.hasMore
+);

@@ -3,7 +3,6 @@ import React, {
   Fragment,
   useEffect,
   useRef,
-  useCallback,
   useState,
 } from 'react';
 import PropTypes from 'prop-types';
@@ -38,16 +37,12 @@ const PostDialogCommentForm = ({
   const [mention, setMention] = useState(null);
 
   let {
-    handleSearchDebounced,
+    handleSearchDebouncedMemoized,
     result,
     setResult,
     fetching,
     setFetching,
   } = useSearchUsersDebounced();
-  const handleSearchDebouncedMemoized = useCallback(
-    (username, offset = 0) => handleSearchDebounced(username, offset),
-    []
-  );
 
   const commentInputRef = useRef();
 

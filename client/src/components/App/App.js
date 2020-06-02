@@ -8,7 +8,6 @@ import { signInStart } from '../../redux/user/userActions';
 import { hideAlert } from '../../redux/alert/alertActions';
 import { connectSocket } from '../../redux/socket/socketActions';
 import { fetchNotificationsStart } from '../../redux/notification/notificationActions';
-import { fetchFeedPostsStart } from '../../redux/feed/feedActions';
 
 import ProtectedRoute from '../ProtectedRoute/ProtectedRoute';
 import Header from '../Header/Header';
@@ -17,16 +16,23 @@ import Alert from '../../components/Alert/Alert';
 import Footer from '../../components/Footer/Footer';
 import MobileNav from '../../components/MobileNav/MobileNav';
 
-import LoadingPage from '../../pages/LoadingPage';
-const ProfilePage = lazy(() => import('../../pages/ProfilePage'));
-const PostPage = lazy(() => import('../../pages/PostPage'));
-const ConfirmationPage = lazy(() => import('../../pages/ConfirmationPage'));
-const SettingsPage = lazy(() => import('../../pages/SettingsPage'));
-const ActivityPage = lazy(() => import('../../pages/ActivityPage'));
-const LoginPage = lazy(() => import('../../pages/LoginPage'));
-const SignUpPage = lazy(() => import('../../pages/SignUpPage'));
-const HomePage = lazy(() => import('../../pages/HomePage'));
-const NewPostPage = lazy(() => import('../../pages/NewPostPage'));
+import LoadingPage from '../../pages/LoadingPage/LoadingPage';
+const ProfilePage = lazy(() => import('../../pages/ProfilePage/ProfilePage'));
+const PostPage = lazy(() => import('../../pages/PostPage/PostPage'));
+const ConfirmationPage = lazy(() =>
+  import('../../pages/ConfirmationPage/ConfirmationPage')
+);
+const SettingsPage = lazy(() =>
+  import('../../pages/SettingsPage/SettingsPage')
+);
+const ActivityPage = lazy(() =>
+  import('../../pages/ActivityPage/ActivityPage')
+);
+const LoginPage = lazy(() => import('../../pages/LoginPage/LoginPage'));
+const SignUpPage = lazy(() => import('../../pages/SignUpPage/SignUpPage'));
+const HomePage = lazy(() => import('../../pages/HomePage/HomePage'));
+const NewPostPage = lazy(() => import('../../pages/NewPostPage/NewPostPage'));
+const ExplorePage = lazy(() => import('../../pages/ExplorePage/ExplorePage'));
 
 export function UnconnectedApp({
   signInStart,
@@ -36,7 +42,6 @@ export function UnconnectedApp({
   currentUser,
   connectSocket,
   fetchNotificationsStart,
-  fetchFeedPostsStart,
 }) {
   const token = localStorage.getItem('token');
   const ALERT_TIME = 10000;
@@ -49,7 +54,6 @@ export function UnconnectedApp({
       signInStart(null, null, token);
       connectSocket();
       fetchNotificationsStart(token);
-      fetchFeedPostsStart(token);
     }
   }, [signInStart, token]);
 
@@ -111,6 +115,7 @@ export function UnconnectedApp({
           <ProtectedRoute path="/settings" component={SettingsPage} />
           <ProtectedRoute path="/activity" component={ActivityPage} />
           <ProtectedRoute path="/new" component={NewPostPage} />
+          <ProtectedRoute path="/explore" component={ExplorePage} />
           <Route exact path="/:username" component={ProfilePage} />
           <Route path="/post/:postId" component={PostPage} />
           <ProtectedRoute path="/confirm/:token" component={ConfirmationPage} />
@@ -147,7 +152,5 @@ const mapDispatchToProps = (dispatch) => ({
   connectSocket: () => dispatch(connectSocket()),
   fetchNotificationsStart: (authToken) =>
     dispatch(fetchNotificationsStart(authToken)),
-  fetchFeedPostsStart: (authToken, offset) =>
-    dispatch(fetchFeedPostsStart(authToken, offset)),
 });
 export default connect(mapStateToProps, mapDispatchToProps)(UnconnectedApp);

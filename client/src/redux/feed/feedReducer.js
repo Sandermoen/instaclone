@@ -4,6 +4,7 @@ const INITIAL_STATE = {
   posts: [],
   fetching: true,
   error: false,
+  hasMore: false,
 };
 
 const feedReducer = (state = INITIAL_STATE, action) => {
@@ -20,7 +21,8 @@ const feedReducer = (state = INITIAL_STATE, action) => {
         ...state,
         fetching: false,
         error: false,
-        posts: action.payload,
+        posts: [...state.posts, ...action.payload],
+        hasMore: action.payload.length === 5,
       };
     }
     case feedTypes.FETCH_POSTS_FAILURE: {
@@ -45,6 +47,12 @@ const feedReducer = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         posts,
+      };
+    }
+    case feedTypes.CLEAR_POSTS: {
+      return {
+        ...state,
+        posts: [],
       };
     }
     default: {

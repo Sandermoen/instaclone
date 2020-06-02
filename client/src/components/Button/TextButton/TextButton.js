@@ -6,12 +6,14 @@ const TextButton = ({
   blue,
   darkBlue,
   bold,
+  large,
   medium,
   small,
   ...additionalProps
 }) => {
   const textButtonClassNames = ClassNames({
     'text-button': true,
+    'heading-3': large,
     'heading-4': medium,
     'heading-5': small,
     'color-blue': blue,

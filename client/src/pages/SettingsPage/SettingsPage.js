@@ -1,11 +1,11 @@
 import React, { Fragment } from 'react';
 import { NavLink, Switch } from 'react-router-dom';
 
-import ProtectedRoute from '../components/ProtectedRoute/ProtectedRoute';
-import Card from '../components/Card/Card';
-import ChangePasswordForm from '../components/ChangePasswordForm/ChangePasswordForm';
-import EditProfileForm from '../components/EditProfileForm/EditProfileForm';
-import MobileHeader from '../components/Header/MobileHeader/MobileHeader';
+import ProtectedRoute from '../../components/ProtectedRoute/ProtectedRoute';
+import Card from '../../components/Card/Card';
+import ChangePasswordForm from '../../components/ChangePasswordForm/ChangePasswordForm';
+import EditProfileForm from '../../components/EditProfileForm/EditProfileForm';
+import MobileHeader from '../../components/Header/MobileHeader/MobileHeader';
 
 const SettingsPage = () => (
   <Fragment>

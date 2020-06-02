@@ -21,3 +21,7 @@ export const removePost = (postId) => ({
   type: feedTypes.REMOVE_POST,
   payload: postId,
 });
+
+export const clearPosts = () => ({
+  type: feedTypes.CLEAR_POSTS,
+});

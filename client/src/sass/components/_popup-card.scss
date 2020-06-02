@@ -1,13 +1,13 @@
-.notification-card {
+.popup-card {
+  @include horizontalAbsoluteCenter;
   position: absolute;
   border: none;
   top: 100%;
   filter: drop-shadow(0px 0px 3px $color-grey-2);
-  width: 50rem;
   background-color: $color-white;
-  transform: translateX(-80%);
-  left: 80%;
+  min-width: 25rem;
   cursor: initial;
+  border-radius: 50rem;
 
   &__empty {
     display: flex;
@@ -20,14 +20,23 @@
 
   &:before {
     content: '';
+    @include horizontalAbsoluteCenter;
     width: 2.5rem;
     height: 1rem;
-    position: absolute;
     bottom: 100%;
     background-color: $color-white;
     clip-path: polygon(50% 0, 100% 100%, 0 100%);
     box-shadow: 0 0 30px 0px $color-grey-1;
-    left: 80%;
+  }
+
+  &--left-align {
     transform: translateX(-80%);
+    left: 80%;
+    width: 50rem;
+
+    &:before {
+      transform: translateX(-80%);
+      left: 80%;
+    }
   }
 }

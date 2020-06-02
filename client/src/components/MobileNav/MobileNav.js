@@ -19,8 +19,10 @@ const MobileNav = ({ currentUser }) => {
           </Link>
         </li>
         <li>
-          <Link to="/search">
-            <Icon icon="search-outline" />
+          <Link to="/explore">
+            <Icon
+              icon={pathname === '/explore' ? 'search' : 'search-outline'}
+            />
           </Link>
         </li>
         <li>

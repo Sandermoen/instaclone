@@ -3,12 +3,12 @@ import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import { useHistory, useParams } from 'react-router-dom';
 
-import { showModal } from '../redux/modal/modalActions';
-import { selectToken } from '../redux/user/userSelectors';
+import { showModal } from '../../redux/modal/modalActions';
+import { selectToken } from '../../redux/user/userSelectors';
 
-import { confirmUser } from '../services/userService';
+import { confirmUser } from '../../services/userService';
 
-import Loader from '../components/Loader/Loader';
+import Loader from '../../components/Loader/Loader';
 
 const VerificationPage = ({ authToken, showModal }) => {
   const history = useHistory();

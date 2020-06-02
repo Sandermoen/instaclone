@@ -3,9 +3,9 @@ import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import { useHistory } from 'react-router-dom';
 
-import { selectCurrentUser } from '../redux/user/userSelectors';
+import { selectCurrentUser } from '../../redux/user/userSelectors';
 
-import SignUpCard from '../components/SignUpCard/SignUpCard';
+import SignUpCard from '../../components/SignUpCard/SignUpCard';
 
 const SignUpPage = ({ currentUser }) => {
   const history = useHistory();

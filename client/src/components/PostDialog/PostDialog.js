@@ -105,40 +105,23 @@ const PostDialog = ({
     }
   };
 
-  const postDialogClassNames = classNames({
-    'post-dialog': true,
-    'post-dialog--simple': simple,
-    [className]: className,
-  });
-
-  const postDialogImageClassNames = classNames({
-    'post-dialog__image': true,
-    'post-dialog__image--simple': simple,
-  });
-
-  const postDialogHeaderClassNames = classNames({
-    'post-dialog__header': true,
-    'post-dialog__header--simple': simple,
-  });
-
-  const postDialogContentClassNames = classNames({
-    'post-dialog__content': true,
-    'post-dialog__content--simple': simple,
-  });
-
-  const commentsClassNames = classNames({
-    comments: true,
-    'comments--simple': simple,
-  });
-
   return (
     <div
-      className={postDialogClassNames}
+      className={classNames({
+        'post-dialog': true,
+        'post-dialog--simple': simple,
+        [className]: className,
+      })}
       data-test="component-post-dialog"
       style={style}
     >
       <Fragment>
-        <div className={postDialogImageClassNames}>
+        <div
+          className={classNames({
+            'post-dialog__image': true,
+            'post-dialog__image--simple': simple,
+          })}
+        >
           {fetching ? (
             <SkeletonLoader animated />
           ) : (
@@ -149,7 +132,12 @@ const PostDialog = ({
             />
           )}
         </div>
-        <header className={postDialogHeaderClassNames}>
+        <header
+          className={classNames({
+            'post-dialog__header': true,
+            'post-dialog__header--simple': simple,
+          })}
+        >
           {fetching ? (
             <SkeletonLoader
               style={{ height: '4rem', width: '4rem', borderRadius: '100px' }}
@@ -232,9 +220,18 @@ const PostDialog = ({
         </header>
         <div
           data-test="component-post-dialog-content"
-          className={postDialogContentClassNames}
+          className={classNames({
+            'post-dialog__content': true,
+            'post-dialog__content--simple': simple,
+          })}
         >
-          <div ref={commentsRef} className={commentsClassNames}>
+          <div
+            ref={commentsRef}
+            className={classNames({
+              comments: true,
+              'comments--simple': simple,
+            })}
+          >
             {/* Render a caption if there is one as a Comment component with the caption prop */}
             {state.data.caption && !fetching ? (
               <Comment

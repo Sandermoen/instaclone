@@ -4,8 +4,8 @@ import throttle from 'lodash/throttle';
 /**
  * A throttled hook to execute a function upon scroll
  * @function useScrollPositionThrottled
- * @param {HTMLElement} element The element to calculate the scroll position, the default is document
  * @param {function} callback Callback function to call when a user scrolls
+ * @param {HTMLElement} element The element to calculate the scroll position, the default is document
  */
 const useScrollPositionThrottled = (callback, element) => {
   const [, setScrollPosition] = useState(0);
@@ -26,12 +26,15 @@ const useScrollPositionThrottled = (callback, element) => {
       previousScrollPosition = previousPosition;
       return currentScrollPosition;
     });
+
     callback({
       previousScrollPosition,
       currentScrollPosition,
       atBottom:
-        currentElement.scrollTop + currentElement.offsetHeight ===
-        currentElement.scrollHeight,
+        currentElement.scrollHeight -
+          currentElement.scrollTop -
+          currentElement.clientHeight <
+        1000,
     });
   };
 

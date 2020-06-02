@@ -12,9 +12,6 @@
 
   @include respond(phone) {
     display: none;
-    // justify-content: space-between;
-    // padding: 0 2rem;
-    // height: 5rem;
   }
 
   &__content {
@@ -23,12 +20,6 @@
     justify-items: center;
     align-items: center;
     width: 130rem;
-
-    // @include respond(phone) {
-    //   & > form {
-    //     display: none;
-    //   }
-    // }
   }
 
   &__logo {
@@ -73,13 +64,6 @@
     &:active {
       color: $color-grey-3;
     }
-
-    // @include respond(phone) {
-    //   grid-column: 2 / span 1;
-    //   &-image {
-    //     display: none;
-    //   }
-    // }
   }
 
   &__icons {
@@ -95,14 +79,6 @@
     & > :not(:last-child) {
       margin-right: 2.5rem;
     }
-
-    // @include respond(phone) {
-    //   justify-content: flex-end;
-    //   width: 100%;
-    //   & > :not(:last-child) {
-    //     display: none;
-    //   }
-    // }
   }
 
   &--small {
@@ -121,17 +97,28 @@
 
   &--mobile {
     background-color: $color-white;
-    padding: 1rem 2rem;
+    padding: 0 2rem;
     border-bottom: 1px solid $color-grey-2;
     display: none;
-    justify-content: space-between;
-    align-items: center;
     z-index: 10;
     width: 100%;
     height: $mobile-header-height;
+
+    grid-template-columns: repeat(3, 1fr);
+    align-items: center;
+    justify-items: center;
+
+    & :first-child {
+      justify-self: start;
+    }
+
+    & :last-child {
+      justify-self: end;
+    }
+
     @include respond(phone) {
       position: fixed;
-      display: flex;
+      display: grid;
     }
   }
 }

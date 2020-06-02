@@ -28,6 +28,13 @@ const NewPostButton = ({ showModal, hideModal, plusIcon }) => {
   }, [file, showModal]);
   return (
     <Fragment>
+      <label
+        style={{ cursor: 'pointer' }}
+        className="icon"
+        htmlFor="file-upload"
+      >
+        <Icon icon={plusIcon ? 'add-circle-outline' : 'camera-outline'} />
+      </label>
       <input
         id="file-upload"
         type="file"
@@ -37,13 +44,6 @@ const NewPostButton = ({ showModal, hideModal, plusIcon }) => {
         onChange={(event) => setFile(event.target.files[0])}
         ref={fileInputRef}
       />
-      <label
-        style={{ cursor: 'pointer' }}
-        className="icon"
-        htmlFor="file-upload"
-      >
-        <Icon icon={plusIcon ? 'add-circle-outline' : 'camera-outline'} />
-      </label>
     </Fragment>
   );
 };
