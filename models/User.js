@@ -30,7 +30,6 @@ const UserSchema = new Schema({
   },
   password: {
     type: String,
-    required: true,
     minlength: 8,
   },
   avatar: String,
@@ -50,6 +49,7 @@ const UserSchema = new Schema({
       },
     },
   ],
+  githubId: Number,
   private: {
     type: Boolean,
     default: false,

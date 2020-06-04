@@ -11,10 +11,12 @@ export const INITIAL_STATE = {
 
 const userReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
+    case userTypes.GITHUB_SIGN_IN_START:
     case userTypes.SIGN_UP_START:
     case userTypes.SIGN_IN_START: {
       return { ...state, error: false, fetching: true };
     }
+    case userTypes.GITHUB_SIGN_IN_SUCCESS:
     case userTypes.SIGN_IN_SUCCESS: {
       return {
         ...state,
@@ -24,6 +26,7 @@ const userReducer = (state = INITIAL_STATE, action) => {
         token: action.payload.token,
       };
     }
+    case userTypes.GITHUB_SIGN_IN_FAILURE:
     case userTypes.SIGN_UP_FAILURE:
     case userTypes.SIGN_IN_FAILURE: {
       return {

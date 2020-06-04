@@ -119,9 +119,6 @@ export function UnconnectedApp({
           <Route exact path="/:username" component={ProfilePage} />
           <Route path="/post/:postId" component={PostPage} />
           <ProtectedRoute path="/confirm/:token" component={ConfirmationPage} />
-          <Route>
-            <h1>Oof</h1>
-          </Route>
         </Switch>
         {pathname !== '/' && <Footer />}
         {pathname !== '/login' &&

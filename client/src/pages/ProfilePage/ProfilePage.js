@@ -1,7 +1,7 @@
 import React, { useReducer, useEffect, Fragment } from 'react';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
-import { useParams, useHistory, Link } from 'react-router-dom';
+import { useParams, useHistory } from 'react-router-dom';
 
 import { selectCurrentUser, selectToken } from '../../redux/user/userSelectors';
 
@@ -14,11 +14,11 @@ import { getPosts } from '../../services/postService';
 import useScrollPositionThrottled from '../../hooks/useScrollPositionThrottled';
 
 import ProfileCategory from '../../components/ProfileCategory/ProfileCategory';
-import Icon from '../../components/Icon/Icon';
 import ProfileImage from '../../components/ProfileImage/ProfileImage';
 import Loader from '../../components/Loader/Loader';
 import SkeletonLoader from '../../components/SkeletonLoader/SkeletonLoader';
 import MobileHeader from '../../components/Header/MobileHeader/MobileHeader';
+import SettingsButton from '../../components/SettingsButton/SettingsButton';
 import ProfileHeader from './ProfileHeader';
 
 const ProfilePage = ({ currentUser, token, showModal }) => {
@@ -142,7 +142,7 @@ const ProfilePage = ({ currentUser, token, showModal }) => {
     <Fragment>
       {currentUser && currentUser.username === username ? (
         <MobileHeader>
-          <Icon icon="aperture-outline" />
+          <SettingsButton />
           <h3 className="heading-3">{username}</h3>
           <div></div>
         </MobileHeader>

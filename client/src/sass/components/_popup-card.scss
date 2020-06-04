@@ -16,6 +16,11 @@
     padding: 2rem;
     line-height: 4rem;
     text-align: center;
+
+    @include respond(phone) {
+      line-height: 3rem;
+      padding: 2rem 5rem;
+    }
   }
 
   &:before {

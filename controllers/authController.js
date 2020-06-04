@@ -3,8 +3,12 @@ const crypto = require('crypto');
 const User = require('../models/User');
 const ConfirmationToken = require('../models/ConfirmationToken');
 const bcrypt = require('bcrypt');
+const axios = require('axios');
 
-const { sendConfirmationEmail } = require('../utils/controllerUtils');
+const {
+  sendConfirmationEmail,
+  generateUniqueUsername,
+} = require('../utils/controllerUtils');
 const {
   validateEmail,
   validateFullName,
@@ -83,7 +87,7 @@ module.exports.loginAuthentication = async (req, res, next) => {
     const user = await User.findOne({
       $or: [{ username: usernameOrEmail }, { email: usernameOrEmail }],
     });
-    if (!user) {
+    if (!user || !user.password) {
       return res.status(401).send({
         error: 'The credentials you provided are incorrect, please try again.',
       });
@@ -151,6 +155,93 @@ module.exports.register = async (req, res, next) => {
     next(err);
   }
   sendConfirmationEmail(user.username, user.email, confirmationToken.token);
+};
+
+module.exports.githubLoginAuthentication = async (req, res, next) => {
+  const { code, state } = req.body;
+  if (!code || !state) {
+    return res
+      .status(400)
+      .send({ error: 'Please provide a github access code and state.' });
+  }
+
+  try {
+    // Exchange the temporary code with an access token
+    const response = await axios.post(
+      'https://github.com/login/oauth/access_token',
+      {
+        client_id: process.env.GITHUB_CLIENT_ID,
+        client_secret: process.env.GITHUB_CLIENT_SECRET,
+        code,
+        state,
+      }
+    );
+    const accessToken = response.data.split('&')[0].split('=')[1];
+
+    // Retrieve the user's info
+    const githubUser = await axios.get('https://api.github.com/user', {
+      headers: { Authorization: `token ${accessToken}` },
+    });
+
+    // Retrieve the user's email addresses
+    // Private emails are not provided in the previous request
+    const emails = await axios.get('https://api.github.com/user/emails', {
+      headers: { Authorization: `token ${accessToken}` },
+    });
+    const primaryEmail = emails.data.find((email) => email.primary).email;
+
+    const userDocument = await User.findOne({ githubId: githubUser.data.id });
+    if (userDocument) {
+      return res.send({
+        user: {
+          _id: userDocument._id,
+          email: userDocument.email,
+          username: userDocument.username,
+          avatar: userDocument.avatar,
+          bookmarks: userDocument.bookmarks,
+        },
+        token: jwt.encode({ id: userDocument._id }, process.env.JWT_SECRET),
+      });
+    }
+
+    const existingUser = await User.findOne({
+      $or: [{ email: primaryEmail }, { username: githubUser.data.login }],
+    });
+
+    if (existingUser) {
+      if (existingUser.email === primaryEmail) {
+        return res.status(400).send({
+          error:
+            'A user with the same email already exists, please change your primary github email.',
+        });
+      }
+      if (existingUser.username === githubUser.data.login.toLowerCase()) {
+        const username = await generateUniqueUsername(githubUser.data.login);
+        githubUser.data.login = username;
+      }
+    }
+
+    const user = new User({
+      email: primaryEmail,
+      fullName: githubUser.data.name,
+      username: githubUser.data.login,
+      githubId: githubUser.data.id,
+      avatar: githubUser.data.avatar_url,
+    });
+
+    await user.save();
+    return res.send({
+      user: {
+        email: user.email,
+        username: user.username,
+        avatar: user.avatar,
+        bookmarks: user.bookmarks,
+      },
+      token: jwt.encode({ id: user._id }, process.env.JWT_SECRET),
+    });
+  } catch (err) {
+    next(err);
+  }
 };
 
 module.exports.changePassword = async (req, res, next) => {

@@ -21,6 +21,7 @@ import Icon from '../Icon/Icon';
 import Card from '../Card/Card';
 import FormInput from '../FormInput/FormInput';
 import ViewOnGithubButton from '../ViewOnGithubButton/ViewOnGithubButton';
+import GithubLoginButton from '../GithubLoginButton/GithubLoginButton';
 
 const SignUpCard = ({ signUpStart, error, fetching }) => {
   const validate = (values) => {
@@ -66,20 +67,16 @@ const SignUpCard = ({ signUpStart, error, fetching }) => {
         >
           Sign up to see photos and videos from your friends.
         </h2>
-        <Button
+        <GithubLoginButton
           style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             width: '100%',
+            color: 'white',
           }}
-        >
-          <Icon
-            style={{ marginRight: '1rem', color: 'white' }}
-            icon="logo-github"
-          />{' '}
-          Log in with GitHub
-        </Button>
+          button
+        />
         <Divider>OR</Divider>
         <form className="form-card__form" onSubmit={formik.handleSubmit}>
           <FormInput
@@ -119,7 +116,7 @@ const SignUpCard = ({ signUpStart, error, fetching }) => {
         </form>
         <p className="error">
           {error
-            ? error.error
+            ? error
             : formik.submitCount > 0 && Object.values(formik.errors)[0]}
         </p>
         <p className="heading-5 color-grey">

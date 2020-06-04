@@ -12,15 +12,13 @@ import Button from '../Button/Button';
 import FormInput from '../FormInput/FormInput';
 import Divider from '../Divider/Divider';
 import TextButton from '../Button/TextButton/TextButton';
-import Icon from '../Icon/Icon';
 import ViewOnGithubButton from '../ViewOnGithubButton/ViewOnGithubButton';
-
+import GithubLoginButton from '../GithubLoginButton/GithubLoginButton';
 import Card from '../Card/Card';
 
 const LoginCard = ({ signInStart, error, fetching }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
   const handleSubmit = (event) => {
     event.preventDefault();
     signInStart(email, password);
@@ -46,24 +44,15 @@ const LoginCard = ({ signInStart, error, fetching }) => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          <Button loading={fetching}>Log In</Button>
+          <Button disabled={fetching} loading={fetching}>
+            Log In
+          </Button>
         </form>
         <Divider>OR</Divider>
-        <TextButton
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            margin: '0 auto',
-          }}
-          bold
-        >
-          <Icon style={{ marginRight: '1rem' }} icon="logo-github" />
-          Log in with GitHub
-        </TextButton>
+        <GithubLoginButton />
         {error && (
           <p style={{ padding: '1rem 0' }} className="error">
-            {error.error}
+            {error}
           </p>
         )}
         <TextButton style={{ marginTop: '1.5rem' }} darkBlue small>

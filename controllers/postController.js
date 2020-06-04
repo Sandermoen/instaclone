@@ -221,6 +221,7 @@ module.exports.votePost = async (req, res, next) => {
           notificationData: {
             postId,
             image,
+            filter: post.filter,
           },
         });
 

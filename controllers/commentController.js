@@ -55,7 +55,15 @@ module.exports.createComment = async (req, res, next) => {
       { height: 50, width: 50, x: '100%', y: '100%' },
       true
     );
-    sendCommentNotification(req, user, post.author, image, message, post._id);
+    sendCommentNotification(
+      req,
+      user,
+      post.author,
+      image,
+      post.filter,
+      message,
+      post._id
+    );
 
     // Find the username of the post author
     const postDocument = await Post.findById(post._id).populate('author');
@@ -197,6 +205,7 @@ module.exports.createCommentReply = async (req, res, next) => {
       user,
       postDocument.author._id,
       image,
+      postDocument.filter,
       message,
       postDocument._id
     );

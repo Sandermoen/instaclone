@@ -6,7 +6,7 @@ import Avatar from '../../components/Avatar/Avatar';
 import UsersList from '../../components/UsersList/UsersList';
 import UnfollowPrompt from '../../components/UnfollowPrompt/UnfollowPrompt';
 import Button from '../../components/Button/Button';
-import Icon from '../../components/Icon/Icon';
+import SettingsButton from '../../components/SettingsButton/SettingsButton';
 
 const ProfileHeader = ({
   currentUser,
@@ -48,9 +48,7 @@ const ProfileHeader = ({
             <Link to="/settings/edit">
               <Button inverted>Edit Profile</Button>
             </Link>
-            <div className="icon">
-              <Icon icon="aperture-outline" />
-            </div>
+            <SettingsButton />
           </Fragment>
         );
       } else if (data.isFollowing) {

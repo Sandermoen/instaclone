@@ -203,7 +203,10 @@ const PostDialog = ({
                             {
                               text: 'Delete post',
                               warning: true,
-                              onClick: () => handleDeletePost(),
+                              onClick: () => {
+                                handleDeletePost();
+                                history.push('/' + currentUser.username);
+                              },
                             },
                           ]
                         : options,

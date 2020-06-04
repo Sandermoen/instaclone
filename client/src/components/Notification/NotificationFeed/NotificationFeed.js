@@ -83,7 +83,10 @@ const NotificationFeed = ({
                 <Link to={`/post/${notification.notificationData.postId}`}>
                   <img
                     src={notification.notificationData.image}
-                    style={{ display: 'flex' }}
+                    style={{
+                      display: 'flex',
+                      filter: notification.notificationData.filter,
+                    }}
                     onClick={() =>
                       setShowNotifications && setShowNotifications(false)
                     }
@@ -105,7 +108,10 @@ const NotificationFeed = ({
                 <Link to={`/post/${notification.notificationData.postId}`}>
                   <img
                     src={notification.notificationData.image}
-                    style={{ display: 'flex' }}
+                    style={{
+                      display: 'flex',
+                      filter: notification.notificationData.filter,
+                    }}
                     onClick={() =>
                       setShowNotifications && setShowNotifications(false)
                     }
@@ -126,7 +132,7 @@ const NotificationFeed = ({
           );
         })
       ) : (
-        <div className="notification-card__empty">
+        <div className="popup-card__empty">
           <Icon className="icon--larger" icon="heart-circle-outline" />
           <h2 className="heading-2 font-medium">Activity On Your Posts</h2>
           <h4 className="heading-4 font-medium">

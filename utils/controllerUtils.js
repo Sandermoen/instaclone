@@ -177,6 +177,7 @@ module.exports.formatCloudinaryUrl = (url, size, thumb) => {
  * @param {object} sender User who triggered the notification
  * @param {string} receiver Id of the user to receive the notification
  * @param {string} image Image of the post that was commented on
+ * @param {string} filter The filter applied to the image
  * @param {string} message The message sent by the user
  * @param {string} postId The id of the post that was commented on
  */
@@ -185,6 +186,7 @@ module.exports.sendCommentNotification = async (
   sender,
   receiver,
   image,
+  filter,
   message,
   postId
 ) => {
@@ -199,6 +201,7 @@ module.exports.sendCommentNotification = async (
           postId,
           image,
           message,
+          filter,
         },
       });
       await notification.save();
@@ -253,6 +256,7 @@ module.exports.sendMentionNotification = (req, message, image, post, user) => {
             postId: post._id,
             image,
             message,
+            filter: post.filter,
           },
         });
         await notification.save();
@@ -267,4 +271,26 @@ module.exports.sendMentionNotification = (req, message, image, post, user) => {
       }
     }
   });
+};
+
+/**
+ * Generates a unique username based on the base username
+ * @function generateUniqueUsername
+ * @param {string} baseUsername The first part of the username to add a random number to
+ * @returns {string} Unique username
+ */
+module.exports.generateUniqueUsername = async (baseUsername) => {
+  let uniqueUsername = undefined;
+  try {
+    while (!uniqueUsername) {
+      const username = baseUsername + Math.floor(Math.random(1000) * 9999 + 1);
+      const user = await User.findOne({ username });
+      if (!user) {
+        uniqueUsername = username;
+      }
+    }
+    return uniqueUsername;
+  } catch (err) {
+    throw new Error(err.message);
+  }
 };

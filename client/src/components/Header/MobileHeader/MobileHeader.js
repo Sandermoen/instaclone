@@ -1,19 +1,51 @@
-import React from 'react';
+import React, { Fragment } from 'react';
+import { connect } from 'react-redux';
+import { createStructuredSelector } from 'reselect';
 import { useHistory } from 'react-router-dom';
 
-import Icon from '../../Icon/Icon';
+import { selectCurrentUser } from '../../../redux/user/userSelectors';
 
-const MobileHeader = ({ children, backArrow, style, show }) => {
+import Icon from '../../Icon/Icon';
+import Button from '../../Button/Button';
+import TextButton from '../../Button/TextButton/TextButton';
+
+const MobileHeader = ({ children, backArrow, style, show, currentUser }) => {
   const { goBack } = useHistory();
   return (
     <header
       style={{ ...style, display: `${show && 'grid'}` }}
       className="header--mobile"
     >
-      {backArrow && <Icon onClick={() => goBack()} icon="chevron-back" />}
-      {children}
+      {currentUser ? (
+        <Fragment>
+          {backArrow && (
+            <Icon
+              onClick={() => goBack()}
+              style={{ cursor: 'pointer' }}
+              icon="chevron-back"
+            />
+          )}
+          {children}
+        </Fragment>
+      ) : (
+        <Fragment>
+          <h3 style={{ fontSize: '2.5rem' }} className="heading-logo">
+            Instaclone
+          </h3>
+          <div style={{ gridColumn: '-1' }}>
+            <Button style={{ marginRight: '1rem' }}>Log In</Button>
+            <TextButton bold blue>
+              Sign Up
+            </TextButton>
+          </div>
+        </Fragment>
+      )}
     </header>
   );
 };
 
-export default MobileHeader;
+const mapStateToProps = createStructuredSelector({
+  currentUser: selectCurrentUser,
+});
+
+export default connect(mapStateToProps)(MobileHeader);

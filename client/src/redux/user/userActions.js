@@ -1,14 +1,18 @@
 import userTypes from './userTypes';
 
 import { bookmarkPost as bookmark } from '../../services/postService';
-import { registerUser, login } from '../../services/authenticationServices';
+import {
+  registerUser,
+  login,
+  githubAuthentication,
+} from '../../services/authenticationServices';
 import {
   changeAvatar,
   removeAvatar,
   updateProfile,
 } from '../../services/userService';
 
-const signOut = () => {
+export const signOut = () => {
   localStorage.removeItem('token');
   return {
     type: userTypes.SIGN_OUT,
@@ -37,7 +41,18 @@ export const signInStart = (usernameOrEmail, password, authToken) => async (
     dispatch(signInSuccess(response));
   } catch (err) {
     if (authToken) dispatch(signOut);
-    dispatch(signInFailure({ error: err.message }));
+    dispatch(signInFailure(err.message));
+  }
+};
+
+export const githubSignInStart = (code) => async (dispatch) => {
+  try {
+    dispatch({ type: userTypes.GITHUB_SIGN_IN_START });
+    const response = await githubAuthentication(code);
+    localStorage.setItem('token', response.token);
+    dispatch({ type: userTypes.GITHUB_SIGN_IN_SUCCESS, payload: response });
+  } catch (err) {
+    dispatch({ type: userTypes.GITHUB_SIGN_IN_FAILURE, payload: err.message });
   }
 };
 
