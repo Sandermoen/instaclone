@@ -1,0 +1,42 @@
+.suggested-users {
+  grid-column: center-start / center-end;
+  justify-self: center;
+  width: 70%;
+
+  &__small {
+    display: none;
+  }
+
+  &__title {
+    margin: 0 4rem;
+  }
+
+  @include respond(phone) {
+    grid-column: full-start / full-end;
+    background-color: $color-grey-3;
+    min-height: 100vh;
+    min-width: 100%;
+    padding: 2rem 0;
+    text-align: center;
+
+    &__large {
+      display: none;
+    }
+
+    &__small {
+      display: block;
+    }
+
+    &__card-container {
+      display: flex;
+      margin-top: 2rem;
+      padding: 2rem 0;
+      width: 100%;
+      overflow-x: scroll;
+
+      & > :not(:last-child) {
+        margin-right: 2rem;
+      }
+    }
+  }
+}

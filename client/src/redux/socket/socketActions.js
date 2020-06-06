@@ -19,3 +19,7 @@ export const connectSocket = () => (dispatch) => {
     dispatch(removePost(data));
   });
 };
+
+export const disconnectSocket = () => ({
+  type: socketTypes.DISCONNECT,
+});

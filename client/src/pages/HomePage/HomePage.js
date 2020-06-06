@@ -18,6 +18,7 @@ import SmallFooter from '../../components/Footer/SmallFooter/SmallFooter';
 import MobileHeader from '../../components/Header/MobileHeader/MobileHeader';
 import Icon from '../../components/Icon/Icon';
 import NewPostButton from '../../components/NewPost/NewPostButton/NewPostButton';
+import SuggestedUsers from '../../components/Suggestion/SuggestedUsers/SuggestedUsers';
 
 const HomePage = ({
   currentUser,
@@ -34,7 +35,7 @@ const HomePage = ({
     return () => {
       clearPosts();
     };
-  }, []);
+  }, [clearPosts, fetchFeedPostsStart, token]);
 
   useScrollPositionThrottled(
     ({ previousScrollPosition, currentScrollPosition, atBottom }) => {
@@ -54,19 +55,26 @@ const HomePage = ({
         <Icon icon="paper-plane-outline" />
       </MobileHeader>
       <div data-test="page-home" className="home-page grid">
-        <Feed />
-        <aside className="sidebar">
-          <div className="sidebar__content">
-            <UserCard
-              avatar={currentUser.avatar}
-              username={currentUser.username}
-              subText={currentUser.fullName}
-              style={{ padding: '0' }}
-              avatarMedium
-            />
-            <SmallFooter />
-          </div>
-        </aside>
+        {!fetching && feedPosts.length === 0 ? (
+          <SuggestedUsers card />
+        ) : (
+          <Fragment>
+            <Feed />
+            <aside className="sidebar">
+              <div className="sidebar__content">
+                <UserCard
+                  avatar={currentUser.avatar}
+                  username={currentUser.username}
+                  subText={currentUser.fullName}
+                  style={{ padding: '0' }}
+                  avatarMedium
+                />
+                <SuggestedUsers style={{ width: '100%' }} />
+                <SmallFooter />
+              </div>
+            </aside>
+          </Fragment>
+        )}
       </div>
     </Fragment>
   );

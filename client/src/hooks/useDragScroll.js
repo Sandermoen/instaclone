@@ -5,12 +5,12 @@ let startX = 0;
 let scrollLeft = 0;
 
 const useDragScroll = (elementRef) => {
-  let mouseDownEvent = null;
-  let mouseLeaveEvent = null;
-  let mouseUpEvent = null;
-  let mouseMoveEvent = null;
-
   useEffect(() => {
+    let mouseDownEvent = null;
+    let mouseLeaveEvent = null;
+    let mouseUpEvent = null;
+    let mouseMoveEvent = null;
+    const element = elementRef.current;
     if (elementRef.current) {
       const down = (event) => {
         event.preventDefault();
@@ -43,11 +43,13 @@ const useDragScroll = (elementRef) => {
       );
     }
     return () => {
-      // Remove event listeners
-      elementRef.current.removeEventListener('mousedown', mouseDownEvent);
-      elementRef.current.removeEventListener('mouseleave', mouseLeaveEvent);
-      elementRef.current.removeEventListener('mouseup', mouseUpEvent);
-      elementRef.current.removeEventListener('mousemove', mouseMoveEvent);
+      if (element) {
+        // Remove event listeners
+        element.removeEventListener('mousedown', mouseDownEvent);
+        element.removeEventListener('mouseleave', mouseLeaveEvent);
+        element.removeEventListener('mouseup', mouseUpEvent);
+        element.removeEventListener('mousemove', mouseMoveEvent);
+      }
     };
   }, [elementRef]);
 };

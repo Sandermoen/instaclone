@@ -55,13 +55,13 @@ export function UnconnectedApp({
       connectSocket();
       fetchNotificationsStart(token);
     }
-  }, [signInStart, token]);
+  }, [signInStart, connectSocket, fetchNotificationsStart, token]);
 
   useEffect(() => {
     if (alert.showAlert) {
       setTimeout(() => hideAlert(), ALERT_TIME);
     }
-  }, [alert.showAlert]);
+  }, [alert.showAlert, hideAlert]);
 
   const renderModals = () => {
     if (modal.modals.length > 0) {

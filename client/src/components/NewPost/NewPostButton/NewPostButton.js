@@ -6,7 +6,7 @@ import { showModal, hideModal } from '../../../redux/modal/modalActions';
 
 import Icon from '../../Icon/Icon';
 
-const NewPostButton = ({ showModal, hideModal, plusIcon }) => {
+const NewPostButton = ({ showModal, hideModal, plusIcon, children, style }) => {
   const [file, setFile] = useState(undefined);
   const fileInputRef = useRef();
   const history = useHistory();
@@ -25,15 +25,19 @@ const NewPostButton = ({ showModal, hideModal, plusIcon }) => {
       // use the same file twice
       fileInputRef.current.value = '';
     }
-  }, [file, showModal]);
+  }, [file, showModal, hideModal, history]);
   return (
     <Fragment>
       <label
-        style={{ cursor: 'pointer' }}
+        style={{ cursor: 'pointer', ...style }}
         className="icon"
         htmlFor="file-upload"
       >
-        <Icon icon={plusIcon ? 'add-circle-outline' : 'camera-outline'} />
+        {children ? (
+          children
+        ) : (
+          <Icon icon={plusIcon ? 'add-circle-outline' : 'camera-outline'} />
+        )}
       </label>
       <input
         id="file-upload"

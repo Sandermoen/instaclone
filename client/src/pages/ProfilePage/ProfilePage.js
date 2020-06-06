@@ -20,6 +20,7 @@ import SkeletonLoader from '../../components/SkeletonLoader/SkeletonLoader';
 import MobileHeader from '../../components/Header/MobileHeader/MobileHeader';
 import SettingsButton from '../../components/SettingsButton/SettingsButton';
 import ProfileHeader from './ProfileHeader';
+import EmptyProfile from './EmptyProfile';
 
 const ProfilePage = ({ currentUser, token, showModal }) => {
   const { username } = useParams();
@@ -71,7 +72,7 @@ const ProfilePage = ({ currentUser, token, showModal }) => {
         dispatch({ type: 'FETCH_PROFILE_FAILURE', payload: err });
       }
     })();
-  }, [username]);
+  }, [username, token]);
 
   const handleClick = (postId) => {
     if (window.outerWidth <= 600) {
@@ -106,33 +107,40 @@ const ProfilePage = ({ currentUser, token, showModal }) => {
             loading={state.following}
           />
           <ProfileCategory category="POSTS" icon="apps-outline" />
-          <div className="profile-images">
-            {state.data.posts.map((post, idx) => {
-              return (
-                <ProfileImage
-                  onClick={() => handleClick(post._id)}
-                  image={post.image}
-                  likes={post.postVotes}
-                  comments={post.comments}
-                  filter={post.filter}
-                  key={idx}
-                />
-              );
-            })}
-            {state.fetchingAdditionalPosts && (
-              <Fragment>
-                <div>
-                  <SkeletonLoader animated />
-                </div>
-                <div>
-                  <SkeletonLoader animated />
-                </div>
-                <div>
-                  <SkeletonLoader animated />
-                </div>
-              </Fragment>
-            )}
-          </div>
+          {state.data.posts.length > 0 ? (
+            <div className="profile-images">
+              {state.data.posts.map((post, idx) => {
+                return (
+                  <ProfileImage
+                    onClick={() => handleClick(post._id)}
+                    image={post.image}
+                    likes={post.postVotes}
+                    comments={post.comments}
+                    filter={post.filter}
+                    key={idx}
+                  />
+                );
+              })}
+              {state.fetchingAdditionalPosts && (
+                <Fragment>
+                  <div>
+                    <SkeletonLoader animated />
+                  </div>
+                  <div>
+                    <SkeletonLoader animated />
+                  </div>
+                  <div>
+                    <SkeletonLoader animated />
+                  </div>
+                </Fragment>
+              )}
+            </div>
+          ) : (
+            <EmptyProfile
+              currentUserProfile={currentUser.username === username}
+              username={username}
+            />
+          )}
         </Fragment>
       );
     }

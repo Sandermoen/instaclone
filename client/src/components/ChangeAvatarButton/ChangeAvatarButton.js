@@ -31,7 +31,7 @@ const ChangeAvatarButton = ({
     if (error) {
       showAlert(error);
     }
-  }, [error]);
+  }, [error, showAlert]);
 
   const handleClick = (event) => {
     if (avatar) {

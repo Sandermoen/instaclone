@@ -31,7 +31,7 @@ const FilterSelector = ({ setFilter, filters, previewImage }) => {
             <span className="filter-selector__filter-name heading-5">
               Normal
             </span>
-            <img src={previewImage} alt="Filter preview photo" />
+            <img src={previewImage} alt="Filter preview" />
           </li>
           {filters.map(({ name, filter }, idx) => (
             <li
@@ -46,11 +46,7 @@ const FilterSelector = ({ setFilter, filters, previewImage }) => {
               <span className="filter-selector__filter-name heading-5">
                 {name}
               </span>
-              <img
-                src={previewImage}
-                style={{ filter }}
-                alt="Filter preview photo"
-              />
+              <img src={previewImage} style={{ filter }} alt="Filter preview" />
             </li>
           ))}
         </Fragment>

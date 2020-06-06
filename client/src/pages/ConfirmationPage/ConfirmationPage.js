@@ -44,7 +44,7 @@ const VerificationPage = ({ authToken, showModal }) => {
       );
       return history.push('/');
     })();
-  }, [authToken, history, showModal]);
+  }, [authToken, history, showModal, token]);
 
   return (
     <div className="verification-page">

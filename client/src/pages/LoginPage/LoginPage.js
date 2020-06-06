@@ -24,7 +24,7 @@ const LoginPage = ({ currentUser, githubSignInStart }) => {
       }
       githubSignInStart(code);
     }
-  }, []);
+  }, [authState, code, githubSignInStart]);
 
   return (
     <div data-test="page-login" className="login-page">

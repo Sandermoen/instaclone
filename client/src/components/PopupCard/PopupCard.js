@@ -12,7 +12,7 @@ const PopupCard = ({ children, hide, leftAlign }) => {
     return () => {
       window.removeEventListener('click', hide);
     };
-  }, []);
+  }, [hide]);
 
   return (
     <Card

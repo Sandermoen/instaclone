@@ -34,16 +34,6 @@ const EditProfileForm = ({
   updateProfileStart,
   updatingProfile,
 }) => {
-  useEffect(() => {
-    document.title = 'Edit Profile • Instaclone';
-  }, []);
-
-  useEffect(() => {
-    if (formik.submitCount > 0) {
-      showAlert('Profile saved.');
-    }
-  }, [currentUser]);
-
   const validate = (values) => {
     const errors = {};
     const emailError = validateEmail(values.email);
@@ -77,6 +67,16 @@ const EditProfileForm = ({
       updateProfileStart(token, values);
     },
   });
+
+  useEffect(() => {
+    document.title = 'Edit Profile • Instaclone';
+  }, []);
+
+  useEffect(() => {
+    if (formik.submitCount > 0) {
+      showAlert('Profile saved.');
+    }
+  }, [currentUser, formik.submitCount, showAlert]);
 
   return (
     <SettingsForm onSubmit={formik.handleSubmit}>

@@ -1,0 +1,46 @@
+.suggestion-card {
+  background-color: $color-white;
+  padding: 2rem 0;
+  border-radius: 30px;
+  flex-basis: 25rem;
+  box-shadow: 0 2px 25px -15px $color-black;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  &__content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 1rem 0;
+    height: 7rem;
+    & > :not(:last-child) {
+      margin-right: 1px;
+    }
+  }
+
+  &__image-container {
+    width: 7rem;
+    margin: 0 auto;
+
+    & > img {
+      height: 100%;
+      width: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &__footer {
+    margin-top: auto;
+    width: 100%;
+
+    & > :not(:last-child) {
+      margin-bottom: 1rem;
+    }
+  }
+}

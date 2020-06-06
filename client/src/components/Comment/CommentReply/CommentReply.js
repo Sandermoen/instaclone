@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect, Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { formatDateDistance } from '../../../utils/timeUtils';
 import { Link } from 'react-router-dom';
 import Linkify from 'linkifyjs/react';

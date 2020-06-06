@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment } from 'react';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import { Link } from 'react-router-dom';
@@ -17,7 +17,6 @@ import {
 import Button from '../Button/Button';
 import TextButton from '../Button/TextButton/TextButton';
 import Divider from '../Divider/Divider';
-import Icon from '../Icon/Icon';
 import Card from '../Card/Card';
 import FormInput from '../FormInput/FormInput';
 import ViewOnGithubButton from '../ViewOnGithubButton/ViewOnGithubButton';

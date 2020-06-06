@@ -1,5 +1,6 @@
 import userTypes from './userTypes';
 
+import { disconnectSocket } from '../socket/socketActions';
 import { bookmarkPost as bookmark } from '../../services/postService';
 import {
   registerUser,
@@ -12,11 +13,10 @@ import {
   updateProfile,
 } from '../../services/userService';
 
-export const signOut = () => {
+export const signOut = () => (dispatch) => {
   localStorage.removeItem('token');
-  return {
-    type: userTypes.SIGN_OUT,
-  };
+  dispatch(disconnectSocket());
+  dispatch({ type: userTypes.SIGN_OUT });
 };
 
 export const signInSuccess = (user) => {

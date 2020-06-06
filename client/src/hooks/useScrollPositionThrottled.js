@@ -50,7 +50,7 @@ const useScrollPositionThrottled = (callback, element) => {
         ? element.removeEventListener('scroll', handleScrollThrottled)
         : window.removeEventListener('scroll', handleScrollThrottled);
     };
-  }, [handleScrollThrottled]);
+  }, [handleScrollThrottled, element]);
 };
 
 export default useScrollPositionThrottled;

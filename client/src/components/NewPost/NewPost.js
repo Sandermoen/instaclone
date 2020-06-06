@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { getPostFilters } from '../../services/postService';
 
 import NewPostForm from './NewPostForm/NewPostForm';
-import NewPostEdit from './NewPostEdit/NewPostEdit';
 import NewPostFilter from './NewPostFilter/NewPostFilter';
 import MobileHeader from '../Header/MobileHeader/MobileHeader';
 import TextButton from '../Button/TextButton/TextButton';

@@ -74,7 +74,7 @@ const PostDialog = ({
         );
       }
     };
-  }, [postId]);
+  }, [postId, history, loading, postData]);
 
   const fetchAdditionalComments = async () => {
     try {

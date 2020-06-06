@@ -30,7 +30,7 @@ const useSearchUsersDebounced = () => {
   const handleSearchDebounced = debounce(handleSearch, 500);
   const handleSearchDebouncedMemoized = useCallback(
     (string, offset) => handleSearchDebounced(string, offset),
-    []
+    [handleSearchDebounced]
   );
   return {
     handleSearchDebouncedMemoized,

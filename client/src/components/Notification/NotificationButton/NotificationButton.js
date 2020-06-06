@@ -42,7 +42,7 @@ const NotificationButton = ({
       clearTimeout(notificationPopupTimeout);
       setShowNotificationPopup(false);
     }
-  }, [showNotifications]);
+  }, [showNotifications, notificationPopupTimeout]);
 
   const transitions = useTransition(
     showNotificationPopup && !showNotifications,

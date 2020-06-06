@@ -23,6 +23,7 @@ const FollowButton = ({
   username,
   avatar,
   showAlert,
+  style,
 }) => {
   const [isFollowing, setIsFollowing] = useState(following);
   const [loading, setLoading] = useState(false);
@@ -50,6 +51,7 @@ const FollowButton = ({
   if (isFollowing) {
     return (
       <Button
+        style={style}
         loading={loading}
         onClick={() =>
           showModal(
@@ -73,7 +75,7 @@ const FollowButton = ({
     );
   }
   return (
-    <Button loading={loading} onClick={() => follow()}>
+    <Button style={style} loading={loading} onClick={() => follow()}>
       Follow
     </Button>
   );

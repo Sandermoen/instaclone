@@ -629,3 +629,69 @@ module.exports.updateProfile = async (req, res, next) => {
     next(err);
   }
 };
+
+module.exports.retrieveSuggestedUsers = async (req, res, next) => {
+  const user = res.locals.user;
+  try {
+    const users = await User.aggregate([
+      {
+        $match: { _id: { $ne: ObjectId(user._id) } },
+      },
+      {
+        $lookup: {
+          from: 'followers',
+          localField: '_id',
+          foreignField: 'user',
+          as: 'followers',
+        },
+      },
+      {
+        $lookup: {
+          from: 'posts',
+          let: { userId: '$_id' },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $eq: ['$author', '$$userId'],
+                },
+              },
+            },
+            {
+              $sort: { date: -1 },
+            },
+            {
+              $limit: 3,
+            },
+          ],
+          as: 'posts',
+        },
+      },
+      {
+        $unwind: '$followers',
+      },
+      {
+        $project: {
+          username: true,
+          fullName: true,
+          email: true,
+          avatar: true,
+          isFollowing: { $in: [user._id, '$followers.followers.user'] },
+          posts: true,
+        },
+      },
+      {
+        $match: { isFollowing: false },
+      },
+      {
+        $unset: ['isFollowing'],
+      },
+      {
+        $sample: { size: 20 },
+      },
+    ]);
+    res.send(users);
+  } catch (err) {
+    next(err);
+  }
+};

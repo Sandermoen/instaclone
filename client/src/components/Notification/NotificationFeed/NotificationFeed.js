@@ -46,7 +46,12 @@ const NotificationFeed = ({
     return () => {
       clearNotifications();
     };
-  }, []);
+  }, [
+    fetchNotificationsStart,
+    readNotificationsStart,
+    clearNotifications,
+    token,
+  ]);
 
   return (
     <Fragment>
@@ -90,7 +95,7 @@ const NotificationFeed = ({
                     onClick={() =>
                       setShowNotifications && setShowNotifications(false)
                     }
-                    alt="liked photo"
+                    alt="liked post"
                   />
                 </Link>
               );
@@ -115,7 +120,7 @@ const NotificationFeed = ({
                     onClick={() =>
                       setShowNotifications && setShowNotifications(false)
                     }
-                    alt="photo commented on"
+                    alt="post commented on"
                   />
                 </Link>
               );

@@ -105,3 +105,22 @@ export const updateProfile = async (authToken, updates) => {
     throw new Error(err.response.data.error);
   }
 };
+
+/**
+ * Gets random suggested users for the user to follow
+ * @function getSuggestedUsers
+ * @param {string} authToken A user's auth token
+ * @returns {array} Array of users
+ */
+export const getSuggestedUsers = async (authToken) => {
+  try {
+    const response = await axios.get('/api/user/suggested', {
+      headers: {
+        authorization: authToken,
+      },
+    });
+    return response.data;
+  } catch (err) {
+    throw new Error(err.response.data.error);
+  }
+};

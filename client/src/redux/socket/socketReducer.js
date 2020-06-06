@@ -12,6 +12,10 @@ const socketReducer = (state = INTIAL_STATE, action) => {
         socket: action.payload,
       };
     }
+    case socketTypes.DISCONNECT: {
+      state.socket && state.socket.disconnect();
+      return INTIAL_STATE;
+    }
     default: {
       return state;
     }

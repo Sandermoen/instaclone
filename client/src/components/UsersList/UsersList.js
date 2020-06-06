@@ -44,19 +44,22 @@ const UsersList = ({
     }
   }, componentRef.current);
 
+  const stateRef = useRef(state.data).current;
+  const followingRef = useRef(following).current;
+
   useEffect(() => {
     (async function () {
       try {
         dispatch({ type: 'FETCH_START' });
-        const response = following
+        const response = followingRef
           ? await retrieveUserFollowing(
               userId,
-              state.data ? state.data.length : 0,
+              stateRef ? stateRef.length : 0,
               token
             )
           : await retrieveUserFollowers(
               userId,
-              state.data ? state.data.length : 0,
+              stateRef ? stateRef.length : 0,
               token
             );
         dispatch({ type: 'FETCH_SUCCESS', payload: response });
@@ -64,7 +67,7 @@ const UsersList = ({
         dispatch({ type: 'FETCH_FAILURE', payload: err });
       }
     })();
-  }, [userId, token]);
+  }, [userId, token, stateRef, followingRef]);
 
   return (
     <section

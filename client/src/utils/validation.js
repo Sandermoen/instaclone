@@ -2,6 +2,7 @@ export const validateEmail = (email) => {
   if (
     !email ||
     !email.match(
+      //eslint-disable-next-line
       /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     )
   ) {
@@ -22,6 +23,7 @@ export const validateUsername = (username) => {
     return 'Enter a valid username.';
   } else if (username.length > 30 || username.length < 3) {
     return 'Please choose a username between 3 and 30 characters.';
+    //eslint-disable-next-line
   } else if (!username.match(/^[a-zA-Z0-9\_.]+$/)) {
     return 'A username can only contain the following: letters A-Z, numbers 0-9 and the symbols _ . ';
   }
@@ -52,6 +54,7 @@ export const validateWebsite = (website) => {
   if (
     website &&
     !website.match(
+      //eslint-disable-next-line
       /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/
     )
   ) {

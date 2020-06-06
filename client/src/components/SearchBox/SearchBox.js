@@ -23,7 +23,7 @@ const SearchBox = ({ style, setResult, onClick }) => {
     if (result.length > 0 && setResult) {
       setResult(result);
     }
-  }, [result]);
+  }, [result, setResult]);
 
   return (
     <Fragment>

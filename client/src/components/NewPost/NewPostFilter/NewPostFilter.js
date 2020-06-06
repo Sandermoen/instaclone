@@ -9,7 +9,7 @@ const NewPostFilter = ({ previewImage, setPreviewImage, filters }) => {
         <div className="new-post__preview-image-container">
           <img
             src={previewImage.src}
-            alt="Photo to customize"
+            alt="Customize"
             style={{
               width: '100%',
               height: '100%',
