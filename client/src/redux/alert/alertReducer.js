@@ -4,6 +4,7 @@ const INITIAL_STATE = {
   text: '',
   onClick: null,
   showAlert: false,
+  timeoutId: null,
 };
 
 const alertReducer = (state = INITIAL_STATE, action) => {
@@ -18,7 +19,13 @@ const alertReducer = (state = INITIAL_STATE, action) => {
       };
     }
     case alertTypes.HIDE_ALERT: {
-      return INITIAL_STATE;
+      return { ...state, text: '', onClick: null, showAlert: false };
+    }
+    case alertTypes.SET_ALERT_TIMEOUT_ID: {
+      return {
+        ...state,
+        timeoutId: action.payload,
+      };
     }
     default: {
       return state;

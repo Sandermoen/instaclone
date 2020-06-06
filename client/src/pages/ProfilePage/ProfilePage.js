@@ -19,6 +19,7 @@ import Loader from '../../components/Loader/Loader';
 import SkeletonLoader from '../../components/SkeletonLoader/SkeletonLoader';
 import MobileHeader from '../../components/Header/MobileHeader/MobileHeader';
 import SettingsButton from '../../components/SettingsButton/SettingsButton';
+import NotFoundPage from '../../pages/NotFoundPage/NotFoundPage';
 import ProfileHeader from './ProfileHeader';
 import EmptyProfile from './EmptyProfile';
 
@@ -92,8 +93,6 @@ const ProfilePage = ({ currentUser, token, showModal }) => {
   const renderProfile = () => {
     if (state.fetching) {
       return <Loader />;
-    } else if (state.error) {
-      return <h1 className="heading-1">This page does not exist</h1>;
     }
     if (!state.fetching && state.data) {
       return (
@@ -146,7 +145,9 @@ const ProfilePage = ({ currentUser, token, showModal }) => {
     }
   };
 
-  return (
+  return state.error ? (
+    <NotFoundPage />
+  ) : (
     <Fragment>
       {currentUser && currentUser.username === username ? (
         <MobileHeader>

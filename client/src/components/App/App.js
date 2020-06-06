@@ -33,6 +33,9 @@ const SignUpPage = lazy(() => import('../../pages/SignUpPage/SignUpPage'));
 const HomePage = lazy(() => import('../../pages/HomePage/HomePage'));
 const NewPostPage = lazy(() => import('../../pages/NewPostPage/NewPostPage'));
 const ExplorePage = lazy(() => import('../../pages/ExplorePage/ExplorePage'));
+const NotFoundPage = lazy(() =>
+  import('../../pages/NotFoundPage/NotFoundPage')
+);
 
 export function UnconnectedApp({
   signInStart,
@@ -56,12 +59,6 @@ export function UnconnectedApp({
       fetchNotificationsStart(token);
     }
   }, [signInStart, connectSocket, fetchNotificationsStart, token]);
-
-  useEffect(() => {
-    if (alert.showAlert) {
-      setTimeout(() => hideAlert(), ALERT_TIME);
-    }
-  }, [alert.showAlert, hideAlert]);
 
   const renderModals = () => {
     if (modal.modals.length > 0) {
@@ -119,6 +116,7 @@ export function UnconnectedApp({
           <Route exact path="/:username" component={ProfilePage} />
           <Route path="/post/:postId" component={PostPage} />
           <ProtectedRoute path="/confirm/:token" component={ConfirmationPage} />
+          <Route component={NotFoundPage} />
         </Switch>
         {pathname !== '/' && <Footer />}
         {pathname !== '/login' &&

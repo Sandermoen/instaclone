@@ -46,7 +46,9 @@ const Header = memo(({ currentUser }) => {
         <div className="header__icons">
           {currentUser ? (
             <Fragment>
-              <Icon icon="compass-outline" />
+              <Link to="/explore">
+                <Icon icon="compass-outline" />
+              </Link>
               <NotificationButton />
               <NavLink
                 className="icon"

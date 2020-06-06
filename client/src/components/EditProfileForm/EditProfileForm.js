@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { connect } from 'react-redux';
 import { useFormik } from 'formik';
 import { createStructuredSelector } from 'reselect';
@@ -63,20 +63,15 @@ const EditProfileForm = ({
       website: currentUser.website || '',
     },
     validate,
-    onSubmit: (values) => {
-      updateProfileStart(token, values);
+    onSubmit: async (values) => {
+      await updateProfileStart(token, values);
+      showAlert('Profile saved.');
     },
   });
 
   useEffect(() => {
     document.title = 'Edit Profile • Instaclone';
   }, []);
-
-  useEffect(() => {
-    if (formik.submitCount > 0) {
-      showAlert('Profile saved.');
-    }
-  }, [currentUser, formik.submitCount, showAlert]);
 
   return (
     <SettingsForm onSubmit={formik.handleSubmit}>

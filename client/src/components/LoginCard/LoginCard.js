@@ -25,7 +25,7 @@ const LoginCard = ({ signInStart, error, fetching }) => {
   };
 
   return (
-    <Fragment>
+    <div className="login-card-container">
       <Card className="form-card">
         <h1 className="heading-logo text-center">Instaclone</h1>
         <form
@@ -79,7 +79,7 @@ const LoginCard = ({ signInStart, error, fetching }) => {
         </section>
       </Card>
       <ViewOnGithubButton />
-    </Fragment>
+    </div>
   );
 };
 

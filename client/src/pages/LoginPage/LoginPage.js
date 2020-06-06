@@ -28,6 +28,7 @@ const LoginPage = ({ currentUser, githubSignInStart }) => {
 
   return (
     <div data-test="page-login" className="login-page">
+      <div className="login-page__showcase"></div>
       <LoginCard />
     </div>
   );

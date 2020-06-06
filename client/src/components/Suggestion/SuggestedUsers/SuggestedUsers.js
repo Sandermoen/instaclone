@@ -66,12 +66,13 @@ const SuggestedUsers = ({ token, showAlert, card, style }) => {
           </div>
           <div className="suggested-users__card-container">
             {users &&
-              users.map((user) => (
+              users.map((user, idx) => (
                 <SuggestionCard
                   avatar={user.avatar}
                   username={user.username}
                   fullName={user.fullName}
                   posts={user.posts}
+                  key={idx}
                 >
                   <FollowButton
                     userId={user._id}

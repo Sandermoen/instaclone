@@ -1,18 +1,41 @@
 .login-page {
   display: grid;
   grid-template-rows: repeat(2, min-content);
-  grid-template-columns: minmax(35rem, min-content);
+  grid-template-columns: 65rem minmax(35rem, min-content);
   grid-row-gap: 1rem;
   justify-content: center;
   align-items: center;
+  grid-column-gap: 4rem;
 
   grid-row: 2 / span 1;
   grid-column: center-start / center-end;
 
   transform: translateY(15rem);
 
+  &__showcase {
+    background: url('https://res.cloudinary.com/drwb19czo/image/upload/v1591473701/PixelBook_Go_and_Pixel_4_XL_3_tqf7oq.png');
+    width: 100%;
+    height: 100%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+
+  @include respond(tab-land) {
+    grid-template-columns: minmax(35rem, min-content);
+    &__showcase {
+      display: none;
+    }
+  }
+
   @include respond(phone) {
     grid-template-columns: 100%;
     padding: 0 4rem;
+  }
+}
+
+.login-card-container {
+  & > :not(:last-child) {
+    margin-bottom: 1rem;
   }
 }
