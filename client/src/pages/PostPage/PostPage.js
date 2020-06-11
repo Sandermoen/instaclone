@@ -14,9 +14,9 @@ const PostPage = () => {
         {/* Empty element to keep grid happy */}
         <div></div>
       </MobileHeader>
-      <div className="post-page grid">
+      <main className="post-page grid">
         <PostDialog className="border-grey-2" postId={postId} />
-      </div>
+      </main>
     </Fragment>
   );
 };

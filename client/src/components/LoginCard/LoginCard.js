@@ -1,4 +1,4 @@
-import React, { useState, Fragment } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
@@ -6,7 +6,11 @@ import { Link } from 'react-router-dom';
 
 import { signInStart } from '../../redux/user/userActions';
 
-import { selectError, selectFetching } from '../../redux/user/userSelectors';
+import {
+  selectError,
+  selectFetching,
+  selectCurrentUser,
+} from '../../redux/user/userSelectors';
 
 import Button from '../Button/Button';
 import FormInput from '../FormInput/FormInput';
@@ -16,7 +20,14 @@ import ViewOnGithubButton from '../ViewOnGithubButton/ViewOnGithubButton';
 import GithubLoginButton from '../GithubLoginButton/GithubLoginButton';
 import Card from '../Card/Card';
 
-const LoginCard = ({ signInStart, error, fetching }) => {
+const LoginCard = ({
+  signInStart,
+  error,
+  fetching,
+  currentUser,
+  onClick,
+  modal,
+}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const handleSubmit = (event) => {
@@ -24,8 +35,19 @@ const LoginCard = ({ signInStart, error, fetching }) => {
     signInStart(email, password);
   };
 
+  currentUser && onClick();
+
   return (
-    <div className="login-card-container">
+    <div
+      className="login-card-container"
+      style={
+        modal
+          ? {
+              padding: '2rem',
+            }
+          : {}
+      }
+    >
       <Card className="form-card">
         <h1 className="heading-logo text-center">Instaclone</h1>
         <form
@@ -71,7 +93,7 @@ const LoginCard = ({ signInStart, error, fetching }) => {
           <h4 style={{ marginRight: '5px' }} className="heading-4 font-thin">
             Don't have an account?
           </h4>
-          <Link to="/signup">
+          <Link to="/signup" onClick={() => onClick && onClick()}>
             <TextButton medium blue bold>
               Sign up
             </TextButton>
@@ -94,6 +116,7 @@ const mapDispatchToProps = (dispatch) => ({
 const mapStateToProps = createStructuredSelector({
   error: selectError,
   fetching: selectFetching,
+  currentUser: selectCurrentUser,
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(LoginCard);

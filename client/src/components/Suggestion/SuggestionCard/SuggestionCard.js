@@ -17,8 +17,8 @@ const SuggestionCard = ({ avatar, username, fullName, posts, children }) => {
       <h4 className="heading-4 color-grey font-medium">{fullName}</h4>
       <div className="suggestion-card__content">
         {posts.length > 0 ? (
-          posts.map((post) => (
-            <figure className="suggestion-card__image-container">
+          posts.map((post, idx) => (
+            <figure className="suggestion-card__image-container" key={idx}>
               <img
                 src={post.thumbnail}
                 alt="User post"

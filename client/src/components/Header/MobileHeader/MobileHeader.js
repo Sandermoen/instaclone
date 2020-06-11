@@ -10,7 +10,7 @@ import Button from '../../Button/Button';
 import TextButton from '../../Button/TextButton/TextButton';
 
 const MobileHeader = ({ children, backArrow, style, show, currentUser }) => {
-  const { goBack } = useHistory();
+  const history = useHistory();
   return (
     <header
       style={{ ...style, display: `${show && 'grid'}` }}
@@ -20,7 +20,7 @@ const MobileHeader = ({ children, backArrow, style, show, currentUser }) => {
         <Fragment>
           {backArrow && (
             <Icon
-              onClick={() => goBack()}
+              onClick={() => history.goBack()}
               style={{ cursor: 'pointer' }}
               icon="chevron-back"
             />
@@ -33,8 +33,13 @@ const MobileHeader = ({ children, backArrow, style, show, currentUser }) => {
             Instaclone
           </h3>
           <div style={{ gridColumn: '-1' }}>
-            <Button style={{ marginRight: '1rem' }}>Log In</Button>
-            <TextButton bold blue>
+            <Button
+              onClick={() => history.push('/')}
+              style={{ marginRight: '1rem' }}
+            >
+              Log In
+            </Button>
+            <TextButton onClick={() => history.push('/signup')} bold blue>
               Sign Up
             </TextButton>
           </div>

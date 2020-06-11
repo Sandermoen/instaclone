@@ -38,11 +38,13 @@ const HomePage = ({
   }, [clearPosts, fetchFeedPostsStart, token]);
 
   useScrollPositionThrottled(
-    ({ previousScrollPosition, currentScrollPosition, atBottom }) => {
+    ({ atBottom }) => {
       if (atBottom && hasMore && !fetching) {
         fetchFeedPostsStart(token, feedPosts.length);
       }
-    }
+    },
+    null,
+    [hasMore, fetching]
   );
 
   return (
@@ -54,7 +56,7 @@ const HomePage = ({
         </h3>
         <Icon icon="paper-plane-outline" />
       </MobileHeader>
-      <div data-test="page-home" className="home-page grid">
+      <main data-test="page-home" className="home-page grid">
         {!fetching && feedPosts.length === 0 ? (
           <SuggestedUsers card />
         ) : (
@@ -75,7 +77,7 @@ const HomePage = ({
             </aside>
           </Fragment>
         )}
-      </div>
+      </main>
     </Fragment>
   );
 };

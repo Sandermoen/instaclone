@@ -27,10 +27,10 @@ const LoginPage = ({ currentUser, githubSignInStart }) => {
   }, [authState, code, githubSignInStart]);
 
   return (
-    <div data-test="page-login" className="login-page">
+    <main data-test="page-login" className="login-page">
       <div className="login-page__showcase"></div>
       <LoginCard />
-    </div>
+    </main>
   );
 };
 

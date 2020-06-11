@@ -15,11 +15,11 @@ const ActivityPage = () => {
         <h3 className="heading-3">Activity</h3>
         <div></div>
       </MobileHeader>
-      <div className="activity-page grid">
+      <main className="activity-page grid">
         <ul className="activity-page__notifications">
           <NotificationFeed />
         </ul>
-      </div>
+      </main>
     </Fragment>
   );
 };

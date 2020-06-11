@@ -5,12 +5,14 @@ import classNames from 'classnames';
 
 import { bookmarkPost } from '../../../redux/user/userActions';
 import { showAlert } from '../../../redux/alert/alertActions';
+import { showModal, hideModal } from '../../../redux/modal/modalActions';
 
 import { formatDate } from '../../../utils/timeUtils';
 import { votePost } from '../../../services/postService';
 
 import Icon from '../../Icon/Icon';
 import PulsatingIcon from '../../Icon/PulsatingIcon/PulsatingIcon';
+import LoginCard from '../../LoginCard/LoginCard';
 
 const PostDialogStats = ({
   currentUser,
@@ -20,11 +22,26 @@ const PostDialogStats = ({
   profileDispatch,
   bookmarkPost,
   showAlert,
+  showModal,
+  hideModal,
   simple,
 }) => {
   const ref = useRef();
 
   const handleClick = async () => {
+    if (!currentUser) {
+      return showModal(
+        {
+          children: <LoginCard onClick={() => hideModal('Card/Card')} modal />,
+          style: {
+            gridColumn: 'center-start / center-end',
+            justifySelf: 'center',
+            width: '40rem',
+          },
+        },
+        'Card/Card'
+      );
+    }
     // Dispatch the action immediately to avoid a delay between the user's click and something happening
     dispatch({
       type: 'VOTE_POST',
@@ -71,12 +88,15 @@ const PostDialogStats = ({
           />
         ) : (
           <Icon
+            onClick={() => handleClick()}
             icon="heart-outline"
             className="icon--button post-dialog__like"
           />
         )}
         <Icon
-          onClick={() => document.querySelector('.add-comment__input').focus()}
+          onClick={() =>
+            currentUser && document.querySelector('.add-comment__input').focus()
+          }
           className="icon--button"
           icon="chatbubble-outline"
         />
@@ -85,7 +105,7 @@ const PostDialogStats = ({
           className="icon--button"
           onClick={() => bookmarkPost(post._id, token)}
           icon={
-            currentUser
+            currentUser && currentUser.bookmarks
               ? !!currentUser.bookmarks.find(
                   (bookmark) => bookmark.post === post._id
                 )
@@ -137,6 +157,8 @@ const mapDispatchToProps = (dispatch) => ({
   bookmarkPost: (postId, authToken) =>
     dispatch(bookmarkPost(postId, authToken)),
   showAlert: (text, onClick) => dispatch(showAlert(text, onClick)),
+  showModal: (props, component) => dispatch(showModal(props, component)),
+  hideModal: (component) => dispatch(hideModal(component)),
 });
 
 export default connect(null, mapDispatchToProps)(PostDialogStats);

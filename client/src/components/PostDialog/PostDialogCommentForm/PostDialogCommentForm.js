@@ -6,6 +6,7 @@ import React, {
   useState,
 } from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 
 import {
   createComment,
@@ -29,6 +30,7 @@ const PostDialogCommentForm = ({
   dialogDispatch,
   profileDispatch,
   replying,
+  currentUser,
 }) => {
   const [state, dispatch] = useReducer(
     postDialogCommentFormReducer,
@@ -37,7 +39,7 @@ const PostDialogCommentForm = ({
   const [mention, setMention] = useState(null);
 
   let {
-    handleSearchDebouncedMemoized,
+    handleSearchDebouncedRef,
     result,
     setResult,
     fetching,
@@ -47,7 +49,7 @@ const PostDialogCommentForm = ({
   const commentInputRef = useRef();
 
   useEffect(() => {
-    if (replying) {
+    if (replying && commentInputRef.current) {
       commentInputRef.current.value = `@${replying.commentUser} `;
       commentInputRef.current.focus();
     }
@@ -109,42 +111,59 @@ const PostDialogCommentForm = ({
       data-test="component-post-dialog-add-comment"
     >
       <Fragment>
-        {state.posting && <Loader />}
-        <input
-          className="add-comment__input"
-          type="text"
-          placeholder="Add a comment..."
-          onChange={(event) => {
-            // Removed the `@username` from the input so the user is no longer looking to reply
-            if (replying && !event.target.value) {
-              dialogDispatch({ type: 'SET_REPLYING' });
-            }
-            dispatch({ type: 'SET_COMMENT', payload: event.target.value });
-            // Checking for an @ mention
-            let string = event.target.value.match(new RegExp(/@[a-zA-Z0-9]+$/));
-            if (string) {
-              setMention(() => {
-                setFetching(true);
-                const mention = string[0].substring(1);
-                // Setting the result to an empty array to show skeleton
-                setResult([]);
-                handleSearchDebouncedMemoized(mention);
-                return mention;
-              });
-            } else {
-              setResult(null);
-            }
-          }}
-          value={state.comment}
-          ref={commentInputRef}
-          data-test="component-add-comment-input"
-        />
-        <button
-          type="submit"
-          className="heading-3 heading--button font-bold color-blue"
-        >
-          Post
-        </button>
+        {currentUser ? (
+          <Fragment>
+            {state.posting && <Loader />}
+            <input
+              className="add-comment__input"
+              type="text"
+              placeholder="Add a comment..."
+              onChange={(event) => {
+                // Removed the `@username` from the input so the user is no longer looking to reply
+                if (replying && !event.target.value) {
+                  dialogDispatch({ type: 'SET_REPLYING' });
+                }
+                dispatch({ type: 'SET_COMMENT', payload: event.target.value });
+                // Checking for an @ mention
+                let string = event.target.value.match(
+                  new RegExp(/@[a-zA-Z0-9]+$/)
+                );
+                if (string) {
+                  setMention(() => {
+                    setFetching(true);
+                    const mention = string[0].substring(1);
+                    // Setting the result to an empty array to show skeleton
+                    setResult([]);
+                    handleSearchDebouncedRef(mention);
+                    return mention;
+                  });
+                } else {
+                  setResult(null);
+                }
+              }}
+              value={state.comment}
+              ref={commentInputRef}
+              data-test="component-add-comment-input"
+            />
+            <button
+              type="submit"
+              className="heading-3 heading--button font-bold color-blue"
+            >
+              Post
+            </button>
+          </Fragment>
+        ) : (
+          <Fragment>
+            <h4 className="heading-4 font-medium color-grey">
+              <span>
+                <Link to="/login" className="link">
+                  Log in
+                </Link>{' '}
+              </span>
+              to like or comment.
+            </h4>
+          </Fragment>
+        )}
       </Fragment>
       {result && (
         <SearchSuggestion

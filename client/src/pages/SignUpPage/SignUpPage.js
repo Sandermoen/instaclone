@@ -13,9 +13,9 @@ const SignUpPage = ({ currentUser }) => {
     if (currentUser) history.push('/');
   }, [currentUser, history]);
   return (
-    <div className="sign-up-page">
+    <main className="sign-up-page">
       <SignUpCard />
-    </div>
+    </main>
   );
 };
 

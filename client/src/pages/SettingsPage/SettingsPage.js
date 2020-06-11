@@ -13,7 +13,7 @@ const SettingsPage = () => (
       <h3 className="heading-3">Edit Profile</h3>
       <div></div>
     </MobileHeader>
-    <div className="settings-page grid">
+    <main className="settings-page grid">
       <Card className="settings-card">
         <ul className="settings-card__sidebar">
           <NavLink
@@ -42,7 +42,7 @@ const SettingsPage = () => (
           </Switch>
         </article>
       </Card>
-    </div>
+    </main>
   </Fragment>
 );
 

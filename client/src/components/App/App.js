@@ -5,7 +5,6 @@ import { useTransition } from 'react-spring';
 
 import { selectCurrentUser } from '../../redux/user/userSelectors';
 import { signInStart } from '../../redux/user/userActions';
-import { hideAlert } from '../../redux/alert/alertActions';
 import { connectSocket } from '../../redux/socket/socketActions';
 import { fetchNotificationsStart } from '../../redux/notification/notificationActions';
 
@@ -41,13 +40,11 @@ export function UnconnectedApp({
   signInStart,
   modal,
   alert,
-  hideAlert,
   currentUser,
   connectSocket,
   fetchNotificationsStart,
 }) {
   const token = localStorage.getItem('token');
-  const ALERT_TIME = 10000;
   const {
     location: { pathname },
   } = useHistory();
@@ -143,7 +140,6 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
   signInStart: (usernameOrEmail, password, token) =>
     dispatch(signInStart(usernameOrEmail, password, token)),
-  hideAlert: () => dispatch(hideAlert()),
   connectSocket: () => dispatch(connectSocket()),
   fetchNotificationsStart: (authToken) =>
     dispatch(fetchNotificationsStart(authToken)),

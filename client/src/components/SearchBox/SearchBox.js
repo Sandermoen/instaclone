@@ -12,7 +12,7 @@ import Loader from '../Loader/Loader';
 const SearchBox = ({ style, setResult, onClick }) => {
   const [query, setQuery] = useState('');
   const {
-    handleSearchDebouncedMemoized,
+    handleSearchDebouncedRef,
     result,
     fetching,
     setFetching,
@@ -27,10 +27,14 @@ const SearchBox = ({ style, setResult, onClick }) => {
 
   return (
     <Fragment>
-      <form className="search-box" style={style}>
+      <form
+        className="search-box"
+        style={style}
+        onSubmit={(event) => event.preventDefault()}
+      >
         <input
           onChange={(event) => {
-            handleSearchDebouncedMemoized(event.target.value);
+            handleSearchDebouncedRef(event.target.value);
             setQuery(event.target.value);
             event.target.value && setFetching(true);
           }}

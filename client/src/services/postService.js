@@ -16,6 +16,11 @@ export const getPost = async (postId) => {
   }
 };
 
+/**
+ *
+ * @param {string} username A users username
+ * @param {number} offset The amount of posts to skip
+ */
 export const getPosts = async (username, offset = 0) => {
   try {
     const response = await axios.get(`/api/user/${username}/posts/${offset}`);
@@ -103,6 +108,26 @@ export const bookmarkPost = async (postId, authToken) => {
 export const getPostFilters = async () => {
   try {
     const response = await axios.get('/api/post/filters');
+    return response.data;
+  } catch (err) {
+    throw new Error(err);
+  }
+};
+
+/**
+ * Gets suggested posts
+ * @function getSuggestedPosts
+ * @param {string} authToken A user's auth token
+ * @param {number} offset The amounts of posts to skip
+ * @returns {array} Array of posts
+ */
+export const getSuggestedPosts = async (authToken, offset = 0) => {
+  try {
+    const response = await axios.get('/api/post/suggested/' + offset, {
+      headers: {
+        authorization: authToken,
+      },
+    });
     return response.data;
   } catch (err) {
     throw new Error(err);

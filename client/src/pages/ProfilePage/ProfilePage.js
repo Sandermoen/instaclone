@@ -6,7 +6,7 @@ import { useParams, useHistory } from 'react-router-dom';
 import { selectCurrentUser, selectToken } from '../../redux/user/userSelectors';
 
 import { INITIAL_STATE, profileReducer } from './ProfilePageReducer';
-import { showModal } from '../../redux/modal/modalActions';
+import { showModal, hideModal } from '../../redux/modal/modalActions';
 
 import { getUserProfile, followUser } from '../../services/profileService';
 import { getPosts } from '../../services/postService';
@@ -14,21 +14,35 @@ import { getPosts } from '../../services/postService';
 import useScrollPositionThrottled from '../../hooks/useScrollPositionThrottled';
 
 import ProfileCategory from '../../components/ProfileCategory/ProfileCategory';
-import ProfileImage from '../../components/ProfileImage/ProfileImage';
+import PreviewImage from '../../components/PreviewImage/PreviewImage';
 import Loader from '../../components/Loader/Loader';
 import SkeletonLoader from '../../components/SkeletonLoader/SkeletonLoader';
 import MobileHeader from '../../components/Header/MobileHeader/MobileHeader';
 import SettingsButton from '../../components/SettingsButton/SettingsButton';
+import LoginCard from '../../components/LoginCard/LoginCard';
 import NotFoundPage from '../../pages/NotFoundPage/NotFoundPage';
 import ProfileHeader from './ProfileHeader';
 import EmptyProfile from './EmptyProfile';
 
-const ProfilePage = ({ currentUser, token, showModal }) => {
+const ProfilePage = ({ currentUser, token, showModal, hideModal }) => {
   const { username } = useParams();
   const history = useHistory();
   const [state, dispatch] = useReducer(profileReducer, INITIAL_STATE);
 
   const follow = async () => {
+    if (!currentUser) {
+      return showModal(
+        {
+          children: <LoginCard onClick={() => hideModal('Card/Card')} modal />,
+          style: {
+            gridColumn: 'center-start / center-end',
+            justifySelf: 'center',
+            width: '40rem',
+          },
+        },
+        'Card/Card'
+      );
+    }
     try {
       dispatch({ type: 'FOLLOW_USER_START' });
       const response = await followUser(state.data.user._id, token);
@@ -110,7 +124,7 @@ const ProfilePage = ({ currentUser, token, showModal }) => {
             <div className="profile-images">
               {state.data.posts.map((post, idx) => {
                 return (
-                  <ProfileImage
+                  <PreviewImage
                     onClick={() => handleClick(post._id)}
                     image={post.image}
                     likes={post.postVotes}
@@ -161,7 +175,7 @@ const ProfilePage = ({ currentUser, token, showModal }) => {
           <div></div>
         </MobileHeader>
       )}
-      <div className="profile-page grid">{renderProfile()}</div>
+      <main className="profile-page grid">{renderProfile()}</main>
     </Fragment>
   );
 };
@@ -173,6 +187,7 @@ const mapStateToProps = createStructuredSelector({
 
 const mapDispatchToProps = (dispatch) => ({
   showModal: (props, component) => dispatch(showModal(props, component)),
+  hideModal: (component) => dispatch(hideModal(component)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProfilePage);

@@ -1,13 +1,11 @@
 import React, { useRef, useState, Fragment } from 'react';
 import classNames from 'classnames';
 
-import useDragScroll from '../../hooks/useDragScroll';
 import Loader from '../Loader/Loader';
 
 const FilterSelector = ({ setFilter, filters, previewImage }) => {
   const filterSelectorRef = useRef();
   const [selectedFilter, setSelectedFilter] = useState('Normal');
-  useDragScroll(filterSelectorRef);
 
   const handleClick = (name, filter) => {
     setSelectedFilter(name);

@@ -47,9 +47,9 @@ const VerificationPage = ({ authToken, showModal }) => {
   }, [authToken, history, showModal, token]);
 
   return (
-    <div className="verification-page">
+    <main className="verification-page">
       <Loader />
-    </div>
+    </main>
   );
 };
 

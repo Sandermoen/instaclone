@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useRef } from 'react';
 import debounce from 'lodash/debounce';
 
 import { searchUsers } from '../services/userService';
@@ -28,12 +28,11 @@ const useSearchUsersDebounced = () => {
     }
   };
   const handleSearchDebounced = debounce(handleSearch, 500);
-  const handleSearchDebouncedMemoized = useCallback(
-    (string, offset) => handleSearchDebounced(string, offset),
-    [handleSearchDebounced]
-  );
+  const handleSearchDebouncedRef = useRef((string, offset) =>
+    handleSearchDebounced(string, offset)
+  ).current;
   return {
-    handleSearchDebouncedMemoized,
+    handleSearchDebouncedRef,
     result,
     setResult,
     fetching,

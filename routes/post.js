@@ -10,6 +10,7 @@ const {
   votePost,
   deletePost,
   retrievePostFeed,
+  retrieveSuggestedPosts,
 } = require('../controllers/postController');
 const filters = require('../utils/filters');
 
@@ -30,6 +31,7 @@ postRouter.post(
 );
 postRouter.post('/:postId/vote', requireAuth, votePost);
 
+postRouter.get('/suggested/:offset', requireAuth, retrieveSuggestedPosts);
 postRouter.get('/filters', (req, res) => {
   res.send({ filters });
 });

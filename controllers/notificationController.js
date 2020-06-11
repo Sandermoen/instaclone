@@ -68,11 +68,6 @@ module.exports.retrieveNotifications = async (req, res, next) => {
         },
       },
     ]);
-    if (notifications.length === 0) {
-      return res
-        .status(404)
-        .send({ error: 'Could not find any notifications.' });
-    }
     return res.send(notifications);
   } catch (err) {
     next(err);

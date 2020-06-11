@@ -154,6 +154,7 @@ module.exports.retrievePost = async (req, res, next) => {
           'author.email',
           'author.private',
           'author.bio',
+          'author.githubId',
         ],
       },
       {
@@ -264,6 +265,7 @@ module.exports.retrievePostFeed = async (req, res, next) => {
       'author.email',
       'author.website',
       'author.bio',
+      'author.githubId',
     ];
 
     const posts = await Post.aggregate([
@@ -391,6 +393,88 @@ module.exports.retrievePostFeed = async (req, res, next) => {
       },
       {
         $unset: [...unwantedUserFields, 'comments', 'commentCount'],
+      },
+    ]);
+    return res.send(posts);
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports.retrieveSuggestedPosts = async (req, res, next) => {
+  const { offset = 0 } = req.params;
+
+  try {
+    const posts = await Post.aggregate([
+      {
+        $sort: { date: -1 },
+      },
+      {
+        $skip: Number(offset),
+      },
+      {
+        $limit: 10,
+      },
+      {
+        $sample: { size: 10 },
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'author',
+          foreignField: '_id',
+          as: 'author',
+        },
+      },
+      {
+        $lookup: {
+          from: 'comments',
+          localField: '_id',
+          foreignField: 'post',
+          as: 'comments',
+        },
+      },
+      {
+        $lookup: {
+          from: 'commentreplies',
+          localField: 'comments._id',
+          foreignField: 'parentComment',
+          as: 'commentReplies',
+        },
+      },
+      {
+        $lookup: {
+          from: 'postvotes',
+          localField: '_id',
+          foreignField: 'post',
+          as: 'postVotes',
+        },
+      },
+      {
+        $unwind: '$postVotes',
+      },
+      {
+        $unwind: '$author',
+      },
+      {
+        $addFields: {
+          comments: { $size: '$comments' },
+          commentReplies: { $size: '$commentReplies' },
+          postVotes: { $size: '$postVotes.votes' },
+        },
+      },
+      {
+        $addFields: { comments: { $add: ['$comments', '$commentReplies'] } },
+      },
+      {
+        $unset: [
+          'commentReplies',
+          'author.private',
+          'author.confirmed',
+          'author.githubId',
+          'author.bookmarks',
+          'author.password',
+        ],
       },
     ]);
     return res.send(posts);

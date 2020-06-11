@@ -1,8 +1,9 @@
 import React, { useState, memo, Fragment } from 'react';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
-import { Link, NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import classNames from 'classnames';
+import { useHistory } from 'react-router-dom';
 
 import { selectCurrentUser } from '../../redux/user/userSelectors';
 
@@ -17,14 +18,16 @@ import Icon from '../Icon/Icon';
 
 const Header = memo(({ currentUser }) => {
   const [shouldMinimizeHeader, setShouldMinimizeHeader] = useState(false);
+  const {
+    location: { pathname },
+  } = useHistory();
+
   // Shrink header height and remove logo on scroll
-  useScrollPositionThrottled(
-    ({ previousScrollPosition, currentScrollPosition }) => {
-      if (window.outerWidth > 600) {
-        setShouldMinimizeHeader(currentScrollPosition > 100);
-      }
+  useScrollPositionThrottled(({ currentScrollPosition }) => {
+    if (window.outerWidth > 600) {
+      setShouldMinimizeHeader(currentScrollPosition > 100);
     }
-  );
+  });
 
   const headerClassNames = classNames({
     header: true,
@@ -47,16 +50,20 @@ const Header = memo(({ currentUser }) => {
           {currentUser ? (
             <Fragment>
               <Link to="/explore">
-                <Icon icon="compass-outline" />
+                <Icon
+                  icon={pathname === '/explore' ? 'compass' : 'compass-outline'}
+                />
               </Link>
               <NotificationButton />
-              <NavLink
-                className="icon"
-                activeClassName="icon--active"
-                to={`/${currentUser.username}`}
-              >
-                <Icon icon="person-circle-outline" />
-              </NavLink>
+              <Link to={'/' + currentUser.username}>
+                <Icon
+                  icon={
+                    pathname === '/' + currentUser.username
+                      ? 'person-circle'
+                      : 'person-circle-outline'
+                  }
+                />
+              </Link>
               <NewPostButton />
             </Fragment>
           ) : (

@@ -309,6 +309,7 @@ const PostDialog = ({
             <PostDialogCommentForm
               postId={postId}
               token={token}
+              currentUser={currentUser}
               commentsRef={commentsRef}
               dialogDispatch={dispatch}
               profileDispatch={profileDispatch}
