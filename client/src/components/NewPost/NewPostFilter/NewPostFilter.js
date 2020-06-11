@@ -1,22 +1,27 @@
 import React, { Fragment } from 'react';
 
 import FilterSelector from '../../FilterSelector/FilterSelector';
+import SkeletonLoader from '../../SkeletonLoader/SkeletonLoader';
 
 const NewPostFilter = ({ previewImage, setPreviewImage, filters }) => {
   return (
     <Fragment>
       <div className="new-post__preview">
         <div className="new-post__preview-image-container">
-          <img
-            src={previewImage.src}
-            alt="Customize"
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'contain',
-              filter: previewImage.filter,
-            }}
-          />
+          {previewImage.src ? (
+            <img
+              src={previewImage.src}
+              alt="Customize"
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain',
+                filter: previewImage.filter,
+              }}
+            />
+          ) : (
+            <SkeletonLoader />
+          )}
         </div>
       </div>
       <FilterSelector

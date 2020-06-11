@@ -2,6 +2,7 @@ import React, { useRef, useState, Fragment } from 'react';
 import classNames from 'classnames';
 
 import Loader from '../Loader/Loader';
+import SkeletonLoader from '../SkeletonLoader/SkeletonLoader';
 
 const FilterSelector = ({ setFilter, filters, previewImage }) => {
   const filterSelectorRef = useRef();
@@ -12,11 +13,26 @@ const FilterSelector = ({ setFilter, filters, previewImage }) => {
     setFilter(filter, name);
   };
 
+  const renderSkeleton = (amount) => {
+    const skeleton = [];
+    for (let i = 0; i < amount; i++) {
+      skeleton.push(
+        <li
+          className="filter-selector__item"
+          style={{ width: '12rem', height: '8rem' }}
+        >
+          <SkeletonLoader animated />
+        </li>
+      );
+    }
+    return skeleton;
+  };
+
   return (
     <ul ref={filterSelectorRef} className="filter-selector">
       {filters.length === 0 ? (
         <Loader />
-      ) : (
+      ) : previewImage ? (
         <Fragment>
           <li
             className={classNames({
@@ -48,6 +64,8 @@ const FilterSelector = ({ setFilter, filters, previewImage }) => {
             </li>
           ))}
         </Fragment>
+      ) : (
+        renderSkeleton(10)
       )}
     </ul>
   );

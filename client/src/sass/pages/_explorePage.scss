@@ -12,6 +12,7 @@
   grid-column-gap: 3rem;
   grid-row-gap: 3rem;
   justify-content: center;
+  overflow: hidden;
 
   @include respond(phone) {
     grid-column-gap: 2px;

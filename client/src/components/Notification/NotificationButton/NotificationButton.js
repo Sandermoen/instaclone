@@ -45,7 +45,9 @@ const NotificationButton = ({
   }, [showNotifications, notificationPopupTimeout]);
 
   const transitions = useTransition(
-    showNotificationPopup && !showNotifications,
+    notificationState.unreadCount > 0 && showNotificationPopup
+      ? { notifications }
+      : false,
     null,
     {
       from: {
@@ -73,7 +75,9 @@ const NotificationButton = ({
         <Icon
           icon={icon ? icon : showNotifications ? 'heart' : 'heart-outline'}
           className={notificationState.unreadCount > 0 ? 'icon--unread' : ''}
-          onClick={() => setShowNotifications((previous) => !previous)}
+          onClick={() =>
+            !mobile && setShowNotifications((previous) => !previous)
+          }
           style={{ cursor: 'pointer' }}
         />
         {transitions.map(
@@ -81,7 +85,7 @@ const NotificationButton = ({
             item && (
               <NotificationPopup
                 style={props}
-                notifications={notifications}
+                notifications={item.notifications}
                 key={key}
               />
             )

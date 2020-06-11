@@ -413,10 +413,10 @@ module.exports.retrieveSuggestedPosts = async (req, res, next) => {
         $skip: Number(offset),
       },
       {
-        $limit: 10,
+        $limit: 20,
       },
       {
-        $sample: { size: 10 },
+        $sample: { size: 20 },
       },
       {
         $lookup: {

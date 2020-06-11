@@ -49,7 +49,7 @@ const ExplorePage = ({ token, showAlert, showModal }) => {
       setSuggestedPosts((previous) => ({
         posts: previous.posts ? [...previous.posts, ...response] : response,
         fetching: false,
-        hasMore: response.length === 10,
+        hasMore: response.length === 20,
       }));
     } catch (err) {
       showAlert(err.message);
