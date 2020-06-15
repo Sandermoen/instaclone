@@ -16,7 +16,6 @@ export const showAlert = (text, onClick = null) => (dispatch, getState) => {
   // disable it and allow the animation to finish
   // before toggling the new one
   if (state.alert.showAlert) {
-    console.log('ye');
     dispatch(hideAlert());
     setTimeout(() => {
       dispatch({

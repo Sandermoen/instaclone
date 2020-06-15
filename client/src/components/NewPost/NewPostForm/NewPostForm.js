@@ -46,7 +46,9 @@ const NewPostForm = ({
       history.push('/');
     } catch (err) {
       setLoading(false);
-      showAlert('Could not share the post', () => handleClick(event));
+      showAlert(err.message || 'Could not share post.', () =>
+        handleClick(event)
+      );
     }
   };
 

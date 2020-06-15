@@ -54,7 +54,6 @@ const NewPostEdit = ({ previewImage, setPreviewImage, file }) => {
         'newFile.jpeg'
       );
       setPreviewImage({ src: croppedImageUrl, crop });
-      // console.log(crop);
       setImageState((previous) => ({ ...previous, isCropping: false }));
     }
   };

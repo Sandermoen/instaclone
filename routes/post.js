@@ -1,6 +1,10 @@
 const express = require('express');
 const postRouter = express.Router();
 const multer = require('multer');
+const upload = multer({
+  dest: 'temp/',
+  limits: { fileSize: 5 * 1024 * 1024 },
+}).single('image');
 const rateLimit = require('express-rate-limit');
 
 const { requireAuth } = require('../controllers/authController');
@@ -23,10 +27,23 @@ postRouter.post(
   '/',
   postLimiter,
   requireAuth,
-  multer({
-    dest: 'temp/',
-    limits: { fieldSize: 8 * 1024 * 1024 },
-  }).single('image'),
+  (req, res, next) => {
+    upload(req, res, next, (err) => {
+      if (err) {
+        if (
+          err instanceof multer.MulterError &&
+          err.code === 'LIMIT_FILE_SIZE'
+        ) {
+          return res.status(400).send({
+            error:
+              'The file you are trying to upload exceeds the upload limit of 5MB.',
+          });
+        }
+        return next(err);
+      }
+      next();
+    });
+  },
   createPost
 );
 postRouter.post('/:postId/vote', requireAuth, votePost);

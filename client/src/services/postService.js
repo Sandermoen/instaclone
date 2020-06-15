@@ -12,7 +12,7 @@ export const getPost = async (postId) => {
     const response = await axios.get(`/api/post/${postId}`);
     return response.data;
   } catch (err) {
-    throw new Error(err);
+    throw new Error(err.response.data.error);
   }
 };
 
@@ -26,7 +26,7 @@ export const getPosts = async (username, offset = 0) => {
     const response = await axios.get(`/api/user/${username}/posts/${offset}`);
     return response.data;
   } catch (err) {
-    throw new Error(err);
+    throw new Error(err.response.data.error);
   }
 };
 
@@ -42,7 +42,7 @@ export const votePost = async (postId, authToken) => {
       headers: { authorization: authToken },
     });
   } catch (err) {
-    throw new Error(err);
+    throw new Error(err.response.data.error);
   }
 };
 
@@ -61,7 +61,7 @@ export const createPost = async (formData, authToken) => {
       },
     });
   } catch (err) {
-    throw new Error(err);
+    throw new Error(err.response.data.error);
   }
 };
 
@@ -79,7 +79,7 @@ export const deletePost = async (postId, authToken) => {
       },
     });
   } catch (err) {
-    throw new Error(err);
+    throw new Error(err.response.data.error);
   }
 };
 
@@ -96,7 +96,7 @@ export const bookmarkPost = async (postId, authToken) => {
     });
     return response.data;
   } catch (err) {
-    throw new Error(err);
+    throw new Error(err.response.data.error);
   }
 };
 
@@ -110,7 +110,7 @@ export const getPostFilters = async () => {
     const response = await axios.get('/api/post/filters');
     return response.data;
   } catch (err) {
-    throw new Error(err);
+    throw new Error(err.response.data.error);
   }
 };
 
@@ -130,6 +130,6 @@ export const getSuggestedPosts = async (authToken, offset = 0) => {
     });
     return response.data;
   } catch (err) {
-    throw new Error(err);
+    throw new Error(err.response.data.error);
   }
 };

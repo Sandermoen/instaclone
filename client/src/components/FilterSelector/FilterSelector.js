@@ -20,6 +20,7 @@ const FilterSelector = ({ setFilter, filters, previewImage }) => {
         <li
           className="filter-selector__item"
           style={{ width: '12rem', height: '8rem' }}
+          key={i}
         >
           <SkeletonLoader animated />
         </li>
