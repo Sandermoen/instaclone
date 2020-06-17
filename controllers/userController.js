@@ -631,11 +631,15 @@ module.exports.updateProfile = async (req, res, next) => {
 };
 
 module.exports.retrieveSuggestedUsers = async (req, res, next) => {
+  const { max } = req.params;
   const user = res.locals.user;
   try {
     const users = await User.aggregate([
       {
         $match: { _id: { $ne: ObjectId(user._id) } },
+      },
+      {
+        $limit: max ? Number(max) : 50,
       },
       {
         $lookup: {

@@ -13,13 +13,13 @@ import Card from '../../Card/Card';
 import FollowButton from '../../Button/FollowButton/FollowButton';
 import SuggestionCard from '../SuggestionCard/SuggestionCard';
 
-const SuggestedUsers = ({ token, showAlert, card, style }) => {
+const SuggestedUsers = ({ token, showAlert, card, style, max }) => {
   const [users, setUsers] = useState(null);
 
   useEffect(() => {
     (async function () {
       try {
-        const response = await getSuggestedUsers(token);
+        const response = await getSuggestedUsers(token, max);
         setUsers(response);
       } catch (err) {
         showAlert(err.message);

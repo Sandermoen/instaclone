@@ -112,9 +112,9 @@ export const updateProfile = async (authToken, updates) => {
  * @param {string} authToken A user's auth token
  * @returns {array} Array of users
  */
-export const getSuggestedUsers = async (authToken) => {
+export const getSuggestedUsers = async (authToken, max) => {
   try {
-    const response = await axios.get('/api/user/suggested', {
+    const response = await axios.get(`/api/user/suggested/${max || ''}`, {
       headers: {
         authorization: authToken,
       },

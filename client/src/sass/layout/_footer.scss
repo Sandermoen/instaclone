@@ -1,15 +1,11 @@
 .footer {
-  position: absolute;
-  bottom: 0;
+  margin-top: auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
   width: 100%;
   height: $footer-height;
   padding: 0 25%;
-  @include respond(phone) {
-    display: none;
-  }
 
   &__left {
     & > :not(:last-child) {
@@ -33,5 +29,14 @@
       display: flex;
       align-items: center;
     }
+  }
+
+  @include respond(tab-port) {
+    flex-direction: column;
+    justify-content: space-around;
+  }
+
+  @include respond(phone) {
+    display: none;
   }
 }

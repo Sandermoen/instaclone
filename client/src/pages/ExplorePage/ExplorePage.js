@@ -90,7 +90,6 @@ const ExplorePage = ({ token, showAlert, showModal }) => {
             gridColumnGap: '2rem',
           }
         }
-        show
       >
         <SearchBox
           style={{ gridColumn: `${search ? '1 / span 2' : '1 / -1'}` }}

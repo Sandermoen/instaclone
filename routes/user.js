@@ -18,7 +18,7 @@ const {
 } = require('../controllers/userController');
 const { requireAuth, optionalAuth } = require('../controllers/authController');
 
-userRouter.get('/suggested', requireAuth, retrieveSuggestedUsers);
+userRouter.get('/suggested/:max?', requireAuth, retrieveSuggestedUsers);
 userRouter.get('/:username', optionalAuth, retrieveUser);
 userRouter.get('/:username/posts/:offset', retrievePosts);
 userRouter.get('/:userId/:offset/following', requireAuth, retrieveFollowing);
