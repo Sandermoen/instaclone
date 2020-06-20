@@ -1,7 +1,7 @@
 export const linkifyOptions = {
   formatHref: function (href, type) {
     if (type === 'hashtag') {
-      href = '/hashtags/' + href.substring(1);
+      href = '/explore/tags/' + href.substring(1);
     }
     if (type === 'mention') {
       href = '/' + href.substring(1);

@@ -133,3 +133,24 @@ export const getSuggestedPosts = async (authToken, offset = 0) => {
     throw new Error(err.response.data.error);
   }
 };
+
+/**
+ * Gets posts associated with a specific hashtag
+ * @function getHashtagPosts
+ * @param {string} authToken A user's auth token
+ * @param {string} hashtag The hashtag to find posts by
+ * @param {number} offset The amount of posts to skip
+ * @returns {array} Array of posts
+ */
+export const getHashtagPosts = async (authToken, hashtag, offset = 0) => {
+  try {
+    const response = await axios.get(`/api/post/hashtag/${hashtag}/${offset}`, {
+      headers: {
+        authorization: authToken,
+      },
+    });
+    return response.data;
+  } catch (err) {
+    throw new Error(err.response.data.error);
+  }
+};

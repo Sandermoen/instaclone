@@ -294,3 +294,64 @@ module.exports.generateUniqueUsername = async (baseUsername) => {
     throw new Error(err.message);
   }
 };
+
+module.exports.populatePostsPipeline = [
+  {
+    $lookup: {
+      from: 'users',
+      localField: 'author',
+      foreignField: '_id',
+      as: 'author',
+    },
+  },
+  {
+    $lookup: {
+      from: 'comments',
+      localField: '_id',
+      foreignField: 'post',
+      as: 'comments',
+    },
+  },
+  {
+    $lookup: {
+      from: 'commentreplies',
+      localField: 'comments._id',
+      foreignField: 'parentComment',
+      as: 'commentReplies',
+    },
+  },
+  {
+    $lookup: {
+      from: 'postvotes',
+      localField: '_id',
+      foreignField: 'post',
+      as: 'postVotes',
+    },
+  },
+  {
+    $unwind: '$postVotes',
+  },
+  {
+    $unwind: '$author',
+  },
+  {
+    $addFields: {
+      comments: { $size: '$comments' },
+      commentReplies: { $size: '$commentReplies' },
+      postVotes: { $size: '$postVotes.votes' },
+    },
+  },
+  {
+    $addFields: { comments: { $add: ['$comments', '$commentReplies'] } },
+  },
+  {
+    $unset: [
+      'commentReplies',
+      'author.private',
+      'author.confirmed',
+      'author.githubId',
+      'author.bookmarks',
+      'author.password',
+    ],
+  },
+];

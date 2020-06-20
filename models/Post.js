@@ -6,6 +6,12 @@ const PostSchema = new Schema({
   filter: String,
   thumbnail: String,
   caption: String,
+  hashtags: [
+    {
+      type: String,
+      lowercase: true,
+    },
+  ],
   date: {
     type: Date,
     default: Date.now,

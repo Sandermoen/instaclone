@@ -103,6 +103,7 @@
     z-index: 10;
     width: 100%;
     height: $mobile-header-height;
+    top: 0;
 
     grid-template-columns: repeat(3, 1fr);
     align-items: center;

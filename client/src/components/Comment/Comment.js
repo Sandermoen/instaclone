@@ -7,6 +7,7 @@ import classNames from 'classnames';
 import Linkify from 'linkifyjs/react';
 import * as linkify from 'linkifyjs';
 import mention from 'linkifyjs/plugins/mention';
+import hashtag from 'linkifyjs/plugins/hashtag';
 
 import { linkifyOptions } from '../../utils/linkifyUtils';
 
@@ -26,6 +27,7 @@ import PulsatingIcon from '../Icon/PulsatingIcon/PulsatingIcon';
 import CommentReply from './CommentReply/CommentReply';
 
 mention(linkify);
+hashtag(linkify);
 
 const Comment = ({
   comment,

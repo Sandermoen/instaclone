@@ -16,6 +16,7 @@ const getCurrentScrollPosition = (element) => {
  * @function useScrollPositionThrottled
  * @param {function} callback Callback function to call when a user scrolls
  * @param {HTMLElement} element The element to calculate the scroll position, the default is document
+ * @param {array} deps Dependency array
  */
 const useScrollPositionThrottled = (callback, element, deps = []) => {
   const currentElement = element ? element : document.documentElement;

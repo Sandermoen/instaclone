@@ -1,9 +1,10 @@
 const cloudinary = require('cloudinary').v2;
+const linkify = require('linkifyjs');
+require('linkifyjs/plugins/hashtag')(linkify);
 const Post = require('../models/Post');
 const PostVote = require('../models/PostVote');
 const Following = require('../models/Following');
 const Followers = require('../models/Followers');
-const User = require('../models/User');
 const Notification = require('../models/Notification');
 const socketHandler = require('../handlers/socketHandler');
 const fs = require('fs');
@@ -12,6 +13,7 @@ const ObjectId = require('mongoose').Types.ObjectId;
 const {
   retrieveComments,
   formatCloudinaryUrl,
+  populatePostsPipeline,
 } = require('../utils/controllerUtils');
 const filters = require('../utils/filters');
 
@@ -21,8 +23,12 @@ module.exports.createPost = async (req, res, next) => {
   let crop = req.body.crop;
   let post = undefined;
   const filterObject = filters.find((filter) => filter.name === filterName);
-  crop = JSON.parse(crop);
-  console.log(crop);
+  const hashtags = [];
+  linkify.find(caption).forEach((result) => {
+    if (result.type === 'hashtag') {
+      hashtags.push(result.value.substring(1));
+    }
+  });
 
   if (!req.file) {
     return res
@@ -53,6 +59,7 @@ module.exports.createPost = async (req, res, next) => {
       filter: filterObject ? filterObject.filter : '',
       caption,
       author: user._id,
+      hashtags,
     });
     const postVote = new PostVote({
       post: post._id,
@@ -418,66 +425,57 @@ module.exports.retrieveSuggestedPosts = async (req, res, next) => {
       {
         $sample: { size: 20 },
       },
+      ...populatePostsPipeline,
+    ]);
+    return res.send(posts);
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports.retrieveHashtagPosts = async (req, res, next) => {
+  const { hashtag, offset } = req.params;
+
+  try {
+    const posts = await Post.aggregate([
       {
-        $lookup: {
-          from: 'users',
-          localField: 'author',
-          foreignField: '_id',
-          as: 'author',
+        $facet: {
+          posts: [
+            {
+              $match: { hashtags: hashtag },
+            },
+            {
+              $skip: Number(offset),
+            },
+            {
+              $limit: 20,
+            },
+            ...populatePostsPipeline,
+          ],
+          postCount: [
+            {
+              $match: { hashtags: hashtag },
+            },
+            {
+              $group: {
+                _id: null,
+                count: { $sum: 1 },
+              },
+            },
+          ],
         },
       },
       {
-        $lookup: {
-          from: 'comments',
-          localField: '_id',
-          foreignField: 'post',
-          as: 'comments',
-        },
-      },
-      {
-        $lookup: {
-          from: 'commentreplies',
-          localField: 'comments._id',
-          foreignField: 'parentComment',
-          as: 'commentReplies',
-        },
-      },
-      {
-        $lookup: {
-          from: 'postvotes',
-          localField: '_id',
-          foreignField: 'post',
-          as: 'postVotes',
-        },
-      },
-      {
-        $unwind: '$postVotes',
-      },
-      {
-        $unwind: '$author',
+        $unwind: '$postCount',
       },
       {
         $addFields: {
-          comments: { $size: '$comments' },
-          commentReplies: { $size: '$commentReplies' },
-          postVotes: { $size: '$postVotes.votes' },
+          postCount: '$postCount.count',
         },
       },
-      {
-        $addFields: { comments: { $add: ['$comments', '$commentReplies'] } },
-      },
-      {
-        $unset: [
-          'commentReplies',
-          'author.private',
-          'author.confirmed',
-          'author.githubId',
-          'author.bookmarks',
-          'author.password',
-        ],
-      },
     ]);
-    return res.send(posts);
+
+    return res.send(posts[0]);
   } catch (err) {
     next(err);
   }

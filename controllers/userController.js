@@ -639,9 +639,6 @@ module.exports.retrieveSuggestedUsers = async (req, res, next) => {
         $match: { _id: { $ne: ObjectId(user._id) } },
       },
       {
-        $limit: max ? Number(max) : 50,
-      },
-      {
         $lookup: {
           from: 'followers',
           localField: '_id',
@@ -688,10 +685,10 @@ module.exports.retrieveSuggestedUsers = async (req, res, next) => {
         $match: { isFollowing: false },
       },
       {
-        $unset: ['isFollowing'],
+        $sample: { size: max ? Number(max) : 20 },
       },
       {
-        $sample: { size: 20 },
+        $unset: ['isFollowing'],
       },
     ]);
     res.send(users);
