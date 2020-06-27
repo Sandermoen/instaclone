@@ -688,6 +688,9 @@ module.exports.retrieveSuggestedUsers = async (req, res, next) => {
         $sample: { size: max ? Number(max) : 20 },
       },
       {
+        $sort: { posts: -1 },
+      },
+      {
         $unset: ['isFollowing'],
       },
     ]);

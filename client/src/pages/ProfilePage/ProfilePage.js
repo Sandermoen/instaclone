@@ -150,7 +150,9 @@ const ProfilePage = ({ currentUser, token, showModal, hideModal }) => {
             </div>
           ) : (
             <EmptyProfile
-              currentUserProfile={currentUser.username === username}
+              currentUserProfile={
+                currentUser && currentUser.username === username
+              }
               username={username}
             />
           )}
