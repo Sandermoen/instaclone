@@ -8,6 +8,7 @@ import {
   selectCurrentUser,
 } from '../../../redux/user/userSelectors';
 import { showAlert } from '../../../redux/alert/alertActions';
+import { addPost } from '../../../redux/feed/feedActions';
 
 import { createPost } from '../../../services/postService';
 
@@ -25,6 +26,7 @@ const NewPostForm = ({
   hide,
   back,
   showAlert,
+  addPost,
 }) => {
   const [caption, setCaption] = useState('');
   const [loading, setLoading] = useState(false);
@@ -40,10 +42,14 @@ const NewPostForm = ({
     previewImage.filterName && formData.set('filter', previewImage.filterName);
     try {
       setLoading(true);
-      await createPost(formData, token);
+      const post = await createPost(formData, token);
       setLoading(false);
       hide();
-      history.push('/');
+      if (history.location.pathname === '/') {
+        addPost(post);
+      } else {
+        history.push('/');
+      }
     } catch (err) {
       setLoading(false);
       showAlert(err.message || 'Could not share post.', () =>
@@ -114,6 +120,7 @@ const mapStateToProps = createStructuredSelector({
 
 const mapDispatchToProps = (dispatch) => ({
   showAlert: (text, onClick) => dispatch(showAlert(text, onClick)),
+  addPost: (post) => dispatch(addPost(post)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(NewPostForm);

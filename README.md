@@ -35,7 +35,7 @@
 > Install npm dependencies using npm install
 
 ```shell
-$ npm install
+$ npm install && cd client && npm install
 ```
 
 > Set up a MongoDB database either locally or provision a free database with <a href='https://www.mongodb.com/cloud/atlas'>`MongoDB Atlas`</a>

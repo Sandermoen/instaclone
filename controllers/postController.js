@@ -20,7 +20,6 @@ const filters = require('../utils/filters');
 module.exports.createPost = async (req, res, next) => {
   const user = res.locals.user;
   const { caption, filter: filterName } = req.body;
-  let crop = req.body.crop;
   let post = undefined;
   const filterObject = filters.find((filter) => filter.name === filterName);
   const hashtags = [];
@@ -66,7 +65,12 @@ module.exports.createPost = async (req, res, next) => {
     });
     await post.save();
     await postVote.save();
-    res.status(201).send(response);
+    res.status(201).send({
+      ...post.toObject(),
+      postVotes: [],
+      comments: [],
+      author: { avatar: user.avatar, username: user.username },
+    });
   } catch (err) {
     next(err);
   }

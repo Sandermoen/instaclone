@@ -26,20 +26,6 @@ app.use(bodyParser.json());
 app.set('trust proxy', 1);
 app.use('/api', apiRouter);
 
-app.use((err, req, res, next) => {
-  if (!err.statusCode) {
-    err.statusCode = 500;
-    console.log(err);
-  }
-  console.log(err.message);
-  res.status(err.statusCode).send({
-    error:
-      err.statusCode >= 500
-        ? 'An unexpected error ocurred, please try again later.'
-        : err.message,
-  });
-});
-
 if (process.env.NODE_ENV === 'production') {
   app.use(compression());
   app.use(express.static(path.join(__dirname, 'client/build')));
@@ -62,6 +48,26 @@ if (process.env.NODE_ENV === 'production') {
   }
 })();
 
+app.use((err, req, res, next) => {
+  console.log(err.message);
+  if (!err.statusCode) {
+    err.statusCode = 500;
+  }
+  if (err.name === 'MulterError') {
+    if (err.message === 'File too large') {
+      return res
+        .status(400)
+        .send({ error: 'Your file exceeds the limit of 10MB.' });
+    }
+  }
+  res.status(err.statusCode).send({
+    error:
+      err.statusCode >= 500
+        ? 'An unexpected error ocurred, please try again later.'
+        : err.message,
+  });
+});
+
 const expressServer = app.listen(PORT, () => {
   console.log(`Backend listening on port ${PORT}`);
 });
@@ -74,12 +80,16 @@ console.log('Socket.io listening for connections');
 io.use((socket, next) => {
   const token = socket.handshake.query.token;
   if (token) {
-    const user = jwt.decode(token, process.env.JWT_SECRET);
-    if (!user) {
-      return next(new Error('Not authorized.'));
+    try {
+      const user = jwt.decode(token, process.env.JWT_SECRET);
+      if (!user) {
+        return next(new Error('Not authorized.'));
+      }
+      socket.user = user;
+      return next();
+    } catch (err) {
+      next(err);
     }
-    socket.user = user;
-    return next();
   } else {
     return next(new Error('Not authorized.'));
   }

@@ -51,15 +51,17 @@ export const votePost = async (postId, authToken) => {
  * @function createPost
  * @param {object} formData Multipart form data about the image being uploaded
  * @param {string} authToken The user's auth token
+ * @returns {object} The created post
  */
 export const createPost = async (formData, authToken) => {
   try {
-    await axios.post('/api/post', formData, {
+    const post = await axios.post('/api/post', formData, {
       headers: {
         authorization: authToken,
         'Content-Type': 'multipart/form-data',
       },
     });
+    return post.data;
   } catch (err) {
     throw new Error(err.response.data.error);
   }
