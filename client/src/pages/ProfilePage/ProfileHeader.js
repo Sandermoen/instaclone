@@ -135,7 +135,7 @@ const ProfileHeader = ({
               <b>{fullName}</b>
             </h3>
           )}
-          <p className="heading-3" style={{ whiteSpace: 'pre' }}>
+          <p className="heading-3" style={{ whiteSpace: 'pre-wrap' }}>
             {bio}
           </p>
           {website && (
