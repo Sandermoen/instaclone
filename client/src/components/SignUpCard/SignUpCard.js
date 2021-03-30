@@ -77,6 +77,19 @@ const SignUpCard = ({ signUpStart, error, fetching }) => {
           button
         />
         <Divider>OR</Divider>
+        {Object.keys(formik.errors).map((field) => {
+          if (formik.touched[field]) {
+            return (
+              <p
+                className="error"
+                key={formik.errors[field]}
+                style={{ marginTop: '0' }}
+              >
+                {formik.errors[field]}
+              </p>
+            );
+          }
+        })}
         <form className="form-card__form" onSubmit={formik.handleSubmit}>
           <FormInput
             name="email"
