@@ -1,0 +1,26 @@
+version: '3.3'
+
+services:
+  instaclone-backend:
+    depends_on:
+      - mongo
+    stdin_open: true
+    container_name: instaclone-backend
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 9000:9000
+    environment:
+      CHOKIDAR_USEPOLLING: 'true'
+  mongo:
+    image: mongo
+    container_name: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_DATABASE: instaclone
+    volumes:
+      - ~/mongo/data:/data/db
+    ports:
+      - 27017:27017

@@ -24,7 +24,7 @@
 
 ---
 
-## Installation
+## Installation - Development
 
 ### Clone
 
@@ -70,6 +70,47 @@ $ npm run dev
 ```
 
 The app should launch automatically, enjoy playing around 😄
+
+---
+
+## Installation - Production with Docker
+
+### Clone
+
+- Clone this repo to your local machine using `https://github.com/Sandermoen/instaclone`
+
+### Setup
+
+> Create a free <a href="https://cloudinary.com/">`Cloudinary account`</a>
+
+> Create a <a href='https://github.com/settings/developers'>`GitHub OAuth app`</a>
+
+> Create a .env file in the root directory
+
+> Set up required environment variables
+
+```javascript
+MONGO_URI= // mongodb://mongo:27017/instaclone
+JWT_SECRET= // random string: j2390jf09kjsalkj4r93
+CLOUDINARY_API_KEY= // Cloudinary API key
+CLOUDINARY_API_SECRET= // Cloudinary API secret
+CLOUDINARY_CLOUD_NAME= // Cloudinary cloud name
+SMTP_HOST= // mail.example.com
+SMTP_PORT= // 587
+EMAIL_USERNAME= // example@example.com
+EMAIL_PASSWORD= // Password
+HOME_URL= // http://localhost:3000
+GITHUB_CLIENT_ID= // Client id for GitHub OAuth app
+GITHUB_CLIENT_SECRET= // Client secret for GitHub OAuth app
+```
+
+> In the root directory start the docker container by using the docker-compose file using the following command
+
+```shell
+$ docker-compose up
+```
+
+Docker will configure the rest for you, the project should be available on port 9000 unless you specified otherwise 😄
 
 ---
 

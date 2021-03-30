@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
@@ -16,7 +17,6 @@ const PORT = process.env.PORT || 9000;
 if (process.env.NODE_ENV !== 'production') {
   const morgan = require('morgan');
   app.use(morgan('dev'));
-  require('dotenv').config();
 }
 
 app.use(helmet());
@@ -60,7 +60,7 @@ app.use((err, req, res, next) => {
         .send({ error: 'Your file exceeds the limit of 10MB.' });
     }
   }
-  res.status(err.statusCode).send({
+  res.status(err.statusCode || 500).send({
     error:
       err.statusCode >= 500
         ? 'An unexpected error ocurred, please try again later.'

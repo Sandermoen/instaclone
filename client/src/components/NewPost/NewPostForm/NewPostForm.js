@@ -90,7 +90,7 @@ const NewPostForm = ({
                 imageSrc={
                   currentUser.avatar
                     ? currentUser.avatar
-                    : require('../../../assets/img/default-avatar.png')
+                    : require('../../../assets/img/default-avatar.png').default
                 }
               />
             </div>

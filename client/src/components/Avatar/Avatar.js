@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 const Avatar = ({
-  imageSrc = require('../../assets/img/default-avatar.png'),
+  imageSrc = require('../../assets/img/default-avatar.png').default,
   className,
   onClick,
   style,
