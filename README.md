@@ -126,5 +126,3 @@ Docker will configure the rest for you, the project should be available on port 
 Reach out to me at one of the following places!
 
 - Email at <a href="mailto:smoensander@gmail.com">`smoensander@gmail.com`</a>
-
-<a href="https://www.paypal.com/donate?hosted_button_id=QHRDHX96N3H4A"><img src="https://raw.githubusercontent.com/stefan-niedermann/paypal-donate-button/master/paypal-donate-button.png" title="Donate" alt="Donate button" width='200px'></a>
