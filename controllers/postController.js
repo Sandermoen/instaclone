@@ -48,8 +48,7 @@ module.exports.createPost = async (req, res, next) => {
     if (response.moderation[0].status === 'rejected') {
       console.log('yes');
       return res.status(403).send({
-        error:
-          'The content was deemed to explicit to upload. Please upload another picture.',
+        error: 'The content was deemed to explicit to upload.',
       });
     }
     const thumbnailUrl = formatCloudinaryUrl(
