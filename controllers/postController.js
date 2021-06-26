@@ -42,7 +42,16 @@ module.exports.createPost = async (req, res, next) => {
   });
 
   try {
-    const response = await cloudinary.uploader.upload(req.file.path);
+    const response = await cloudinary.uploader.upload(req.file.path, {
+      moderation: 'aws_rek',
+    });
+    if (response.moderation[0].status === 'rejected') {
+      console.log('yes');
+      return res.status(403).send({
+        error:
+          'The content was deemed to explicit to upload. Please upload another picture.',
+      });
+    }
     const thumbnailUrl = formatCloudinaryUrl(
       response.secure_url,
       {
