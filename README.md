@@ -61,6 +61,7 @@ EMAIL_PASSWORD= // Password
 HOME_URL= // http://localhost:3000
 GITHUB_CLIENT_ID= // Client id for GitHub OAuth app
 GITHUB_CLIENT_SECRET= // Client secret for GitHub OAuth app
+MODERATECONTENT_API_KEY= // Free API key from https://moderatecontent.com
 ```
 
 > In the root directory run both the backend and the front end with the following command
@@ -102,6 +103,7 @@ EMAIL_PASSWORD= // Password
 HOME_URL= // http://localhost:3000
 GITHUB_CLIENT_ID= // Client id for GitHub OAuth app
 GITHUB_CLIENT_SECRET= // Client secret for GitHub OAuth app
+MODERATECONTENT_API_KEY= // Free API key from https://moderatecontent.com
 ```
 
 > In the root directory start the docker container by using the docker-compose file using the following command

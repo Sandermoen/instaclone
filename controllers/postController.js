@@ -1,5 +1,6 @@
 const cloudinary = require('cloudinary').v2;
 const linkify = require('linkifyjs');
+const axios = require('axios');
 require('linkifyjs/plugins/hashtag')(linkify);
 const Post = require('../models/Post');
 const PostVote = require('../models/PostVote');
@@ -42,15 +43,23 @@ module.exports.createPost = async (req, res, next) => {
   });
 
   try {
-    const response = await cloudinary.uploader.upload(req.file.path, {
-      moderation: 'aws_rek',
-    });
-    if (response.moderation[0].status === 'rejected') {
-      console.log('yes');
+    const response = await cloudinary.uploader.upload(req.file.path);
+    const moderationResponse = await axios.get(
+      `https://api.moderatecontent.com/moderate/?key=${process.env.MODERATECONTENT_API_KEY}&url=${response.secure_url}`
+    );
+
+    if (moderationResponse.data.error) {
+      return res
+        .status(500)
+        .send({ error: 'Error moderating image, please try again later.' });
+    }
+
+    if (moderationResponse.data.rating_index > 2) {
       return res.status(403).send({
         error: 'The content was deemed too explicit to upload.',
       });
     }
+
     const thumbnailUrl = formatCloudinaryUrl(
       response.secure_url,
       {
