@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/Sandermoen/instaclone#readme",
   "dependencies": {
-    "axios": "^0.21.1",
+    "axios": "^0.21.2",
     "bcrypt": "^5.0.1",
     "body-parser": "^1.19.0",
     "cloudinary": "^1.21.0",
