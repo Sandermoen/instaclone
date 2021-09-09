@@ -4,10 +4,6 @@
 
 > An instagram clone created with MongoDB, Express, React, and Socket.io
 
-<img src="https://heroku-badge.herokuapp.com/?app=instaclone-prod" alt='Heroku deploy status' />
-
-<a href="https://www.instaclone.net">Have a look at the live demo</a>
-
 ![Showcase GIF](/screenshots/NgmjOVkZ4L.gif)
 
 ## Tech
