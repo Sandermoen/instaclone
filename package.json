@@ -44,7 +44,7 @@
     "nodemailer": "^6.4.6",
     "nodemon": "^2.0.4",
     "socket.io": "^2.4.1",
-    "validator": "^12.2.0"
+    "validator": "^13.7.0"
   },
   "devDependencies": {
     "concurrently": "^5.1.0",
