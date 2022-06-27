@@ -44,6 +44,11 @@ module.exports.createPost = async (req, res, next) => {
 
   try {
     const response = await cloudinary.uploader.upload(req.file.path);
+  } catch {
+    return next({ message: 'Error uploading image, please try again later.' });
+  }
+
+  try {
     const moderationResponse = await axios.get(
       `https://api.moderatecontent.com/moderate/?key=${process.env.MODERATECONTENT_API_KEY}&url=${response.secure_url}`
     );

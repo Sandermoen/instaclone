@@ -62,7 +62,7 @@ app.use((err, req, res, next) => {
   }
   res.status(err.statusCode || 500).send({
     error:
-      err.statusCode >= 500
+      err.statusCode >= 500 && !err.message
         ? 'An unexpected error ocurred, please try again later.'
         : err.message,
   });
