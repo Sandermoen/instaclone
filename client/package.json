@@ -22,7 +22,7 @@
     "react-image-crop": "^8.6.2",
     "react-redux": "^7.1.3",
     "react-router-dom": "^5.1.2",
-    "react-scripts": "^4.0.3",
+    "react-scripts": "^5.0.1",
     "react-spring": "^8.0.27",
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0",
