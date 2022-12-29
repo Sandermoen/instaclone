@@ -22,6 +22,7 @@ module.exports.createPost = async (req, res, next) => {
   const user = res.locals.user;
   const { caption, filter: filterName } = req.body;
   let post = undefined;
+  let response = undefined;
   const filterObject = filters.find((filter) => filter.name === filterName);
   const hashtags = [];
   linkify.find(caption).forEach((result) => {
@@ -43,7 +44,7 @@ module.exports.createPost = async (req, res, next) => {
   });
 
   try {
-    const response = await cloudinary.uploader.upload(req.file.path);
+    response = await cloudinary.uploader.upload(req.file.path);
   } catch {
     return next({ message: 'Error uploading image, please try again later.' });
   }
