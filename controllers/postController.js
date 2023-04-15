@@ -22,6 +22,7 @@ module.exports.createPost = async (req, res, next) => {
   const user = res.locals.user;
   const { caption, filter: filterName } = req.body;
   let post = undefined;
+  let cloudinaryResponse = undefined;
   const filterObject = filters.find((filter) => filter.name === filterName);
   const hashtags = [];
   linkify.find(caption).forEach((result) => {
@@ -43,14 +44,14 @@ module.exports.createPost = async (req, res, next) => {
   });
 
   try {
-    const response = await cloudinary.uploader.upload(req.file.path);
+    cloudinaryResponse = await cloudinary.uploader.upload(req.file.path);
   } catch {
     return next({ message: 'Error uploading image, please try again later.' });
   }
 
   try {
     const moderationResponse = await axios.get(
-      `https://api.moderatecontent.com/moderate/?key=${process.env.MODERATECONTENT_API_KEY}&url=${response.secure_url}`
+      `https://api.moderatecontent.com/moderate/?key=${process.env.MODERATECONTENT_API_KEY}&url=${cloudinaryResponse.secure_url}`
     );
 
     if (moderationResponse.data.error) {
@@ -66,7 +67,7 @@ module.exports.createPost = async (req, res, next) => {
     }
 
     const thumbnailUrl = formatCloudinaryUrl(
-      response.secure_url,
+      cloudinaryResponse.secure_url,
       {
         width: 400,
         height: 400,
@@ -75,7 +76,7 @@ module.exports.createPost = async (req, res, next) => {
     );
     fs.unlinkSync(req.file.path);
     post = new Post({
-      image: response.secure_url,
+      image: cloudinaryResponse.secure_url,
       thumbnail: thumbnailUrl,
       filter: filterObject ? filterObject.filter : '',
       caption,
